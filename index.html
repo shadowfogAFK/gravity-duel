@@ -2742,7 +2742,8 @@ function friendCode(){
    - the host (who opened the search) generates layouts, keeps the match clock and decides every result,
    - every message is numbered, acknowledged and resent until it arrives, so nothing gets lost or reordered. */
 const NET_CFG=window.GD_CONFIG||null;
-const WEB_URL='https://shadowfogafk.github.io/gravity-duel/';
+// the web version's own address (gravityduel.com, or wherever it is served); the offline build links to the main site
+const WEB_URL=NET_CFG&&/^https?:$/.test(location.protocol)?location.origin+location.pathname.replace(/[^/]*$/,''):'https://gravityduel.com/';
 const SB_URLS=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.js',
                'https://unpkg.com/@supabase/supabase-js@2.111.0/dist/umd/supabase.js'];
 const Net={state:'off',me:null,err:'',backend:null,friends:[],declined:new Set()};
