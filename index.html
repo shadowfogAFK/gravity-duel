@@ -252,6 +252,9 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.arenaprog{display:flex;flex-direction:column;gap:6px}
+#shareLink{grid-column:1/-1;margin-top:4px}
+#acctForm .text{font-family:var(--body);font-size:1rem}
 .hint{text-align:center;font-size:.85rem;color:var(--muted);margin:0}
 .rules{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.9rem;line-height:1.4}
 .rules b{color:var(--ink)}
@@ -325,6 +328,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <section class="page" id="page-ranked" aria-label="Wettkampf">
         <div class="hero"><canvas id="arenaCanvas" width="440" height="341" aria-hidden="true"></canvas>
           <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div></div>
+        <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
         <p class="netstate" id="netState">Verbinde …</p>
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
@@ -344,6 +348,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
                 <p class="score" id="duelTally">Bisher 0 : 0</p>
         <label class="pick"><span class="label">Arena</span><select id="arenaPick"></select></label>
         <button id="duelPlay">Duell starten</button>
+        <button class="alt" id="duelFriend">Gegen Freund spielen</button>
         <button class="ghost" id="duelRules">Regeln</button>
       </section>
     </div>
@@ -441,6 +446,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <div class="setting"><div><b>Musik</b><span>Menü- und Kampfmusik</span></div><button class="switch" id="setMusic" role="switch" aria-checked="true" aria-label="Musik"><i></i></button></div>
       <div class="setting"><div><b>Soundeffekte</b><span>Schüsse, Treffer, Hinweise</span></div><button class="switch" id="setSound" role="switch" aria-checked="true" aria-label="Soundeffekte"><i></i></button></div>
       <div class="setting"><div><b>Spielername</b><span id="setNameNow">Pilot</span></div><button class="ghost" id="setName">Ändern</button></div>
+      <div class="setting" id="acctRow" hidden><div><b>Konto</b><span id="acctNow">Nur auf diesem Gerät</span></div><button class="ghost" id="acctBtn">Anmelden</button></div>
       <button class="ghost" id="settingsBack">Zurück</button>
     </div>
   </div>
@@ -469,6 +475,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         <span class="label">Dein Freundescode</span>
         <b id="friendCode">GD-0000-0000</b>
         <button class="ghost" id="copyCode">Kopieren</button>
+        <button class="alt" id="shareLink">Einladungslink teilen</button>
       </div>
       <form class="addfriend" id="addForm">
         <input id="addCode" class="text" placeholder="GD-ABCD-EFGH" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Freundescode eingeben">
@@ -510,6 +517,25 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <div class="friendlist" id="boardList"></div>
       <button class="ghost" id="boardBack">Zurück</button>
     </div>
+  </div>
+
+  <div class="overlay" id="account" hidden>
+    <form class="card" id="acctForm">
+      <span class="label">Spielstand sichern</span>
+      <h2 id="acctTitle">Konto</h2>
+      <div class="seg" id="acctTabs" role="radiogroup" aria-label="Konto">
+        <button type="button" id="acct-new" role="radio">Neues Konto</button><button type="button" id="acct-login" role="radio">Anmelden</button>
+      </div>
+      <p class="fine" id="acctInfo"></p>
+      <input id="acctEmail" class="text" type="email" placeholder="E-Mail" autocomplete="email" spellcheck="false" aria-label="E-Mail">
+      <input id="acctPw" class="text" type="password" placeholder="Passwort (mind. 6 Zeichen)" autocomplete="new-password" aria-label="Passwort">
+      <p class="fine" id="acctHint" aria-live="polite"></p>
+      <div class="btns">
+        <button type="submit" id="acctGo">Konto erstellen</button>
+        <button type="button" class="alt" id="acctGoogle">Mit Google</button>
+        <button type="button" class="ghost" id="acctBack">Zurück</button>
+      </div>
+    </form>
   </div>
 
   <div class="overlay" id="rules" hidden>
@@ -1610,7 +1636,8 @@ const starsFor=(n,par)=>n<=par?3:n<=par+2?2:1;
 /* ---------- storage (per browser) ---------- */
 const KEYS={progress:'gravityDuel.campaign.v2',oldProgress:'gravityDuel.campaign.v1',seen:'gravityDuel.seenWeapons.v1',profile:'gravityDuel.profile.v1',page:'gravityDuel.homePage.v1'};
 function load(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)||'null'); return v??d }catch(e){ return d } }
-function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} }
+let onSaved=()=>{}; // set by online.js: game data changed, sync it to the account
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} if(k===KEYS.progress||k===KEYS.profile||k===KEYS.seen) onSaved() }
 let progress=load(KEYS.progress,null);
 if(!progress||typeof progress!=='object'||Array.isArray(progress)){
   const old=load(KEYS.oldProgress,[]); progress={nova:Array.isArray(old)?old.slice(0,30):[]}; save(KEYS.progress,progress);
@@ -2352,7 +2379,7 @@ function drawCampaignHud(){
 function drawDuelClock(t){
   // drawn at the top of the screen and never turned around (online guest)
   ctx.save(); if(viewRot()){ ctx.translate(W,H); ctx.rotate(Math.PI) }
-  const top=safeTop/scale+26;
+  const top=safeTop/scale+26-offY; // offY: online fields are letterboxed, so the screen top lies above y=0
   const txt=tiebreak?'⚡ Entscheidung':timeUp?'Zeit um':`${Math.floor(Math.ceil(matchLeft)/60)}:${String(Math.ceil(matchLeft)%60).padStart(2,'0')}`;
   const low=!tiebreak&&matchLeft<=15, c=tiebreak||timeUp?COL.gold:low?(Math.sin(t*8)>0?'#ff4f6b':COL.ink):COL.ink;
   const left=MISS_ROUNDS-missRounds, info=tiebreak?'':`Runde ${round}`+(missRounds>0?` · neu in ${left} ${left===1?'Runde':'Runden'}`:'');
@@ -2734,7 +2761,7 @@ async function supabaseBackend(){
   let {data:{session}}=await sb.auth.getSession();
   if(!session){ const r=await sb.auth.signInAnonymously(); if(r.error) throw r.error; session=r.data.session }
   return {
-    uid:session.user.id,
+    uid:session.user.id, sb, user:session.user,
     async rpc(name,args){ const {data,error}=await sb.rpc(name,args||{}); if(error) throw error; return data },
     channel(topic){
       const ch=sb.channel(topic,{config:{broadcast:{self:false,ack:false}}});
@@ -2758,8 +2785,11 @@ async function netInit(){
   Net.state='connecting'; renderOnline();
   try{
     Net.backend=window.__GD_MOCK__?await window.__GD_MOCK__.create():await supabaseBackend();
+    Net.user=Net.backend.user||null;
+    try{ await cloudPull() }catch(e){ console.warn('cloud',e) }
     await netSyncProfile();
     Net.state='ready'; schedulePing(1500);
+    afterReady();
   }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e) }
   renderOnline();
 }
@@ -2828,8 +2858,8 @@ async function queueSearch(){
 }
 async function challengeFriend(f){
   if(Net.state!=='ready'||search||online) return;
-  const mode=onlineMode;
-  search={kind:'challenge',mode,t0:performance.now(),friend:f};
+  const mode=friendCtx?duelMode:onlineMode;
+  search={kind:'challenge',mode,t0:performance.now(),friend:f,arena:friendCtx?duelArenaPick:-1};
   showSearch(`Herausforderung · ${MODE_NAME[mode]}`,`Warte auf ${f.name} …`,'Freundschaftsduell · ohne Gravitonen');
   try{
     await netSyncProfile();
@@ -2844,7 +2874,7 @@ async function pollSearch(){
     const m=await rpc('gd_match',{p_id:s.matchId});
     if(search!==s) return;
     const secs=Math.round((performance.now()-s.t0)/1000);
-    if(m.status==='active'){ clearInterval(s.poll); return beginOnline(m) }
+    if(m.status==='active'){ clearInterval(s.poll); search=s; return beginOnline(m) }
     if(m.status==='cancelled'){
       if(s.kind==='challenge'){ clearInterval(s.poll); search=null; $('searchTitle').textContent=`${s.friend.name} hat abgelehnt`; $('searchText').textContent='Oder die Einladung ist abgelaufen.'; $('searchCancel').textContent='Zurück'; return }
       return queueSearch();
@@ -2883,11 +2913,14 @@ async function answerInvite(yes){
 }
 
 /* ---------- friends ---------- */
-function openFriends(){
+let friendCtx=null; // {fromDuel:true} when opened from the local duel menu: its mode and arena are used
+function openFriends(ctx){
+  if(ctx!==undefined) friendCtx=ctx;
   $('friendCode').textContent=(Net.me&&Net.me.friend_code)||friendCode();
-  $('friendsNote').innerHTML=Net.state==='ready'?'Gib deinen Code an Freunde weiter oder trag ihren Code unten ein. Wer online ist, kannst du direkt herausfordern.'
+  const where=friendCtx?`${MODE_NAME[duelMode]} · ${duelArenaPick>=0?`Arena ${duelArenaPick+1}: ${esc(ARENAS[duelArenaPick].name)}`:'Zufällige Arena'}`:'';
+  $('friendsNote').innerHTML=Net.state==='ready'?(friendCtx?`Freundesduell · ${where}. Tippe bei einem Freund auf „Duell“.`:'Teile deinen Code oder Link. Wer online ist, kannst du herausfordern.')
     :Net.state==='nocfg'?`Freunde gibt es in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`:'Gerade keine Verbindung zum Server.';
-  $('addForm').hidden=Net.state!=='ready'; $('fmodes').hidden=Net.state!=='ready';
+  $('addForm').hidden=Net.state!=='ready'; $('fmodes').hidden=Net.state!=='ready'||!!friendCtx; $('shareLink').hidden=Net.state!=='ready';
   renderFriends(); show('friends'); renderOnline();
   if(Net.state==='ready'){ loadFriends(); schedulePing(3000) }
 }
@@ -2924,6 +2957,160 @@ async function addFriend(code){
   }catch(e){ hint.textContent=niceErr(e) }
 }
 
+/* ---------- friend links: opening ?f=GD-XXXX-XXXX adds that player as a friend ---------- */
+const LINK_CODE=(()=>{ try{ const c=new URLSearchParams(location.search).get('f'); return c&&/^GD-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(c)?c.toUpperCase():null }catch(e){ return null } })();
+const friendLink=()=>{ const c=Net.me&&Net.me.friend_code; return c?`${WEB_URL}?f=${c}`:'' };
+async function shareFriendLink(){
+  const url=friendLink(), btn=$('shareLink'); if(!url) return;
+  const done=t=>{ btn.textContent=t; setTimeout(()=>btn.textContent='Einladungslink teilen',1800) };
+  if(navigator.share){ try{ await navigator.share({title:'Gravity Duel',text:`Spiel mit mir Gravity Duel! Mit diesem Link sind wir direkt Freunde:`,url}); return }catch(e){ if(e&&e.name==='AbortError') return } }
+  try{ await navigator.clipboard.writeText(url); done('Link kopiert') }catch(e){ prompt('Link zum Teilen:',url) }
+}
+function cleanUrl(){ try{ history.replaceState(null,'',location.pathname) }catch(e){} }
+async function afterReady(){
+  // a sign-in through Google that came back with an error
+  const err=(()=>{ try{ const q=new URLSearchParams(location.search+'&'+location.hash.slice(1)); return q.get('error_description') }catch(e){ return null } })();
+  if(err){ cleanUrl(); toast(/already|exists|linked/i.test(err)?'Dieses Google-Konto hat schon einen Spielstand. Melde dich unter „Anmelden“ damit an.':'Anmeldung fehlgeschlagen: '+err.slice(0,60)) }
+  if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
+  if(LINK_CODE){
+    cleanUrl();
+    if(LINK_CODE===(Net.me&&Net.me.friend_code)) return;
+    try{ const r=await rpc('gd_add_friend',{p_code:LINK_CODE});
+      if(r.ok){ Sfx.buy(); toast(`${cleanName(r.friend.name)} ist jetzt dein Freund`); if(current==='home'&&!online) openFriends(null) } else toast(r.error||'Freund konnte nicht hinzugefügt werden')
+    }catch(e){ toast(niceErr(e)) }
+  }
+}
+
+/* ---------- cloud save: campaign, skins, stardust and XP follow the account to every device ---------- */
+const SYNC_KEY='gravityDuel.sync.v1', PENDING_PW='gravityDuel.pendingPw.v1';
+let sync=load(SYNC_KEY,{uid:null,at:null,dirty:true}), pushTimer=null, pushing=false;
+const keepSync=()=>{ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(sync)) }catch(e){} };
+function cloudData(){ const p={...profile}; delete p.trophies; return {v:1,progress,seen,profile:p} }
+onSaved=()=>{ if(!sync.dirty){ sync.dirty=true; keepSync() } clearTimeout(pushTimer); pushTimer=setTimeout(cloudPush,3000) };
+async function cloudPush(){
+  if(Net.state!=='ready'||!Net.backend||pushing||!sync.dirty) return;
+  pushing=true;
+  try{ const at=await rpc('gd_save_put',{p_data:cloudData()}); sync={uid:Net.backend.uid,at,dirty:false}; keepSync() }
+  catch(e){ clearTimeout(pushTimer); pushTimer=setTimeout(cloudPush,20000) }
+  finally{ pushing=false }
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') cloudPush() });
+/* merges a saved state into this device: levels, stars and items are never lost; stardust, look and name come from the newer side */
+function mergeSave(r,remoteNewer){
+  if(!r||typeof r!=='object') return;
+  if(r.progress&&typeof r.progress==='object') for(const g of GALAXIES){
+    const a=progress[g.id]||[], b=Array.isArray(r.progress[g.id])?r.progress[g.id]:[], o=[];
+    for(let i=0;i<Math.max(a.length,b.length);i++) o[i]=Math.max(+a[i]||0,Math.min(3,+b[i]||0));
+    progress[g.id]=o;
+  }
+  if(r.seen&&typeof r.seen==='object') seen=Object.assign({},r.seen,seen);
+  const rp=r.profile&&typeof r.profile==='object'?r.profile:{};
+  const base=remoteNewer?{...profile,...rp}:{...rp,...profile};
+  base.owned=Object.assign({},DEFAULT_PROFILE.owned,rp.owned,profile.owned);
+  base.equip=Object.assign({},DEFAULT_PROFILE.equip,base.equip);
+  for(const c of COSMETIC_CATS) if(!base.owned[c+':'+base.equip[c]]) base.equip[c]=DEFAULT_PROFILE.equip[c];
+  base.xp=Math.max(+profile.xp||0,+rp.xp||0); base.dust=Math.max(0,+base.dust||0); base.trophies=profile.trophies;
+  profile=base;
+  save(KEYS.progress,progress); save(KEYS.seen,seen); saveProfile();
+}
+async function cloudPull(){
+  const uid=Net.backend.uid;
+  if(sync.uid!==uid){ sync={uid,at:null,dirty:true}; keepSync() } // another account on this device: its state is the reference
+  const r=await rpc('gd_save_get');
+  if(r&&r.data) mergeSave(r.data,!sync.at||new Date(r.updated_at)>new Date(sync.at));
+  sync.dirty=true; keepSync(); await cloudPush();
+  if(current==='home') renderHome();
+}
+
+/* ---------- account: e-mail and password or Google, so the game state can move between devices ---------- */
+let acctMode='new';
+const isAccount=()=>!!(Net.user&&!Net.user.is_anonymous);
+function renderAccountRow(){
+  const row=$('acctRow'); row.hidden=!Net.backend||!Net.backend.sb;
+  if(row.hidden) return;
+  const u=Net.user, btn=$('acctBtn'); btn.dataset.sure='';
+  $('acctNow').textContent=isAccount()?`Angemeldet: ${u.email||'Google-Konto'}`:'Nur auf diesem Gerät gespeichert';
+  btn.textContent=isAccount()?'Abmelden':'Anmelden';
+}
+function setAcctMode(m){
+  acctMode=m;
+  $('acct-new').setAttribute('aria-checked',String(m==='new')); $('acct-login').setAttribute('aria-checked',String(m==='login'));
+  $('acctTabs').hidden=m==='setpw'; $('acctEmail').hidden=m==='setpw'; $('acctGoogle').hidden=m==='setpw';
+  $('acctTitle').textContent=m==='setpw'?'Passwort festlegen':'Konto';
+  $('acctInfo').textContent=m==='new'?'Dein Spielstand wird mit dem Konto verbunden. Dann kannst du dich auf jedem Gerät anmelden.'
+    :m==='login'?'Melde dich mit deinem Konto an. Fortschritt von diesem Gerät wird übernommen.':'Deine E-Mail ist bestätigt. Leg jetzt dein Passwort fest.';
+  $('acctPw').autocomplete=m==='login'?'current-password':'new-password';
+  $('acctGo').textContent=m==='new'?'Konto erstellen':m==='login'?'Anmelden':'Speichern';
+  $('acctHint').textContent='';
+}
+function openAccount(m){ setAcctMode(m||'new'); show('account') }
+async function accountButton(){
+  if(!isAccount()) return openAccount('new');
+  const btn=$('acctBtn');
+  if(btn.dataset.sure!=='1'){ btn.dataset.sure='1'; btn.textContent='Sicher?'; return }
+  try{ await cloudPush(); await Net.backend.sb.auth.signOut() }catch(e){}
+  await switchedAccount('Abgemeldet. Dein Fortschritt bleibt auf diesem Gerät.');
+}
+const authErr=e=>{ const m=String(e&&(e.message||e)||'');
+  return /registered|already|exists/i.test(m)?'Diese E-Mail hat schon ein Konto. Wechsle zu „Anmelden“.'
+    :/invalid login|credentials/i.test(m)?'E-Mail oder Passwort stimmt nicht.'
+    :/manual linking|linking is disabled/i.test(m)?'Verknüpfen ist im Server noch nicht freigeschaltet.'
+    :/provider is not enabled|unsupported provider/i.test(m)?'Google-Anmeldung ist im Server noch nicht eingerichtet.'
+    :/rate|too many/i.test(m)?'Zu viele Versuche, bitte gleich nochmal.'
+    :/password/i.test(m)&&/6/.test(m)?'Das Passwort braucht mindestens 6 Zeichen.'
+    :/sending|smtp/i.test(m)?'E-Mail-Versand ist im Server noch nicht eingerichtet.'
+    :/not confirmed|confirm your/i.test(m)?'Bitte bestätige zuerst deine E-Mail.':niceErr(e) };
+async function accountSubmit(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('acctHint'); if(!sb) return;
+  const email=$('acctEmail').value.trim(), pw=$('acctPw').value;
+  if(acctMode!=='setpw'&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ hint.textContent='Bitte eine gültige E-Mail eingeben.'; return }
+  if(pw.length<6){ hint.textContent='Das Passwort braucht mindestens 6 Zeichen.'; return }
+  $('acctGo').disabled=true; hint.textContent='Einen Moment …';
+  try{
+    if(acctMode==='login'){
+      await cloudPush();
+      const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) throw error;
+      return await switchedAccount('Angemeldet. Dein Spielstand ist synchronisiert.');
+    }
+    if(acctMode==='setpw'){
+      const {error}=await sb.auth.updateUser({password:pw}); if(error) throw error;
+      try{ localStorage.removeItem(PENDING_PW) }catch(e){}
+      Net.user=(await sb.auth.getUser()).data.user; toast('Passwort gespeichert'); renderAccountRow(); return show('settings');
+    }
+    const r=await sb.auth.updateUser({email}); if(r.error) throw r.error;
+    const u=r.data.user;
+    if(u&&u.email&&u.email.toLowerCase()===email.toLowerCase()){
+      const r2=await sb.auth.updateUser({password:pw}); if(r2.error) throw r2.error;
+      Net.user=r2.data.user||u; await cloudPush(); toast('Konto erstellt. Dein Spielstand ist gesichert.'); renderAccountRow(); return show('settings');
+    }
+    save(PENDING_PW,email.toLowerCase());
+    hint.textContent='Fast fertig: Öffne den Bestätigungslink in der E-Mail, die wir dir geschickt haben. Danach legst du hier dein Passwort fest.';
+  }catch(e){ hint.textContent=authErr(e) }
+  finally{ $('acctGo').disabled=false }
+}
+async function accountGoogle(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('acctHint'); if(!sb) return;
+  const redirectTo=/^https?:/.test(location.protocol)?location.origin+location.pathname:WEB_URL;
+  hint.textContent='Weiter zu Google …';
+  try{
+    await cloudPush();
+    const {error}=acctMode==='login'||isAccount()
+      ?await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo}})
+      :await sb.auth.linkIdentity({provider:'google',options:{redirectTo}});
+    if(error) throw error;
+  }catch(e){ hint.textContent=authErr(e) }
+}
+/* the session changed (sign-in or sign-out): load that account's state and profile */
+async function switchedAccount(msg){
+  const sb=Net.backend.sb;
+  let {data:{session}}=await sb.auth.getSession();
+  if(!session){ const r=await sb.auth.signInAnonymously(); if(r.error){ Net.state='error'; Net.err=niceErr(r.error); renderOnline(); return } session=r.data.session }
+  Net.backend.uid=session.user.id; Net.user=session.user; Net.friends=[];
+  try{ await cloudPull() }catch(e){ console.warn('cloud',e) }
+  try{ await netSyncProfile() }catch(e){}
+  toast(msg); renderAccountRow(); renderHome(); show('settings');
+}
+
 /* ---------- leaderboard ---------- */
 async function openBoard(){
   $('boardList').innerHTML='<div class="fr"><span class="fn"><b>Lade …</b></span></div>'; $('boardMe').textContent=''; show('board');
@@ -2937,6 +3124,7 @@ async function openBoard(){
 
 /* ---------- the online match ---------- */
 async function beginOnline(m){
+  const arenaPick=search&&search.arena!=null?search.arena:-1, fromDuel=!!friendCtx&&!m.ranked;
   search=null;
   const opp=m.opponent||{}, meP=m.me||Net.me||{};
   showSearch(m.ranked?`Wettkampf · ${MODE_NAME[m.mode]}`:`Freundschaftsduell · ${MODE_NAME[m.mode]}`,`Gegner: ${cleanName(opp.name)}`,
@@ -2945,7 +3133,7 @@ async function beginOnline(m){
   online={id:m.id,host:m.role==='host',ranked:!!m.ranked,mode:m.mode,opp,meId:meP.id||Net.backend.uid,ch,
     seq:0,out:[],inSeq:0,buf:{},queue:[],k:0,lastHeard:performance.now(),lastHb:0,started:false,over:false,
     myBlitz:null,remoteBlitz:null,pendingRes:null,guestFin:false,finK:-1,prevMode:duelMode,sentLayout:-1,
-    myG:meP.gravitons|0,oppG:opp.gravitons|0};
+    myG:meP.gravitons|0,oppG:opp.gravitons|0,arenaPick,fromDuel};
   const o=online;
   ch.onMsg(onlineRecv);
   try{ await ch.subscribe() }catch(e){ if(online===o){ online=null; searchFailed(e) } return }
@@ -2956,7 +3144,7 @@ async function beginOnline(m){
 }
 function hostStart(){
   const o=online;
-  const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
+  const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):o.arenaPick>=0&&ARENAS[o.arenaPick]?o.arenaPick:Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
   newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
   starter=Math.random()<.5?0:1;
   onlineSend('start',{arena,seed,specs:duelSpecs,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
@@ -3150,7 +3338,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules'];
+const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account'];
 let current='home';
 function show(name){
   current=name;
@@ -3206,6 +3394,11 @@ function renderHome(){
   $('arenaLabel').textContent=`Arena ${ai+1} von ${ARENAS.length}`;
   $('arenaName').textContent=a.name;
   $('arenaTrophies').innerHTML=`<span class="gv" aria-hidden="true"></span> ${profile.trophies} ${CURRENCY}`;
+  const nx=ARENAS[ai+1];
+  if(nx){ const k=Math.max(0,Math.min(1,(profile.trophies-a.min)/(nx.min-a.min)));
+    $('arenaBar').style.width=`${Math.round(100*k)}%`;
+    $('arenaNext').innerHTML=`${profile.trophies} / ${nx.min} <span class="gv" aria-hidden="true"></span> bis ${esc(nx.name)}` }
+  else { $('arenaBar').style.width='100%'; $('arenaNext').textContent='Höchste Arena erreicht' }
   $('road').innerHTML=ARENAS.slice(ai,ai+4).map((x,k)=>`<div class="${k===0?'here':''}"><b>${ARENAS.indexOf(x)+1} · ${x.name}</b><span>${k===0?'Deine Arena':`ab ${x.min} <span class="gv" aria-hidden="true"></span>`}</span></div>`).join('');
   $('duelTally').textContent=`Diese Sitzung ${wins[0]} : ${wins[1]}`;
   renderModes(); renderOnline();
@@ -3361,6 +3554,7 @@ tap('campPlay',()=>{ const gi=activeGalaxy(), g=GALAXIES[gi], n=nextLevelIn(g); 
 tap('campAll',goGalaxies);
 tap('duelPlay',startDuel);
 tap('duelRules',()=>show('rules'));
+tap('duelFriend',()=>openFriends({fromDuel:true}));
 tap('rulesBack',()=>goHome(2));
 /* arena picker for the local duel */
 (()=>{ const sel=$('arenaPick');
@@ -3383,8 +3577,15 @@ for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
 tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ renderQuests(); show('quests') } else { renderShop(); show('shop') } });
 tap('toQuests',()=>{ renderQuests(); show('quests') });
 tap('questsBack',()=>goHome());
-tap('toFriends',openFriends);
+tap('toFriends',()=>openFriends(null));
 tap('friendsBack',()=>goHome());
+tap('shareLink',shareFriendLink);
+tap('acctBtn',accountButton);
+tap('acctBack',()=>{ renderAccountRow(); show('settings') });
+tap('acct-new',()=>setAcctMode('new'));
+tap('acct-login',()=>setAcctMode('login'));
+tap('acctGoogle',accountGoogle);
+$('acctForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); accountSubmit() });
 tap('copyCode',()=>{
   const code=$('friendCode').textContent, btn=$('copyCode');
   const done=()=>{ btn.textContent='Kopiert'; setTimeout(()=>btn.textContent='Kopieren',1500) };
@@ -3397,7 +3598,7 @@ $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.reveale
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
 tap('again',()=>{ if(!online) return startDuel(); const ranked=online.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; openFriends() } });
-tap('overBack',()=>goHome(online?1:2));
+tap('overBack',()=>goHome(online&&!online.fromDuel?1:2));
 tap('next',()=>{
   const g=curGalaxy();
   if(levelIdx<g.levels.length-1) startLevel(levelIdx+1);
@@ -3418,7 +3619,7 @@ syncMusicLabels();
 // browsers only allow sound after the first touch, so the music starts with it
 document.addEventListener('pointerdown',()=>Sfx.init(),{once:true,capture:true});
 $('setSound').addEventListener('click',toggleMute);
-tap('toSettings',()=>{ $('setNameNow').textContent=playerName(); show('settings') });
+tap('toSettings',()=>{ $('setNameNow').textContent=playerName(); renderAccountRow(); show('settings') });
 tap('settingsBack',()=>goHome());
 tap('setName',()=>{ $('nameInput').value=playerName(); show('nameEdit'); setTimeout(()=>$('nameInput').focus(),50) });
 
