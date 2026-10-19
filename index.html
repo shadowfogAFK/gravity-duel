@@ -25,7 +25,8 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--space);color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
-#wrap{position:fixed;inset:0}
+#wrap{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:calc(100vh * .62);max-width:calc(100dvh * .62);overflow:hidden}
+@media (min-aspect-ratio:62/100){#wrap{border-left:1px solid var(--line);border-right:1px solid var(--line);box-shadow:0 0 60px rgba(120,60,220,.25)}}
 canvas{display:block}
 #game{width:100%;height:100%;touch-action:none}
 .overlay{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;z-index:3;
@@ -181,7 +182,7 @@ button:active{transform:translateY(1px)}
 .fr .av{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.5),rgba(167,123,255,.25) 40%,rgba(20,10,40,.8))}
 .fr .st{font-size:.75rem}
 .fr.ghosted{opacity:.35}
-#toast{position:absolute;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:5;max-width:calc(100% - 32px);
+#toast{position:absolute;left:50%;top:calc(104px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:5;max-width:calc(100% - 32px);
   padding:10px 14px;border-radius:12px;background:rgba(22,10,52,.92);border:1px solid rgba(255,211,79,.6);color:var(--ink);font-size:.85rem;
   box-shadow:0 0 20px rgba(255,211,79,.25);transition:opacity .4s;pointer-events:none;text-align:center}
 #toast.out{opacity:0}
@@ -2349,21 +2350,31 @@ function drawCampaignHud(){
   textAt('★'.repeat(nextStars)+'☆'.repeat(3-nextStars),W/2,top+22,false,COL.gold,14,'system-ui, sans-serif');
 }
 function drawDuelClock(t){
-  // drawn at the top of the screen, level with the menu/sound chips, and never turned around (online guest)
+  // drawn at the top of the screen and never turned around (online guest)
   ctx.save(); if(viewRot()){ ctx.translate(W,H); ctx.rotate(Math.PI) }
   const top=safeTop/scale+26;
   const txt=tiebreak?'⚡ Entscheidung':timeUp?'Zeit um':`${Math.floor(Math.ceil(matchLeft)/60)}:${String(Math.ceil(matchLeft)%60).padStart(2,'0')}`;
   const low=!tiebreak&&matchLeft<=15, c=tiebreak||timeUp?COL.gold:low?(Math.sin(t*8)>0?'#ff4f6b':COL.ink):COL.ink;
-  ctx.font='700 15px "Chakra Petch", ui-monospace, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  const left=MISS_ROUNDS-missRounds, info=tiebreak?'':`Runde ${round}`+(missRounds>0?` · neu in ${left} ${left===1?'Runde':'Runden'}`:'');
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(!online){
+    // local duel: player 2's weapon bar uses the top row, so clock and round share one line just below it
+    const y=top+36;
+    ctx.font='700 14px "Chakra Petch", ui-monospace, monospace'; const w1=ctx.measureText(txt).width;
+    ctx.font='600 12px "Figtree", system-ui, sans-serif'; const w2=info?ctx.measureText('  ·  '+info).width:0;
+    const bw=w1+w2+24;
+    ctx.fillStyle='rgba(22,10,52,.72)'; ctx.beginPath(); ctx.roundRect?ctx.roundRect(W/2-bw/2,y-11,bw,22,11):ctx.rect(W/2-bw/2,y-11,bw,22); ctx.fill();
+    const x0=W/2-(w1+w2)/2;
+    ctx.textAlign='left'; ctx.font='700 14px "Chakra Petch", ui-monospace, monospace'; ctx.fillStyle=c; ctx.fillText(txt,x0,y+1);
+    if(info){ ctx.font='600 12px "Figtree", system-ui, sans-serif'; ctx.fillStyle=COL.muted; ctx.fillText('  ·  '+info,x0+w1,y+1) }
+    ctx.restore(); return;
+  }
+  ctx.font='700 15px "Chakra Petch", ui-monospace, monospace';
   const bw=Math.max(70,ctx.measureText(txt).width+28);
   ctx.fillStyle='rgba(22,10,52,.78)'; ctx.strokeStyle='rgba(167,123,255,.35)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.roundRect?ctx.roundRect(W/2-bw/2,top-14,bw,28,14):ctx.rect(W/2-bw/2,top-14,bw,28); ctx.fill(); ctx.stroke();
   ctx.fillStyle=c; ctx.fillText(txt,W/2,top+1);
-  if(!tiebreak){
-    const left=MISS_ROUNDS-missRounds;
-    const info=`Runde ${round}`+(missRounds>0?` · neu in ${left} ${left===1?'Runde':'Runden'}`:'');
-    ctx.font='600 12px "Figtree", system-ui, sans-serif'; ctx.fillStyle=COL.muted; ctx.fillText(info,W/2,top+28);
-  }
+  if(info){ ctx.font='600 12px "Figtree", system-ui, sans-serif'; ctx.fillStyle=COL.muted; ctx.fillText(info,W/2,top+28) }
   ctx.restore();
 }
 function drawParticles(){
