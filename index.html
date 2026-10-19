@@ -249,6 +249,9 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.hint{text-align:center;font-size:.85rem;color:var(--muted);margin:0}
+.rules{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.9rem;line-height:1.4}
+.rules b{color:var(--ink)}
 .cratecv{width:100%;height:auto;aspect-ratio:1.25/1;cursor:pointer}
 @media (prefers-reduced-motion:reduce){button:active{transform:none}.pager{scroll-behavior:auto}}
 /* online */
@@ -325,21 +328,20 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
         <div class="road" id="road"></div>
-        <p>Gleiche Regeln wie im lokalen Duell, aber gegen echte Gegner. Ein Sieg bringt <b>30 Gravitonen</b>, eine Niederlage kostet 20. Mit mehr Gravitonen steigst du in schwerere Arenen auf. Gespielt wird in der Arena des schwächeren Spielers.</p>
+        <p class="hint">Sieg <b>+30</b> · Niederlage <b>−20</b> Gravitonen</p>
         <button class="ghost" id="toBoard" disabled>Bestenliste</button>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
         <div class="hero"><canvas id="duelCanvas" width="440" height="341" aria-hidden="true"></canvas>
-          <div class="cap"><span class="label">2 Spieler · 1 Handy</span><h2>Lokales Duell</h2><p>Wer zuerst 3 Treffer kassiert, verliert.</p></div></div>
+          <div class="cap"><span class="label">2 Spieler · 1 Handy</span><h2>Lokales Duell</h2><p>3 Treffer und raus</p></div></div>
         <div class="modes" role="radiogroup" aria-label="Duell-Modus">
-          <button class="mode" id="mode-classic" role="radio"><b>Klassisch</b><span>Ihr schießt abwechselnd. Jede Runde schießen beide genau einmal, gewonnen wird erst am Rundenende.</span></button>
-          <button class="mode" id="mode-blitz" role="radio"><b>Blitzduell</b><span>Beide zielen verdeckt nacheinander, dann fliegen beide Schüsse gleichzeitig los.</span></button>
+          <button class="mode" id="mode-classic" role="radio"><b>Klassisch</b><span>Abwechselnd schießen</span></button>
+          <button class="mode" id="mode-blitz" role="radio"><b>Blitzduell</b><span>Gleichzeitig schießen</span></button>
         </div>
-        <p>Jedes Duell spielt in einer zufälligen Arena mit ihren eigenen Himmelskörpern. Nach jedem Treffer ordnen sie sich neu an, und auch nach 5 Runden ohne Treffer. Pro Schuss habt ihr 10 Sekunden, sonst verfällt er. Ein Match dauert höchstens 2 Minuten. Danach gewinnt, wer mehr Leben hat, bei Gleichstand entscheidet der Entscheidungsschuss. Fallen beide Planeten in derselben Runde, folgt ein <b>Entscheidungsschuss</b> auf einer neuen Anordnung: Beide zielen verdeckt und schießen gleichzeitig, wer näher an die Mitte des gegnerischen Planeten kommt, gewinnt. Wer anfängt, wird ausgelost, in der Revanche beginnt der andere.</p>
-        <p>Legt das Handy zwischen euch, Spieler 2 sitzt oben. Jeder hat zwei Stück von jedem Spezialgeschoss.</p>
-        <p class="score" id="duelTally">Bisher 0 : 0</p>
+                <p class="score" id="duelTally">Bisher 0 : 0</p>
         <label class="pick"><span class="label">Arena</span><select id="arenaPick"></select></label>
         <button id="duelPlay">Duell starten</button>
+        <button class="ghost" id="duelRules">Regeln</button>
       </section>
     </div>
     <nav class="navbar" role="tablist" aria-label="Spielmodus">
@@ -504,6 +506,23 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <p class="fine" id="boardMe"></p>
       <div class="friendlist" id="boardList"></div>
       <button class="ghost" id="boardBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="rules" hidden>
+    <div class="card">
+      <span class="label">Lokales Duell</span>
+      <h2>Regeln</h2>
+      <ul class="rules">
+        <li>Handy zwischen euch legen, Spieler 2 sitzt oben.</li>
+        <li>Wer 3-mal getroffen wird, verliert.</li>
+        <li>10 Sekunden pro Schuss, höchstens 2 Minuten pro Match. Dann gewinnt, wer mehr Leben hat.</li>
+        <li>Nach jedem Treffer und nach 5 Runden ohne Treffer ordnet sich die Arena neu.</li>
+        <li>Fallen beide gleichzeitig: <b>Entscheidungsschuss</b>. Wer näher an die Mitte des anderen Planeten trifft, gewinnt.</li>
+        <li>Jeder hat 2 Stück von jedem Spezialgeschoss.</li>
+        <li>Wer anfängt, wird ausgelost. In der Revanche beginnt der andere.</li>
+      </ul>
+      <button class="ghost" id="rulesBack">Zurück</button>
     </div>
   </div>
 
@@ -2635,7 +2654,7 @@ async function findMatch(){
   if(Net.state!=='ready'||search||online) return;
   const mode=onlineMode;
   search={kind:'ranked',mode,t0:performance.now(),queued:0};
-  showSearch(`Wettkampf · ${MODE_NAME[mode]}`,'Suche Gegner …','Sobald jemand im selben Modus sucht, geht es los.');
+  showSearch(`Wettkampf · ${MODE_NAME[mode]}`,'Suche Gegner …','');
   try{ await netSyncProfile(); await queueSearch() }catch(e){ searchFailed(e) }
 }
 async function queueSearch(){
@@ -2651,7 +2670,7 @@ async function challengeFriend(f){
   if(Net.state!=='ready'||search||online) return;
   const mode=onlineMode;
   search={kind:'challenge',mode,t0:performance.now(),friend:f};
-  showSearch(`Herausforderung · ${MODE_NAME[mode]}`,`Warte auf ${f.name} …`,'Dein Freund bekommt die Einladung, sobald er das Spiel offen hat. Freundschaftsduelle ändern keine Gravitonen.');
+  showSearch(`Herausforderung · ${MODE_NAME[mode]}`,`Warte auf ${f.name} …`,'Freundschaftsduell · ohne Gravitonen');
   try{
     await netSyncProfile();
     const m=await rpc('gd_challenge',{p_friend:f.id,p_mode:mode});
@@ -2671,7 +2690,7 @@ async function pollSearch(){
       return queueSearch();
     }
     if(s.kind==='ranked'){
-      $('searchText').textContent=`Seit ${secs} s · Sobald jemand im selben Modus sucht, geht es los.`;
+      $('searchText').textContent=`Seit ${secs} s`;
       if(performance.now()-s.queued>75000) await queueSearch(); // keep the search fresh on the server
     } else if(secs>170){ cancelSearch(); toast('Die Einladung ist abgelaufen') }
   }catch(e){} finally{ s.busy=false }
@@ -2688,7 +2707,7 @@ let invite=null;
 function showInvite(inv){
   invite=inv;
   $('inviteTitle').textContent=`${cleanName(inv.from.name)} fordert dich heraus`;
-  $('inviteText').textContent=`${MODE_NAME[inv.mode]||'Duell'} · Freundschaftsduell, ändert keine Gravitonen.`;
+  $('inviteText').textContent=`${MODE_NAME[inv.mode]||'Duell'} · ohne Gravitonen`;
   invite.back=current; show('invite');
 }
 async function answerInvite(yes){
@@ -2971,7 +2990,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board'];
+const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules'];
 let current='home';
 function show(name){
   current=name;
@@ -3181,6 +3200,8 @@ const tap=(id,fn)=>$(id).addEventListener('click',()=>{Sfx.init();fn()});
 tap('campPlay',()=>{ const gi=activeGalaxy(), g=GALAXIES[gi], n=nextLevelIn(g); galIdx=gi; n===null?goLevels(gi):startLevel(n) });
 tap('campAll',goGalaxies);
 tap('duelPlay',startDuel);
+tap('duelRules',()=>show('rules'));
+tap('rulesBack',()=>goHome(2));
 /* arena picker for the local duel */
 (()=>{ const sel=$('arenaPick');
   sel.innerHTML='<option value="-1">Zufällige Arena</option>'+ARENAS.map((a,i)=>`<option value="${i}">${i+1} · ${a.name}</option>`).join('');
