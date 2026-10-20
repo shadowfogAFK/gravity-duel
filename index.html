@@ -259,6 +259,23 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.herobtn{display:block;width:100%;padding:0;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.herobtn:active{transform:scale(.99)}
+#page-ranked .herobtn{flex:1 1 auto;min-height:190px}
+#page-ranked .herobtn canvas{width:100%;height:100%;aspect-ratio:auto;display:block}
+.heromore{position:absolute;top:10px;right:10px;font-family:var(--display);font-size:.72rem;padding:5px 10px;border-radius:99px;background:rgba(13,6,38,.7);border:1px solid var(--line);color:var(--ink)}
+.road2{display:flex;flex-direction:column-reverse;gap:6px;margin:10px 0}
+.ar{position:relative;display:grid;grid-template-columns:38px 1fr auto;gap:2px 10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);overflow:hidden}
+.ar{isolation:isolate}.ar::before{content:'';position:absolute;inset:0;background:var(--bg);z-index:-1}
+.ar .n{grid-row:span 2;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;background:rgba(13,6,38,.65);border:1px solid rgba(255,255,255,.18)}
+.ar b{font-family:var(--display);font-size:.95rem}
+.ar .min{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.ar .frs{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:4px}
+.ar .frs span{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;padding:2px 8px 2px 3px;border-radius:99px;background:rgba(13,6,38,.7);border:1px solid rgba(255,255,255,.15)}
+.ar .frs i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.ar .frs span.mine{border-color:var(--gold);color:var(--gold)}
+.ar.here{border-color:var(--gold);box-shadow:0 0 16px rgba(255,211,79,.25)}.ar.here .n{border-color:var(--gold);color:var(--gold)}
+.ar.locked{opacity:.6}
 .shead h2{margin:4px 0 0}.shead .fine{margin:2px 0 8px}
 .slvl{display:flex;justify-content:space-between;font-family:var(--display);font-size:.85rem;margin:6px 0 4px}
 .stiers{display:flex;flex-direction:column;gap:6px;margin:10px 0}
@@ -369,16 +386,15 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         </div>
       </section>
       <section class="page" id="page-ranked" aria-label="Wettkampf">
-        <div class="hero"><canvas id="arenaCanvas" width="440" height="341" aria-hidden="true"></canvas>
-          <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div></div>
+        <button class="hero herobtn" id="arenaHero" aria-label="Alle Arenen anzeigen"><canvas id="arenaCanvas" width="440" height="341" aria-hidden="true"></canvas>
+          <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div>
+          <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
         <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
-        <p class="netstate" id="netState">Verbinde …</p>
+        <p class="netstate" id="netState" hidden>Verbinde …</p>
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
-        <div class="road" id="road"></div>
-        <p class="hint">Sieg <b>+10 bis +50</b> · Niederlage <b>−5 bis −35</b> Gravitonen, je nach Gegner</p>
         <button class="ghost" id="toBoard" disabled>Bestenliste</button>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
@@ -554,6 +570,17 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <h2 id="inviteTitle"></h2>
       <p id="inviteText"></p>
       <div class="btns"><button id="inviteYes">Annehmen</button><button class="ghost" id="inviteNo">Ablehnen</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="arenas" hidden>
+    <div class="card">
+      <span class="label">Wettkampf</span>
+      <h2>Arena-Pfad</h2>
+      <p class="fine" id="roadInfo"></p>
+      <div class="road2" id="road2"></div>
+      <p class="hint">Sieg <b>+10 bis +50</b> · Niederlage <b>−5 bis −35</b> Gravitonen, je nach Gegner</p>
+      <button class="ghost" id="arenasBack">Zurück</button>
     </div>
   </div>
 
@@ -3326,7 +3353,8 @@ function renderOnline(){
   if(Net.state==='nocfg') st.innerHTML=`Online-Duelle laufen in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`;
   else if(Net.state==='connecting') st.textContent='Verbinde mit dem Server …';
   else if(Net.state==='error'){ st.innerHTML=`Keine Verbindung: ${esc(Net.err)} <button class="mini" id="netRetry">Erneut versuchen</button>`; $('netRetry').onclick=()=>netInit() }
-  else st.innerHTML=`<i class="dot"></i> Online als <b>${esc(playerName())}</b>`;
+  else st.innerHTML='';
+  st.hidden=Net.state==='ready';
   for(const m of ['classic','blitz']) for(const p of ['om','fm']){ const b=$(p+'-'+m); if(b) b.setAttribute('aria-checked',String(onlineMode===m)) }
   btn.textContent='Gegner suchen';
 }
@@ -3801,6 +3829,26 @@ async function claimSeason(tier,btn){
   }catch(e){ btn.disabled=false; toast(econErr(e)); loadSeason(true) }
 }
 
+/* ---------- arena path: all arenas, where you and your friends are ---------- */
+async function openArenas(){ renderArenas(); show('arenas'); if(Net.state==='ready'){ try{ Net.friends=await rpc('gd_friends'); if(current==='arenas') renderArenas() }catch(e){} } }
+function renderArenas(){
+  const mine=arenaIndex(profile.trophies), box=$('road2'); box.innerHTML='';
+  const nx=ARENAS[mine+1];
+  $('roadInfo').textContent=nx?`Du bist in Arena ${mine+1} mit ${profile.trophies} ${CURRENCY}. Noch ${nx.min-profile.trophies} bis ${nx.name}.`:`Du bist in der höchsten Arena: ${ARENAS[mine].name}.`;
+  ARENAS.forEach((a,i)=>{
+    const th=THEMES[a.theme]||THEMES.nova, el=document.createElement('div');
+    el.className='ar'+(i===mine?' here':i>mine?' locked':'');
+    el.style.setProperty('--bg',`linear-gradient(100deg,${th.bg[0]},${th.bg[1]} 60%,${th.bg[2]})`);
+    const fr=(Net.friends||[]).filter(f=>arenaIndex(f.gravitons|0)===i);
+    const chips=(i===mine?[`<span class="mine"><i style="background:${mySkin().color}"></i>Du</span>`]:[])
+      .concat(fr.map(f=>`<span><i style="background:${skinFromEquip(f.skin).color}"></i>${badgeHtml(f.badge)}${esc(cleanName(f.name))}</span>`));
+    el.innerHTML=`<span class="n">${i+1}</span><b>${esc(a.name)}</b><span class="min">${a.min?`ab ${a.min} <span class="gv" aria-hidden="true"></span>`:'Start'}</span>
+      ${chips.length?`<span class="frs">${chips.join('')}</span>`:`<span class="min" style="grid-column:2">${(BODY_INFO[a.sig]||{}).title||''}</span>`}`;
+    box.appendChild(el);
+  });
+  requestAnimationFrame(()=>{ const h=box.querySelector('.here'); if(h) h.scrollIntoView({block:'center'}) });
+}
+
 /* ---------- leaderboard ---------- */
 async function openBoard(){
   $('boardList').innerHTML='<div class="fr"><span class="fn"><b>Lade …</b></span></div>'; $('boardMe').textContent=''; show('board');
@@ -4031,7 +4079,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory'];
+const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas'];
 let current='home';
 function show(name){
   current=name;
@@ -4093,7 +4141,7 @@ function renderHome(){
     $('arenaBar').style.width=`${Math.round(100*k)}%`;
     $('arenaNext').innerHTML=`${profile.trophies} / ${nx.min} <span class="gv" aria-hidden="true"></span> bis ${esc(nx.name)}` }
   else { $('arenaBar').style.width='100%'; $('arenaNext').textContent='Höchste Arena erreicht' }
-  $('road').innerHTML=ARENAS.slice(ai,ai+4).map((x,k)=>`<div class="${k===0?'here':''}"><b>${ARENAS.indexOf(x)+1} · ${x.name}</b><span>${k===0?'Deine Arena':`ab ${x.min} <span class="gv" aria-hidden="true"></span>`}</span></div>`).join('');
+  if(false) $('road').innerHTML=ARENAS.slice(ai,ai+4).map((x,k)=>`<div class="${k===0?'here':''}"><b>${ARENAS.indexOf(x)+1} · ${x.name}</b><span>${k===0?'Deine Arena':`ab ${x.min} <span class="gv" aria-hidden="true"></span>`}</span></div>`).join('');
   $('duelTally').textContent=`Diese Sitzung ${wins[0]} : ${wins[1]}`;
   renderModes(); renderOnline();
   setNav(page,false);
@@ -4153,7 +4201,7 @@ function homeTick(t){
   const ai=arenaIndex(profile.trophies), arena=ARENAS[ai];
   paintHero($('arenaCanvas'),arena.theme,t,(g,w,h)=>{
     // arena emblem: a hexagon badge with the arena number
-    const cx=w/2, cy=h*.4, R=Math.min(w,h)*.26;
+    const R=Math.min(w*.26,h*.22), cx=w/2, cy=Math.min(h*.4,h-118-R*1.05);
     g.save();g.translate(cx,cy);
     g.shadowColor='#ffd34f';g.shadowBlur=24;
     const hex=(r)=>{ g.beginPath(); for(let k=0;k<6;k++){ const a=k*Math.PI/3-Math.PI/2; g[k?'lineTo':'moveTo'](Math.cos(a)*r,Math.sin(a)*r) } g.closePath() };
@@ -4375,6 +4423,8 @@ tap('emoteBtn',toggleEmotes);
 tap('inviteYes',()=>answerInvite(true));
 tap('inviteNo',()=>answerInvite(false));
 tap('toBoard',openBoard);
+tap('arenaHero',openArenas);
+tap('arenasBack',()=>goHome(1));
 tap('boardBack',()=>goHome(1));
 for(const m of ['classic','blitz']){ tap('om-'+m,()=>setOnlineMode(m)); tap('fm-'+m,()=>setOnlineMode(m)) }
 $('addForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); addFriend($('addCode').value) });
