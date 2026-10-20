@@ -256,6 +256,17 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.shead h2{margin:4px 0 0}.shead .fine{margin:2px 0 8px}
+.slvl{display:flex;justify-content:space-between;font-family:var(--display);font-size:.85rem;margin:6px 0 4px}
+.stiers{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.stier{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.stier .no{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:.85rem;border:1.5px solid var(--line);color:var(--muted)}
+.stier.done .no{border-color:#3dffd0;color:#3dffd0}.stier.ready{border-color:var(--gold);background:rgba(255,211,79,.07)}.stier.ready .no{border-color:var(--gold);color:var(--gold)}
+.stier.item{background:linear-gradient(90deg,rgba(61,255,208,.08),rgba(255,79,139,.06))}
+.stier .rw b{font-family:var(--display);font-size:.88rem;display:block}.stier .rw span{font-size:.7rem;color:var(--muted)}
+.stier canvas{width:72px;height:48px}
+.stier button{font-size:.75rem;padding:6px 10px;white-space:nowrap}
+.stier .st{font-size:.72rem;color:var(--muted);white-space:nowrap}
 .invhero{width:100%;height:auto;aspect-ratio:12/5;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:8px}
 .invempty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85rem;padding:18px 8px}
 .phead{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
@@ -481,6 +492,8 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
   <div class="overlay" id="quests" hidden>
     <div class="card">
       <span class="label">Belohnungen</span>
+      <div class="tabs" role="tablist"><button class="tab" id="qtab-tasks" role="tab" aria-selected="true">Aufgaben</button><button class="tab" id="qtab-season" role="tab" aria-selected="false">Saison</button></div>
+      <div id="qTasks">
       <h2>Tägliche Aufgaben</h2>
       <p class="fine" id="dailyReset"></p>
       <div class="qlist" id="dailyList"></div>
@@ -489,6 +502,8 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <p class="fine" id="weeklyReset"></p>
       <div class="qlist" id="weeklyList"></div>
       <div class="qlist" id="weeklyBonus"></div>
+      </div>
+      <div id="qSeason" hidden></div>
       <button class="ghost" id="questsBack">Zurück</button>
     </div>
   </div>
@@ -1312,7 +1327,8 @@ const RARITY={
   rare:     {name:'Selten',    color:'#2ee6ff'},
   epic:     {name:'Episch',    color:'#c46bff'},
   legendary:{name:'Legendär',  color:'#ffd34f'},
-  mythic:   {name:'Mystisch',  color:'#ff3b3b'}
+  mythic:   {name:'Mystisch',  color:'#ff3b3b'},
+  season:   {name:'Saison',    color:'#3dffd0'}
 };
 const SHOP={
   color:[
@@ -1339,7 +1355,8 @@ const SHOP={
     {id:'galaxy',name:'Galaxie',         color:'#8a6bff',c2:'#ff2d8a',price:1700, rarity:'legendary',minLevel:7},
     {id:'aurora',name:'Polarlicht',      color:'#3dffa8',anim:'hue', price:3500, rarity:'mythic',   minLevel:9},
     {id:'inferno',name:'Höllenglut',     color:'#ff4a1f',c2:'#5a0500',anim:'fire',price:4500,rarity:'mythic',minLevel:11},
-    {id:'blood', name:'Blutmond',        color:'#ff1f3d',c2:'#1a0006',anim:'beat',price:6000,rarity:'mythic',minLevel:13}
+    {id:'blood', name:'Blutmond',        color:'#ff1f3d',c2:'#1a0006',anim:'beat',price:6000,rarity:'mythic',minLevel:13},
+    {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1}
   ],
   aura:[
     {id:'none',   name:'Keine',            price:0,    rarity:'common'},
@@ -1381,7 +1398,8 @@ const SHOP={
     {id:'echo',    name:'Echo',          price:1600, rarity:'legendary',minLevel:7},
     {id:'ghost',   name:'Geisterspur',   price:1800, rarity:'legendary',minLevel:8},
     {id:'rainbow', name:'Regenbogen',    price:3500, rarity:'mythic',   minLevel:8},
-    {id:'dragon',  name:'Drachenschweif',price:5000, rarity:'mythic',   minLevel:12}
+    {id:'dragon',  name:'Drachenschweif',price:5000, rarity:'mythic',   minLevel:12},
+    {id:'pioneer', name:'Pionierspur',   price:0,    rarity:'season',   season:1}
   ]
 };
 const shopItem=(cat,id)=>SHOP[cat].find(i=>i.id===id)||SHOP[cat][0];
@@ -1398,6 +1416,8 @@ function hueOf(hex){ const n=parseInt(hex.slice(1),16),r=(n>>16)/255,g=(n>>8&255
 /* the skin's main color right now (animated colors cycle) */
 function skinColor(skin,t){
   if(skin.anim==='hue') return hslHex((t*40)%360,95,62);
+  if(skin.anim==='shift'){ const k=.5+.5*Math.sin(t*1.3), a=parseInt(skin.color.slice(1),16), b=parseInt((skin.c2||skin.color).slice(1),16), m=(x,y)=>Math.round(x+(y-x)*k);
+    return '#'+[m(a>>16,b>>16),m(a>>8&255,b>>8&255),m(a&255,b&255)].map(v=>v.toString(16).padStart(2,'0')).join('') }
   if(skin.anim==='fire') return hslHex(10+24*(.5+.5*Math.sin(t*2.3)),100,52+8*Math.sin(t*3.7));
   if(skin.anim==='beat'){ const b=Math.pow(Math.max(0,Math.sin(t*3.2)),6); return hslHex(352,95,40+24*b) }
   return skin.color;
@@ -1569,6 +1589,8 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'rainbow': for(let i=1;i<n;i++){ const hue=(i*5+t*120)%360; ctx.strokeStyle=`hsl(${hue},100%,65%)`;ctx.shadowColor=ctx.strokeStyle;ctx.lineWidth=2.8;ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() } break;
       case 'echo': line(()=>0,2,c); for(const back of [8,16,24]){ const p=seg[n-1-back]; if(!p) break; ctx.fillStyle=rgba(c,.6-back/50);ctx.beginPath();ctx.arc(p[0],p[1],3.4,0,7);ctx.fill() } break;
       case 'thin': line(()=>0,1,c); break;
+      case 'pioneer': line(i=>4.5*Math.sin(i*.32-t*7),2,'#3dffd0'); line(i=>-4.5*Math.sin(i*.32-t*7),2,'#ff4f8b'); line(()=>0,1,'#ffffff');
+        for(let i=n-1;i>0;i-=7){ const a=.4+.6*Math.abs(Math.sin(t*4+i)); ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect(seg[i][0]-1,seg[i][1]-1,2,2) } break;
       case 'wave': line(i=>5*Math.sin(i*.35-t*10),1.8,c); break;
       case 'chain': line(()=>0,.8,rgba(c,.5)); ctx.strokeStyle=c; ctx.lineWidth=1.4; for(let i=0;i<n;i+=5){ ctx.beginPath();ctx.arc(seg[i][0],seg[i][1],3,0,7);ctx.stroke() } break;
       case 'ghost': for(const [o,a] of [[7,.22],[-7,.22],[3.5,.42],[-3.5,.42]]) line(i=>o*Math.sin(i*.12+t*3),1.2,rgba(c,a)); line(()=>0,2,'#ffffff'); break;
@@ -1621,7 +1643,7 @@ function drawSkinPreview(cv,skin,t,P){
     ctx.fillStyle='rgba(22,10,52,.9)';ctx.strokeStyle=rc;ctx.lineWidth=1.2;roundRect(ctx,8,26,104,28,14);ctx.fill();ctx.stroke();
     ctx.font=`700 ${name.length>16?8:name.length>11?9.5:11}px "Chakra Petch", ui-monospace, monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
     if(P.item.rarity==='mythic'){ ctx.shadowColor='#ff2a2a';ctx.shadowBlur=8+6*Math.sin(t*3) }
-    ctx.fillStyle=P.item.rarity==='legendary'?`hsl(${(t*60)%360},90%,72%)`:P.item.rarity==='mythic'?`hsl(0,100%,${76+8*Math.sin(t*3)}%)`:'#f3eeff';ctx.fillText(name,60,41);ctx.shadowBlur=0;
+    ctx.fillStyle=P.item.rarity==='season'?`hsl(${170+20*Math.sin(t*2)},90%,70%)`:P.item.rarity==='legendary'?`hsl(${(t*60)%360},90%,72%)`:P.item.rarity==='mythic'?`hsl(0,100%,${76+8*Math.sin(t*3)}%)`:'#f3eeff';ctx.fillText(name,60,41);ctx.shadowBlur=0;
     return;
   }
   if(cat==='impact'){
@@ -1712,7 +1734,8 @@ SHOP.title=[
   {id:'nova',     name:'Supernova',               price:1300, rarity:'legendary',minLevel:7},
   {id:'emperor',  name:'Herrscher der Leere',     price:2200, rarity:'legendary',minLevel:10},
   {id:'legend',   name:'Legende der Galaxis',     price:4000, rarity:'mythic',   minLevel:10},
-  {id:'redcomet', name:'Der Rote Komet',          price:6000, rarity:'mythic',   minLevel:13}
+  {id:'redcomet', name:'Der Rote Komet',          price:6000, rarity:'mythic',   minLevel:13},
+  {id:'pioneer',  name:'Pionier · Saison 1',      price:0,    rarity:'season',   season:1}
 ];
 const SHOP_TABS=[['color','Farbe'],['aura','Aura'],['trail','Spur'],['shot','Geschoss'],['pattern','Muster'],['impact','Treffer'],['title','Titel'],['crate','Kisten']];
 const COSMETIC_CATS=['color','aura','trail','shot','pattern','impact','title'];
@@ -3006,6 +3029,7 @@ function openCrate(c,free,given){
   $('crateTitle').textContent=c.name; $('crateSub').textContent='Tippe, um schneller zu öffnen';
   $('crateRar').textContent=''; $('crateResult').hidden=true;
   Sfx.init(); Sfx.crateShake();
+  $('crateAgain').hidden=crateFrom!=='shop'; $('crateBack').textContent=crateFrom==='shop'?'Zurück zum Shop':'Zurück';
   show('crate');
 }
 function revealCrate(){
@@ -3129,7 +3153,7 @@ function claimableCount(){
   for(const s of [...q.daily,...q.weekly]){ const d=questDef(s.id); if(d&&s.p>=d.goal&&!s.claimed) n++ }
   if(!q.dailyBonus&&q.daily.every(s=>s.claimed)) n++;
   if(!q.weeklyBonus&&q.weekly.every(s=>s.claimed)) n++;
-  return n;
+  return n+(typeof seasonClaimable==='function'?seasonClaimable():0);
 }
 function updateQuestBadge(){ const el=$('questBadge'); if(!el) return; const n=claimableCount(); el.hidden=!n; el.textContent=n }
 
@@ -3487,7 +3511,7 @@ function applyEcon(st){
   renderMe(); updateQuestBadge();
   if(current==='home') renderHome(); else if(current==='shop') renderShop(); else if(current==='inventory') renderInv(); else if(current==='quests') renderQuests(); else if(current==='levels') goLevels();
 }
-async function econRefresh(){ if(!Net.backend) return; applyEcon(await rpc('gd_econ')); loadAch() }
+async function econRefresh(){ if(!Net.backend) return; applyEcon(await rpc('gd_econ')); loadAch(); loadSeason() }
 function econFail(e,btn){ if(btn) btn.disabled=false; toast(econReady()?econErr(e):'Keine Verbindung zum Server') }
 const econErr=e=>{ const m=String(e&&(e.message||e)||''); return /not enough/.test(m)?'Nicht genug Sternenstaub':/level too low/.test(m)?'Dein Spielerlevel ist zu niedrig':/already/.test(m)?'Schon erledigt':niceErr(e) };
 /* campaign: every cleared level is queued and sent in order, so nothing gets lost when the connection drops */
@@ -3711,6 +3735,65 @@ async function claimAch(id,btn){
 }
 async function pinBadge(id){
   try{ achData=await rpc('gd_set_badge',{p_id:id}); profile.badge=achData.badge||''; saveProfile(); Sfx.select(); renderAch(); renderMe() }catch(e){ toast(econErr(e)) }
+}
+
+/* ---------- season: XP also counts as season points, rewards per tier (gd_season) ---------- */
+var seasonData=null, seasonAt=-1e9, qTab='tasks', seasonPreviews=[];
+const CRATE_NAME=id=>(CRATES.find(c=>c.id===id)||{name:'Kiste'}).name;
+const CAT_NAME={color:'Farbe',aura:'Aura',trail:'Spur',shot:'Geschossform',pattern:'Planetenmuster',impact:'Treffereffekt',title:'Titel'};
+function seasonLevel(){ return seasonData&&seasonData.active?Math.min(seasonData.tiers.length,Math.floor(seasonData.sp/seasonData.tierSp)):0 }
+function seasonClaimable(){ if(!seasonData||!seasonData.active) return 0; const l=seasonLevel(); return seasonData.tiers.filter(t=>t.tier<=l&&!t.claimed).length }
+async function loadSeason(force){
+  if(!SERVER_ECON||!econReady()) return;
+  if(!force&&performance.now()-seasonAt<45000) return;
+  seasonAt=performance.now();
+  try{ seasonData=await rpc('gd_season'); updateQuestBadge(); if(current==='quests'&&qTab==='season') renderSeason() }catch(e){}
+}
+function setQTab(t){
+  qTab=t; $('qtab-tasks').setAttribute('aria-selected',String(t==='tasks')); $('qtab-season').setAttribute('aria-selected',String(t==='season'));
+  $('qTasks').hidden=t!=='tasks'; $('qSeason').hidden=t!=='season';
+  if(t==='season'){ renderSeason(); loadSeason(true) } else renderQuests();
+}
+function renderSeason(){
+  const box=$('qSeason'); box.innerHTML=''; seasonPreviews=[];
+  if(!SERVER_ECON){ box.innerHTML='<p class="fine">Die Saison gibt es in der Web-Version mit Verbindung zum Server.</p>'; return }
+  if(!seasonData){ box.innerHTML=`<p class="fine">${econReady()?'Lade Saison …':'Gerade keine Verbindung zum Server.'}</p>`; return }
+  if(!seasonData.active){ box.innerHTML='<p class="fine">Gerade läuft keine Saison. Die nächste startet bald.</p>'; return }
+  const lvl=seasonLevel(), max=seasonData.tiers.length, into=seasonData.sp-lvl*seasonData.tierSp, days=Math.max(0,Math.ceil((new Date(seasonData.ends)-new Date())/86400000));
+  const head=document.createElement('div'); head.className='shead';
+  head.innerHTML=`<h2>Saison ${seasonData.id}: ${esc(seasonData.name)}</h2><p class="fine">Noch ${days} ${days===1?'Tag':'Tage'} · Jedes XP zählt als Saisonpunkt · exklusive Items auf Stufe 10, 20 und 30</p>
+    <div class="slvl"><span>Stufe ${lvl} von ${max}</span><span>${lvl<max?`${into} / ${seasonData.tierSp} Punkte`:'Alles geschafft!'}</span></div>
+    <div class="bar" aria-hidden="true"><i style="width:${lvl<max?Math.round(100*into/seasonData.tierSp):100}%"></i></div>`;
+  box.appendChild(head);
+  const list=document.createElement('div'); list.className='stiers';
+  for(const t of seasonData.tiers){
+    const reached=t.tier<=lvl, el=document.createElement('div');
+    el.className='stier'+(t.claimed?' done':reached?' ready':'')+(t.kind==='item'?' item':'');
+    let title='', sub='', item=null, cat='';
+    if(t.kind==='dust'){ title=`✦ ${t.amount} Sternenstaub` }
+    else if(t.kind==='crate'){ title=CRATE_NAME(t.value); sub='Kiste, sofort geöffnet' }
+    else { [cat]=t.value.split(':'); item=shopItem(cat,t.value.split(':')[1]); title=item.name; sub=`Exklusiv · ${CAT_NAME[cat]||''}` }
+    el.innerHTML=`<span class="no">${t.tier}</span><span class="rw"><b${item?' style="color:#3dffd0"':''}>${esc(title)}</b>${sub?`<span>${sub}</span>`:''}</span>`;
+    const right=document.createElement('span');
+    if(item){ const cv=document.createElement('canvas'); cv.width=240; cv.height=160; cv.setAttribute('aria-hidden','true'); right.style.cssText='display:flex;align-items:center;gap:6px'; right.appendChild(cv);
+      const skin=mySkin(); if(cat==='color'){ skin.color=item.color; skin.c2=item.c2; skin.anim=item.anim } else skin[cat]=item.id;
+      seasonPreviews.push({cv,skin,cat,item,parts:[],fx:[],next:0}) }
+    if(t.claimed){ const x=document.createElement('span'); x.className='st'; x.textContent='✓ abgeholt'; right.appendChild(x) }
+    else if(reached){ const b=document.createElement('button'); b.textContent='Abholen'; b.onclick=()=>claimSeason(t.tier,b); right.appendChild(b) }
+    else { const x=document.createElement('span'); x.className='st'; x.textContent=`${t.tier*seasonData.tierSp} P`; right.appendChild(x) }
+    el.appendChild(right); list.appendChild(el);
+  }
+  box.appendChild(list);
+}
+function seasonTick(t){ if(current!=='quests'||qTab!=='season') return; for(const p of seasonPreviews) drawSkinPreview(p.cv,p.skin,t,p) }
+async function claimSeason(tier,btn){
+  btn.disabled=true;
+  try{
+    const r=await rpc('gd_season_claim',{p_tier:tier}); seasonData=r.season; applyEcon(r.state); updateQuestBadge();
+    if(r.reward.crate){ crateFrom='quests'; return openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)) }
+    if(r.reward.kind==='item'){ toast(`Neu im Inventar: ${shopItem(r.reward.cat,r.reward.id).name}`); Sfx.levelup() } else Sfx.buy();
+    renderSeason();
+  }catch(e){ btn.disabled=false; toast(econErr(e)); loadSeason(true) }
 }
 
 /* ---------- leaderboard ---------- */
@@ -4145,6 +4228,7 @@ function renderShop(){
     const b=document.createElement('button'); b.id=`buy-${shopTab}-${it.id}`;
     if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
     else if(owned){ b.className='own'; b.textContent='Im Inventar'; b.onclick=()=>openInventory(shopTab) }
+    else if(it.season){ b.textContent=`Saison ${it.season}`; b.disabled=true }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
       b.onclick=()=>{ if(profile.dust<it.price) return; if(SERVER_ECON) return econBuy(shopTab,it.id,b); profile.dust-=it.price; profile.owned[key]=1; profile.equip[shopTab]=it.id; saveProfile(); Sfx.buy(); renderShop() } }
@@ -4227,8 +4311,10 @@ tap('invBack',()=>{ if(invFrom==='shop'){ renderShop(); show('shop') } else if(i
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
-tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ renderQuests(); show('quests') } else { renderShop(); show('shop') } });
-tap('toQuests',()=>{ renderQuests(); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
+tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else { renderShop(); show('shop') } });
+tap('qtab-tasks',()=>setQTab('tasks'));
+tap('qtab-season',()=>setQTab('season'));
+tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
 tap('questsBack',()=>goHome());
 tap('toFriends',()=>openFriends(null));
 tap('friendsBack',()=>goHome());
@@ -4292,7 +4378,7 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); invTick(t); crateTick(t);
+  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); invTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); requestAnimationFrame(loop); netInit();
