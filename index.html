@@ -68,7 +68,7 @@ button:active{transform:translateY(1px)}
 .item.r-cosmic,.ii.r-cosmic{border-color:transparent;background:linear-gradient(rgba(22,10,52,.92),rgba(22,10,52,.92)) padding-box,linear-gradient(120deg,#fff6c9,#8af3ff,#d9a8ff,#ffb3d9,#fff6c9) border-box;background-size:100% 100%,300% 300%;animation:cosmicb 6s linear infinite}
 @keyframes cosmicb{to{background-position:0 0,300% 0}}
 .item.r-void,.ii.r-void{border-color:rgba(162,77,255,.7);background:radial-gradient(circle at 50% 30%,rgba(162,77,255,.18),rgba(5,0,15,.85) 70%);box-shadow:0 0 18px rgba(120,40,220,.35),inset 0 0 22px rgba(0,0,0,.6)}
-.tabs.shoptabs{grid-template-columns:repeat(5,1fr)}.shoptabs .tab{font-size:.74rem;padding:8px 2px}
+.tabs.shoptabs{grid-template-columns:repeat(5,1fr)}.shoptabs .tab.void{color:#ff5a6e;border-color:rgba(255,59,80,.7);background:radial-gradient(circle at 50% 120%,rgba(255,40,70,.28),rgba(40,0,20,.55));text-shadow:0 0 8px rgba(255,40,70,.6);box-shadow:0 0 12px rgba(255,40,70,.25)}.shoptabs .tab{font-size:.74rem;padding:8px 2px}
 .reward{font-family:var(--display);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .levelup{font-family:var(--display);font-weight:700;color:var(--p2);text-shadow:0 0 12px rgba(46,230,255,.6)}
 
@@ -382,6 +382,112 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 .radar i+i{animation-delay:1s;border-color:rgba(255,79,139,.7)}
 @keyframes ping{0%{transform:scale(.15);opacity:1}100%{transform:scale(1);opacity:0}}
 @media (prefers-reduced-motion:reduce){.radar i{animation:none;opacity:.5}}
+/* ---------- Void: game corner in the shop (play money: Sternenstaub only) ---------- */
+#void{--vred:#ff3b5c;--vviolet:#a24dff}
+#void .card{gap:12px;padding:18px 16px;transition:box-shadow .5s,border-color .5s,background .5s}
+#void .vhead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+#void .vhead h2{display:flex;align-items:center;gap:8px}
+#void .vhead h2::before{content:'';width:20px;height:20px;border-radius:50%;flex:none;background:radial-gradient(circle,#000 0 42%,transparent 44%),conic-gradient(from 30deg,#ff9a4f,#ff4f8b,#a24dff,#2ee6ff,#ff9a4f);box-shadow:0 0 12px rgba(162,77,255,.7)}
+#void .dust{font-size:1.05rem;transition:transform .2s}
+#void .dust.bump{transform:scale(1.18)}
+#void .vintro{font-size:.88rem}
+#void .vplay{font-size:.72rem;line-height:1.45;color:var(--muted);opacity:.85;text-align:center;margin-top:4px}
+
+/* picker */
+#void .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+#void .vgame{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;border-radius:14px;overflow:hidden;text-align:left;
+  background:#07031a;color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:1rem}
+#void .vgame canvas{width:100%;height:auto;aspect-ratio:16/10;display:block}
+#void .vgame .vt{display:flex;flex-direction:column;gap:1px;padding:7px 10px 9px;background:linear-gradient(0deg,rgba(13,6,38,.95),rgba(13,6,38,.7))}
+#void .vgame .vt b{font-family:var(--display);font-size:.86rem;letter-spacing:.01em;overflow-wrap:anywhere}
+#void .vgame .vt span{font-family:var(--body);font-weight:400;font-size:.7rem;letter-spacing:0;color:var(--muted);line-height:1.3}
+#void .vgame:active{transform:scale(.98)}
+#void .vgame.degen{grid-column:1/-1;border-color:rgba(255,59,92,.65);background:#0a0006;box-shadow:inset 0 0 30px rgba(255,30,70,.18),0 0 18px rgba(255,30,70,.15)}
+#void .vgame.degen canvas{aspect-ratio:32/9}
+#void .vgame.degen .vt{background:linear-gradient(0deg,rgba(30,0,12,.95),rgba(30,0,12,.6))}
+#void .vgame.degen .vt b{color:#ff8aa0;text-shadow:0 0 10px rgba(255,59,92,.6)}
+#void .vgame .tag{position:absolute;top:7px;right:7px;font-family:var(--display);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:rgba(13,6,38,.75);border:1px solid var(--line);color:var(--muted)}
+#void .vgame.degen .tag{color:#ffd0d8;border-color:rgba(255,59,92,.7);background:rgba(60,0,20,.8)}
+
+/* stage */
+#void #voidStage{display:flex;flex-direction:column;gap:10px}
+#void #voidPlay{width:100%}
+#void .vbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#void .vgname{font-family:var(--display);font-weight:700;font-size:1rem;text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#void .vstage{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(ellipse at 50% 30%,#1a0b40,#07031a 70%)}
+#void #voidCv{width:100%;height:auto;aspect-ratio:1/1;display:block;touch-action:manipulation}
+#void[data-game="coinflip"] #voidCv{aspect-ratio:10/9}
+#void[data-game="plinko"] #voidCv,#void[data-game="plinkovoid"] #voidCv{aspect-ratio:10/10.4}
+#void[data-game="slot"] #voidCv{aspect-ratio:10/8.6}
+#void[data-game="crash"] #voidCv{aspect-ratio:10/9}
+#void[data-game="wheel"] #voidCv{aspect-ratio:1/1}
+@media (max-height:700px){#void[data-game] #voidCv{aspect-ratio:10/8}#void[data-game="plinko"] #voidCv,#void[data-game="plinkovoid"] #voidCv{aspect-ratio:10/9}}
+#void .vfx{position:absolute;inset:0;pointer-events:none}
+#void .vwarn{font-size:.78rem;line-height:1.4;color:#ffd0d8;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,59,92,.55);background:rgba(80,0,24,.35)}
+#void .vwarn b{color:#ff8aa0;font-family:var(--display)}
+
+/* odds sheet */
+#void .vinfo{font-size:.8rem;color:var(--muted);padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);max-height:46vh;overflow:auto}
+#void .vinfo h3{font-family:var(--display);font-size:.85rem;color:var(--ink);margin:0 0 6px;letter-spacing:.04em}
+#void .vinfo p{font-size:.78rem;margin:6px 0 0}
+#void .vinfo table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+#void .vinfo td,#void .vinfo th{padding:3px 2px;border-top:1px solid rgba(167,123,255,.18);text-align:right;white-space:nowrap}
+#void .vinfo th{font-weight:600;color:var(--ink);font-size:.72rem;border-top:0}
+#void .vinfo td:first-child,#void .vinfo th:first-child{text-align:left;white-space:normal}
+#void .vinfo .rtp{display:inline-block;margin-top:8px;font-family:var(--display);color:var(--gold)}
+#void .vinfo i.sw{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+/* options: risk, rows, side, target */
+#void .vopts{display:flex;flex-direction:column;gap:8px}
+#void .vopts:empty{display:none}
+#void .vseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:3px;border-radius:11px;background:rgba(22,10,52,.72);border:1px solid var(--line)}
+#void .vseg button{font-size:.8rem;padding:8px 4px;background:transparent;color:var(--muted);box-shadow:none;border-radius:8px}
+#void .vseg button[aria-checked="true"]{background:rgba(46,230,255,.16);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(46,230,255,.6)}
+#void .vseg.side button[aria-checked="true"]{background:rgba(255,79,139,.16);box-shadow:inset 0 0 0 1px rgba(255,79,139,.7)}
+#void .vrow{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center}
+#void .vrow>span{font-family:var(--display);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);min-width:58px}
+#void .vtarget{display:grid;grid-template-columns:44px 1fr 44px;gap:6px;align-items:center}
+#void .vtarget b{font-family:var(--display);font-size:1.25rem;text-align:center;font-variant-numeric:tabular-nums}
+#void .vtarget small{display:block;font-family:var(--body);font-weight:400;font-size:.7rem;color:var(--muted)}
+#void .vchips{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+#void .vchips button{font-size:.74rem;padding:6px 9px;border-radius:99px;background:transparent;color:var(--muted);border:1px solid var(--line);box-shadow:none}
+#void .vchips button[aria-checked="true"]{color:var(--ink);border-color:var(--p2)}
+
+/* bet */
+#void .vbet{display:grid;grid-template-columns:42px 42px 1fr 42px 42px;gap:6px;align-items:stretch}
+#void .vbb{padding:0;height:46px;font-size:1.05rem;border-radius:10px;background:rgba(22,10,52,.8);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+#void .vbetval{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;border:1px solid rgba(255,211,79,.45);background:rgba(255,211,79,.06)}
+#void .vbetval b{font-family:var(--display);font-size:1.15rem;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1}
+#void .vbetval .label{font-size:.58rem}
+#void .vbb[disabled],#void #voidPlay[disabled],#void .vseg button[disabled],#void .vchips button[disabled],#void .vtarget button[disabled]{opacity:.4}
+#void #voidPlay{font-size:1.1rem;padding:14px;position:relative;overflow:hidden}
+#void #voidPlay:not([disabled])::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-100%);animation:vshine 3.2s ease-in-out infinite}
+@keyframes vshine{0%,60%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+#void .vmsg{min-height:1.4em;text-align:center;font-family:var(--display);font-size:.95rem;color:var(--muted);font-variant-numeric:tabular-nums}
+#void .vmsg.win{color:var(--gold);text-shadow:0 0 12px rgba(255,211,79,.5)}
+#void .vmsg.big{font-size:1.15rem}
+#void .vmsg.lose{color:var(--muted)}
+
+/* prize card */
+#void .vprize{position:absolute;inset:8%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;border-radius:16px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,rgba(162,77,255,.45),rgba(10,0,24,.95) 70%);border:1px solid rgba(162,77,255,.8);box-shadow:0 0 40px rgba(162,77,255,.55),inset 0 0 30px rgba(162,77,255,.3);
+  animation:vprize .7s cubic-bezier(.2,1.6,.4,1) both}
+#void .vprize canvas{width:min(70%,220px);height:auto;aspect-ratio:3/2}
+#void .vprize b{font-family:var(--display);font-size:1.3rem;color:#fff;text-shadow:0 0 14px var(--vviolet)}
+#void .vprize .rar{font-family:var(--display);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#d7b0ff}
+#void .vprizebtns{display:flex;gap:8px;margin-top:6px}
+@keyframes vprize{0%{transform:scale(.3) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
+
+/* Void-Modus: darker, red-violet */
+#void.degen .card{background:linear-gradient(180deg,rgba(26,2,14,.97),rgba(8,0,6,.98));border-color:rgba(255,59,92,.6);box-shadow:0 0 50px rgba(255,30,70,.25),0 0 90px rgba(162,77,255,.15)}
+#void.degen .vstage{border-color:rgba(255,59,92,.5);background:radial-gradient(ellipse at 50% 20%,#2a0418,#050003 72%)}
+#void.degen #voidPlay{background:linear-gradient(90deg,#ff1f4b,#a24dff);color:#fff;box-shadow:0 0 22px rgba(255,31,75,.55)}
+#void.degen .vgname{color:#ff8aa0}
+#void.degen .vbetval{border-color:rgba(255,59,92,.6);background:rgba(255,30,70,.08)}
+#void.degen .vbetval b{color:#ff8aa0}
+#void.degen .label{color:#d9a0b0}
+@media (min-width:500px){#void .card{max-width:440px}}
+@media (prefers-reduced-motion:reduce){#void #voidPlay::after{animation:none}#void .vprize{animation:none}}
 </style>
 </head>
 <body>
@@ -656,6 +762,54 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
     </div>
   </div>
 
+  <div class="overlay" id="void" hidden>
+    <div class="card">
+      <div class="vhead">
+        <div><span class="label" id="voidLabel">Shop · Spielecke</span><h2 id="voidTitle">Void</h2></div>
+        <span class="dust" id="voidDust">✦ 0</span>
+      </div>
+
+      <div id="voidPicker">
+        <p class="vintro">Setze Sternenstaub in kleinen Spielen aus der Schwerkraft. Mit viel Glück öffnet der Void-Modus ein Item, das es nirgends sonst gibt.</p>
+        <div class="vgrid" id="voidGames"></div>
+        <p class="vplay">Nur Spielgeld: Sternenstaub ✦ verdienst du im Spiel. Man kann ihn weder kaufen noch auszahlen. Jede Runde wird auf dem Server ausgelost.</p>
+      </div>
+
+      <div id="voidStage" hidden>
+        <div class="vbar">
+          <button class="ghost mini" id="voidToPicker" aria-label="Zurück zur Spielauswahl">‹ Spiele</button>
+          <span class="vgname" id="voidGameName"></span>
+          <button class="ghost mini" id="voidInfoBtn" aria-expanded="false" aria-controls="voidInfo">Chancen</button>
+        </div>
+        <div class="vwarn" id="voidWarn" hidden><b>Void-Modus</b> · fester Einsatz ✦ 500, extrem schwankend. Meist verlierst du den Großteil. Nur die äußeren Felder können ein Void-Item fallen lassen (≈ 1 zu 445).</div>
+        <div class="vinfo" id="voidInfo" hidden></div>
+        <div class="vstage">
+          <canvas id="voidCv" aria-hidden="true"></canvas>
+          <div class="vfx" id="voidFx" aria-live="polite"></div>
+          <div class="vprize" id="voidPrize" hidden>
+            <span class="label">Void-Fund</span>
+            <canvas id="voidPrizeCv" width="240" height="160" aria-hidden="true"></canvas>
+            <b id="voidPrizeName"></b>
+            <span class="rar" id="voidPrizeRar">Void</span>
+            <div class="vprizebtns"><button class="alt mini" id="voidPrizeInv">Im Inventar ansehen</button><button class="mini" id="voidPrizeOk">Weiter</button></div>
+          </div>
+        </div>
+        <div class="vopts" id="voidOpts"></div>
+        <div class="vbet" id="voidBetRow">
+          <button class="vbb" id="voidBetHalf" aria-label="Einsatz halbieren">½</button>
+          <button class="vbb" id="voidBetMinus" aria-label="Einsatz verringern">−</button>
+          <div class="vbetval"><span class="label">Einsatz</span><b id="voidBet">✦ 50</b></div>
+          <button class="vbb" id="voidBetPlus" aria-label="Einsatz erhöhen">+</button>
+          <button class="vbb" id="voidBetDouble" aria-label="Einsatz verdoppeln">2×</button>
+        </div>
+        <button id="voidPlay">Spielen</button>
+        <p class="vmsg" id="voidMsg" aria-live="polite"></p>
+      </div>
+
+      <button class="ghost" id="voidBack">Zurück zum Shop</button>
+    </div>
+  </div>
+
   <div class="overlay" id="board" hidden>
     <div class="card">
       <span class="label">Wettkampf</span>
@@ -763,6 +917,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         <button class="tab" id="tab-title" role="tab">Titel</button>
         <button class="tab" id="tab-emote" role="tab">Emotes</button>
         <button class="tab" id="tab-crate" role="tab">Kisten</button>
+        <button class="tab void" id="tab-void" role="tab">Void</button>
       </div>
       <div class="items" id="items"></div>
       <button class="ghost" id="shopBack">Zurück</button>
@@ -5549,7 +5704,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['setup','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas'];
+const screens=['setup','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
 let current='home';
 function show(name){
   current=name;
@@ -5883,6 +6038,681 @@ function drawItemIcon(cv,skin,t,P){
 }
 function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return crateCardsTick(t); for(const p of shopPreviews) drawSkinPreview(p.cv,p.skin,t,p) }
 
+/* ---------- Void: a small game corner in the shop ----------
+   Played only with Sternenstaub ✦ (earned by playing, never sold). The server (gd_void_play in void.sql)
+   takes the bet, draws the outcome and pays out in one call; this code only animates the answer it gets.
+   VOID_T is a copy of gd_void_tables() so the board and the odds sheets can be drawn before the first call. */
+const VOID_T={
+  minBet:10,maxBet:2000,cooldown:1,consolation:5000,
+  coinflip:{mult:1.96},
+  plinko:{
+    low: {8:[5.5,1.8,1.2,1,.4,1,1.2,1.8,5.5],12:[10,3,1.5,1.2,1.1,1,.5,1,1.1,1.2,1.5,3,10],16:[16,9,2,1.4,1.3,1.2,1.1,1,.4,1,1.1,1.2,1.3,1.4,2,9,16]},
+    mid: {8:[12,3,1.3,.6,.5,.6,1.3,3,12],12:[32,11,4,2,1,.6,.3,.6,1,2,4,11,32],16:[100,40,10,5,3,1.5,.9,.5,.3,.5,.9,1.5,3,5,10,40,100]},
+    high:{8:[28,3.8,1.6,.3,.1,.3,1.6,3.8,28],12:[150,24,8,2.1,.6,.2,.2,.2,.6,2.1,8,24,150],16:[250,100,26,9,4,2.1,.2,.2,.2,.2,.2,2.1,4,9,26,100,250]}},
+  plinkoVoid:{rows:12,bet:500,mult:[50,20,6,2.5,.7,.3,.05,.3,.7,2.5,6,20,50],item:[1,.3,0,0,0,0,0,0,0,0,0,.3,1]},
+  wheel:[0,1.5,0,2,0,1,0,1.5,0,3,0,1,2,0,1.5,0,1,0,5,0,2,0,1,0,1.5],
+  crash:{edge:.97,min:1.01,max:100},
+  slot:{syms:['a','m','e','r','g','k','s','w','x'],wBase:[21,20,17,12,11,7,5,3,4],wFree:[20,19,16,12,11,7,5,6,4],
+    pay:{a:[5,15,40],m:[6,20,50],e:[8,30,75],r:[15,50,150],g:[20,60,200],k:[30,100,400],s:[50,150,600],w:[80,300,1000]},
+    scatter:{3:1,4:10,5:50},lines:[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[1,0,1,2,1]],
+    freeSpins:8,retrigger:5,maxSpins:30,orbChance:.35,orbs:[[2,50],[3,30],[5,15],[10,5]]},
+  rtp:{coinflip:.98,plinko:{low:{8:.96484,12:.96509,16:.96479},mid:{8:.96484,12:.96523,16:.96465},high:{8:.96484,12:.96475,16:.96556}},
+    plinkoVoid:.90,plinkoVoidItem:.002246,slot:.9546,crash:.97,wheel:.96}
+};
+const VOID_GAMES=[
+  {id:'coinflip',  name:'Coinflip',        sub:'Planet oder Mond? Richtig getippt: 1,96×', tag:'98 %'},
+  {id:'plinko',    name:'Plinko',          sub:'Ein Komet fällt durch ein Sternenfeld',   tag:'bis 250×'},
+  {id:'slot',      name:'Space-Slot',      sub:'Schwarze Löcher, Wurmlöcher, Freispiele',  tag:'Freispiele'},
+  {id:'crash',     name:'Ereignis\u00adhorizont',sub:'Steig aus, bevor das Loch dich holt',      tag:'bis 100×'},
+  {id:'wheel',     name:'Orbit-Rad',       sub:'Dein Planet, 25 Felder, ein Mond',         tag:'bis 5×'},
+  {id:'plinkovoid',name:'Void-Modus',      sub:'Plinko am Abgrund · fester Einsatz ✦ 500 · die Ränder können ein Void-Item fallen lassen',tag:'Void-Item',degen:true}
+];
+const VOID_SYM={a:'Asteroid',m:'Mond',e:'Eismond',r:'Ringplanet',g:'Gasriese',k:'Komet',s:'Supernova',w:'Schwarzes Loch',x:'Wurmloch'};
+const VOID_LADDER=[10,20,25,50,75,100,150,200,250,300,400,500,750,1000,1500,2000];
+const VOID_TARGETS=[1.01,1.1,1.2,1.3,1.5,1.75,2,2.5,3,4,5,7.5,10,15,20,25,50,75,100];
+const VOID_KEY='gravityDuel.void.v1';
+const vPrefs=(()=>{ let v=null; try{ v=JSON.parse(localStorage.getItem(VOID_KEY)||'null') }catch(e){} return Object.assign({bet:{},pick:'planet',risk:'mid',rows:12,target:2},v&&typeof v==='object'?v:{}) })();
+function vSavePrefs(){ try{ localStorage.setItem(VOID_KEY,JSON.stringify(vPrefs)) }catch(e){} }
+const VS={game:null,busy:false,round:null,parts:[],floats:[],shake:0,flash:null,lastAt:0,shownDust:null,speed:1,prize:null,tiles:[],stars:null,lastT:0,info:false,hist:[]};
+
+/* ---------- small helpers ---------- */
+const vNum=n=>Math.round(n).toLocaleString('de-DE');
+const vX=m=>String(m>=100?Math.round(m):+(+m).toFixed(2)).replace('.',',')+'×';
+const vX2=m=>(m>=1000?Math.round(m).toLocaleString('de-DE'):(+m).toFixed(2).replace('.',','))+'×';
+const vPct=p=>(p*100>=10?(p*100).toFixed(1):p*100>=1?(p*100).toFixed(2):(p*100).toPrecision(2)).replace('.',',')+' %';
+const vClamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const vLerp=(a,b,k)=>a+(b-a)*k;
+const vOutCubic=p=>1-Math.pow(1-p,3);
+const vInOut=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+const vOutBack=p=>{ const c=1.7; return 1+(c+1)*Math.pow(p-1,3)+c*Math.pow(p-1,2) };
+const vSleep=ms=>new Promise(r=>setTimeout(r,ms));
+const vChoose=a=>a[Math.floor(Math.random()*a.length)];
+function vMultColor(m){ return m>=10?'#ffd34f':m>=3?'#ff4f8b':m>=1.5?'#c46bff':m>=1?'#2ee6ff':'#5b4a8c' }
+function voidErr(e){ const m=String(e&&(e.message||e)||''); return /not enough/.test(m)?'Nicht genug Sternenstaub':/too fast/.test(m)?'Nicht so schnell, eine Sekunde Pause':/bad bet/.test(m)?`Einsatz zwischen ✦ ${VOID_T.minBet} und ✦ ${VOID_T.maxBet}`:/bad/.test(m)?'Ungültige Auswahl':niceErr(e) }
+function vBet(){ const g=VS.game; if(g==='plinkovoid') return VOID_T.plinkoVoid.bet; const b=vPrefs.bet[g]|0; return VOID_LADDER.includes(b)?b:50 }
+
+/* particles, floating numbers and a little screen shake, all in canvas (CSS pixel) coordinates */
+function vBurst(x,y,n,colors,sp=160,kind){
+  for(let i=0;i<n;i++){ const a=Math.random()*6.283, s=sp*(.3+Math.random()*.9);
+    VS.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-sp*.25,life:.6+Math.random()*.8,max:1.4,c:vChoose(colors),r:1+Math.random()*2.2,k:kind||(Math.random()<.3?'star':'dot')}) }
+}
+function vFloat(text,x,y,color,size=20,dur=1.3){ VS.floats.push({text,x,y,color,size,t:0,dur}) }
+function vDrawFx(g,dt){
+  g.save(); g.globalCompositeOperation='lighter';
+  for(let i=VS.parts.length-1;i>=0;i--){ const p=VS.parts[i]; p.life-=dt; if(p.life<=0){ VS.parts.splice(i,1); continue }
+    p.vy+=220*dt; p.vx*=1-1.4*dt; p.vy*=1-1.4*dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+    g.globalAlpha=Math.min(1,p.life/.5); g.fillStyle=p.c;
+    if(p.k==='star'){ star(g,p.x,p.y,p.r*1.8); g.fill() } else { g.beginPath(); g.arc(p.x,p.y,p.r,0,7); g.fill() } }
+  g.restore(); g.globalAlpha=1;
+  for(let i=VS.floats.length-1;i>=0;i--){ const f=VS.floats[i]; f.t+=dt; if(f.t>f.dur){ VS.floats.splice(i,1); continue }
+    const k=f.t/f.dur, pop=f.t<.18?vOutBack(f.t/.18):1;
+    g.save(); g.globalAlpha=k>.7?(1-k)/.3:1; g.translate(f.x,f.y-k*26); g.scale(pop,pop);
+    g.font=`700 ${f.size}px "Chakra Petch", ui-monospace, monospace`; g.textAlign='center'; g.textBaseline='middle';
+    g.lineWidth=4; g.strokeStyle='rgba(8,3,24,.85)'; g.strokeText(f.text,0,0); g.fillStyle=f.color; g.fillText(f.text,0,0); g.restore() }
+  if(VS.flash){ VS.flash.a-=dt*2.2; if(VS.flash.a<=0) VS.flash=null; else { g.fillStyle=rgba(VS.flash.c,VS.flash.a*.35); g.fillRect(0,0,9999,9999) } }
+}
+function vSky(g,w,h,t,degen){
+  if(!VS.stars){ VS.stars=Array.from({length:110},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.3,p:Math.random()*6.3,s:.5+Math.random()*2})) }
+  const bg=g.createRadialGradient(w*.5,h*.3,0,w*.5,h*.4,Math.max(w,h)*.8);
+  bg.addColorStop(0,degen?'#2a0418':'#1c0c44'); bg.addColorStop(1,degen?'#050003':'#06021a'); g.fillStyle=bg; g.fillRect(0,0,w,h);
+  for(const s of VS.stars){ g.globalAlpha=.25+.55*(.5+.5*Math.sin(t*s.s+s.p)); g.fillStyle=degen&&s.r>1.1?'#ff9db0':'#fff'; g.fillRect(s.x*w,s.y*h,s.r,s.r) }
+  g.globalAlpha=1;
+}
+function vText(g,txt,x,y,size,color,align='center',weight=700){ g.font=`${weight} ${size}px "Chakra Petch", ui-monospace, monospace`; g.textAlign=align; g.textBaseline='middle'; g.fillStyle=color; g.fillText(txt,x,y) }
+
+/* ---------- space symbols (slot reels, tiles) ---------- */
+function vSym(g,id,x,y,s,t,hot){
+  // s = cell size; drawn centered at x,y
+  const r=s*.3; g.save(); g.translate(x,y);
+  if(hot){ radialHex(g,0,0,s*.62,id==='w'?'#ffb15c':id==='x'?'#3dffd0':'#ffd34f',.35+.25*Math.sin(t*8)) }
+  switch(id){
+    case 'a': { // asteroid: lumpy rock
+      g.rotate(.4+Math.sin(t*.7)*.06); const gr=g.createRadialGradient(-r*.3,-r*.3,1,0,0,r*1.1); gr.addColorStop(0,'#f0dcc0'); gr.addColorStop(.6,'#a88a6c'); gr.addColorStop(1,'#4a3a2c');
+      g.fillStyle=gr; g.beginPath(); for(let k=0;k<9;k++){ const a=k/9*6.283, rr=r*(.82+.18*Math.sin(k*2.7+1)); g[k?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr*.86) } g.closePath(); g.fill();
+      g.strokeStyle='#ffd9a8'; g.lineWidth=1.2; g.stroke(); g.fillStyle='rgba(60,40,25,.55)';
+      for(const [cx,cy,cr] of [[-.3,-.1,.2],[.3,.25,.15],[.15,-.4,.12]]){ g.beginPath(); g.arc(cx*r,cy*r,cr*r,0,7); g.fill() } break }
+    case 'm': case 'e': { // moon, ice moon
+      const ice=id==='e', L=ice?['#f2fcff','#9ad8ee','#2f6a8a','#c8f4ff']:['#b9a2ff','#6b4fc4','#1d1245','#a77bff'];
+      const gr=g.createRadialGradient(-r*.4,-r*.4,1,0,0,r); gr.addColorStop(0,L[0]); gr.addColorStop(.55,L[1]); gr.addColorStop(1,L[2]);
+      g.fillStyle=gr; g.beginPath(); g.arc(0,0,r,0,7); g.fill(); g.strokeStyle=L[3]; g.lineWidth=1.4; g.stroke();
+      if(ice){ g.strokeStyle='rgba(255,255,255,.6)'; g.lineWidth=1; for(const a of [.6,2.4,4.1]){ g.beginPath(); g.moveTo(0,0); g.lineTo(Math.cos(a)*r*.8,Math.sin(a)*r*.8); g.stroke() } }
+      else { g.fillStyle='rgba(26,16,64,.7)'; for(const [cx,cy,cr] of [[-.35,.2,.22],[.3,-.25,.18],[.25,.45,.13]]){ g.beginPath(); g.arc(cx*r,cy*r,cr*r,0,7); g.fill() } } break }
+    case 'r': { // ringed planet
+      g.rotate(-.35); g.strokeStyle='rgba(255,210,150,.55)'; g.lineWidth=r*.16; g.beginPath(); g.ellipse(0,0,r*1.55,r*.45,0,Math.PI,6.283); g.stroke();
+      const gr=g.createRadialGradient(-r*.3,-r*.35,1,0,0,r*.95); gr.addColorStop(0,'#fff0c8'); gr.addColorStop(.5,'#ffb347'); gr.addColorStop(1,'#8a3a0e');
+      g.fillStyle=gr; g.beginPath(); g.arc(0,0,r*.95,0,7); g.fill();
+      g.strokeStyle='rgba(255,230,190,.9)'; g.lineWidth=r*.16; g.beginPath(); g.ellipse(0,0,r*1.55,r*.45,0,0,Math.PI); g.stroke(); break }
+    case 'g': { // gas giant with bands
+      g.save(); g.beginPath(); g.arc(0,0,r*1.05,0,7); g.clip();
+      const gr=g.createLinearGradient(0,-r,0,r); gr.addColorStop(0,'#ffc2dc'); gr.addColorStop(1,'#7a2b8a'); g.fillStyle=gr; g.fillRect(-r*1.1,-r*1.1,r*2.2,r*2.2);
+      for(let k=-2;k<=2;k++){ g.fillStyle=k%2?'rgba(255,79,139,.45)':'rgba(255,255,255,.18)'; g.beginPath(); g.ellipse(Math.sin(t*.8+k)*r*.15,k*r*.38,r*1.3,r*.1,0,0,7); g.fill() }
+      g.fillStyle='rgba(120,20,60,.6)'; g.beginPath(); g.ellipse(r*.3,r*.25,r*.22,r*.12,0,0,7); g.fill();
+      g.restore(); g.strokeStyle='#ff9ac8'; g.lineWidth=1.4; g.beginPath(); g.arc(0,0,r*1.05,0,7); g.stroke(); break }
+    case 'k': { // comet
+      g.rotate(-.7); const tl=g.createLinearGradient(-r*2.2,0,r*.4,0); tl.addColorStop(0,'rgba(46,230,255,0)'); tl.addColorStop(1,'rgba(180,250,255,.95)');
+      g.fillStyle=tl; g.beginPath(); g.moveTo(r*.35,-r*.38); g.quadraticCurveTo(-r*1.2,-r*.25+Math.sin(t*6)*r*.05,-r*2.1,0); g.quadraticCurveTo(-r*1.2,r*.25,r*.35,r*.38); g.fill();
+      radialHex(g,r*.3,0,r*.9,'#2ee6ff',.6); g.fillStyle='#fff'; g.beginPath(); g.arc(r*.3,0,r*.34,0,7); g.fill(); break }
+    case 's': { // supernova: gold star burst
+      radialHex(g,0,0,r*1.6,'#ffd34f',.55); g.save(); g.rotate(t*.6);
+      g.fillStyle='#ffd34f'; star(g,0,0,r*1.15); g.fill(); g.rotate(Math.PI/5); g.fillStyle='#fff6dc'; star(g,0,0,r*.62); g.fill(); g.restore(); break }
+    case 'w': { // black hole = wild
+      g.globalCompositeOperation='lighter';
+      for(let k=0;k<3;k++){ g.save(); g.rotate(t*(1.3+k*.4)+k); g.scale(1,.4); g.strokeStyle=k===0?'rgba(255,240,210,.95)':`rgba(255,${150-k*30},${70-k*20},${.65-k*.15})`; g.lineWidth=k===0?r*.12:r*.16;
+        g.beginPath(); g.arc(0,0,r*(1.12+k*.26),0,Math.PI*1.5); g.stroke(); g.restore() }
+      g.globalCompositeOperation='source-over'; g.fillStyle='#000'; g.beginPath(); g.arc(0,0,r*.66,0,7); g.fill();
+      g.strokeStyle='rgba(255,220,180,.9)'; g.lineWidth=1.3; g.beginPath(); g.arc(0,0,r*.7,0,7); g.stroke();
+      vText(g,'WILD',0,r*1.25,Math.max(7,s*.13),'#ffd9a8'); break }
+    case 'x': { // wormhole = scatter
+      radialHex(g,0,0,r*1.5,'#3dffd0',.45); g.fillStyle='#04020a'; g.beginPath(); g.arc(0,0,r*.85,0,7); g.fill();
+      g.save(); g.rotate(t*2.5); g.lineWidth=r*.13;
+      for(let k=0;k<4;k++){ g.rotate(Math.PI/2); g.strokeStyle=k%2?'#ff6bd6':'#3dffd0'; g.beginPath(); g.arc(r*.3,0,r*.55,-1.2,1.2); g.stroke() } g.restore();
+      vText(g,'FREI',0,r*1.25,Math.max(7,s*.13),'#b8fff0'); break }
+  }
+  g.restore();
+}
+
+/* ---------- 1 · Coinflip ---------- */
+const VCoin={
+  st:{a:0,ph:'idle',side:'planet'},
+  reset(){ this.st={a:this.st.side==='mond'?Math.PI:0,ph:'idle',side:this.st.side} },
+  opts(box){
+    box.innerHTML=`<div class="vseg side" role="radiogroup" aria-label="Seite"><button role="radio" data-pick="planet">Planet</button><button role="radio" data-pick="mond">Mond</button></div>`;
+    for(const b of box.querySelectorAll('[data-pick]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.pick=b.dataset.pick; vSavePrefs(); this.sync() });
+    this.sync();
+  },
+  sync(){ for(const b of document.querySelectorAll('#voidOpts [data-pick]')) b.setAttribute('aria-checked',String(b.dataset.pick===vPrefs.pick)) },
+  args(){ return {pick:vPrefs.pick} },
+  info(){ return `<h3>Coinflip</h3><table><tr><th>Ausgang</th><th>Chance</th><th>Auszahlung</th></tr>
+    <tr><td>Richtige Seite</td><td>50 %</td><td>${vX(VOID_T.coinflip.mult)}</td></tr><tr><td>Falsche Seite</td><td>50 %</td><td>0×</td></tr></table>
+    <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.coinflip)}</span>` },
+  charge(t){ const s=this.st; s.ph='charge'; s.t0=t; s.ab=s.side==='mond'?Math.PI:0; Sfx.crateShake() },
+  abort(){ this.reset() },
+  land(r,t){ const s=this.st, res=r.result; s.ph='flip'; s.t0=t; s.dur=1.55; s.a0=s.ab||0; s.side=res.side;
+    s.a1=2*Math.PI*6+(res.side==='mond'?Math.PI:0); s.landed=false; Sfx.launch(.6) },
+  draw(g,w,h,t,dt){
+    const s=this.st, R=Math.min(w,h)*.2, cx=w/2, base=h*.6, rest=s.side==='mond'?Math.PI:0; let y=base, a=rest, sq=1;
+    if(s.ph==='idle'||s.ph==='done') y=base+Math.sin(t*2)*3;
+    if(s.ph==='charge'){ const e=t-s.t0; sq=1-.08*Math.min(1,e*4); y=base+Math.sin(t*50)*1.5*Math.min(1,e*3); a=s.ab+Math.sin(t*40)*.06 }
+    if(s.ph==='flip'){ const p=Math.min(1,(t-s.t0)/s.dur); a=vLerp(s.a0,s.a1,vOutCubic(p)); y=base-Math.sin(Math.PI*p)*h*.34;
+      if(p>=1&&!s.landed){ s.landed=true; s.ph='land'; s.t0=t; Sfx.moon(); VS.shake=6; vBurst(cx,base+R*.9,18,['#a77bff','#2ee6ff','#ffffff'],120);
+        if(s.side===vPrefs.pick) vBurst(cx,base,40,['#ffd34f','#ff4f8b','#ffffff'],230,'star'); voidReveal() } }
+    if(s.ph==='land'){ const e=t-s.t0; y=base-Math.abs(Math.sin(e*9))*14*Math.exp(-e*5); if(e>.9){ s.ph='done'; voidDone() } }
+    // shadow
+    const hgt=(base-y)/(h*.34); g.fillStyle=`rgba(0,0,0,${.45-.3*hgt})`; g.beginPath(); g.ellipse(cx,base+R*1.12,R*(1-.4*hgt),R*.18*(1-.4*hgt),0,0,7); g.fill();
+    // pick indicator: glow of the chosen side
+    const pc=vPrefs.pick==='planet'?'#ff4f8b':'#a77bff'; radialHex(g,cx,y,R*2,pc,.18+(s.ph==='charge'?.2*Math.sin(t*20):0));
+    const c=Math.cos(a), front=c>=0, k=Math.abs(c)*sq;
+    g.save(); g.translate(cx,y);
+    // rim (thickness shows when the coin is edge-on)
+    g.fillStyle='#8a6a1e'; g.beginPath(); g.ellipse(0,R*.08*(1-Math.abs(c)),R,Math.max(1,R*k)+R*.1*(1-Math.abs(c)),0,0,7); g.fill();
+    g.scale(1,Math.max(.02,k));
+    const disc=g.createRadialGradient(-R*.3,-R*.3,R*.1,0,0,R); disc.addColorStop(0,'#fff3c2'); disc.addColorStop(.7,'#ffd34f'); disc.addColorStop(1,'#b8860b');
+    g.fillStyle=disc; g.beginPath(); g.arc(0,0,R,0,7); g.fill();
+    g.fillStyle='#14082e'; g.beginPath(); g.arc(0,0,R*.84,0,7); g.fill();
+    if(front){ // planet face with a ring
+      const pg=g.createRadialGradient(-R*.2,-R*.25,2,0,0,R*.5); pg.addColorStop(0,'#ffd0e0'); pg.addColorStop(.6,'#ff4f8b'); pg.addColorStop(1,'#5a0620');
+      g.strokeStyle='rgba(255,211,79,.8)'; g.lineWidth=R*.07; g.beginPath(); g.ellipse(0,0,R*.72,R*.2,-.35,Math.PI,6.283); g.stroke();
+      g.fillStyle=pg; g.beginPath(); g.arc(0,0,R*.48,0,7); g.fill();
+      g.beginPath(); g.ellipse(0,0,R*.72,R*.2,-.35,0,Math.PI); g.stroke();
+    } else { // moon face with craters
+      const mg=g.createRadialGradient(-R*.2,-R*.25,2,0,0,R*.55); mg.addColorStop(0,'#e9e2ff'); mg.addColorStop(.6,'#8f7bd6'); mg.addColorStop(1,'#2a1a5e');
+      g.fillStyle=mg; g.beginPath(); g.arc(0,0,R*.55,0,7); g.fill(); g.fillStyle='rgba(30,16,70,.55)';
+      for(const [x,yy,r] of [[-.2,.15,.14],[.2,-.2,.11],[.18,.25,.08],[-.25,-.22,.07]]){ g.beginPath(); g.arc(x*R,yy*R,r*R,0,7); g.fill() }
+    }
+    g.restore();
+    // history
+    VS.hist.slice(-12).forEach((hh,i,arr)=>{ const x=w/2+(i-(arr.length-1)/2)*16; g.fillStyle=hh==='planet'?'#ff4f8b':'#a77bff'; g.globalAlpha=.35+.65*(i+1)/arr.length; g.beginPath(); g.arc(x,18,5,0,7); g.fill() }); g.globalAlpha=1;
+    vText(g,vPrefs.pick==='planet'?'Dein Tipp: Planet':'Dein Tipp: Mond',w/2,h-18,13,'rgba(243,238,255,.7)',undefined,500);
+  }
+};
+
+/* ---------- 2 · Plinko (also the Void-Modus) ---------- */
+const VPlinko={
+  st:{ph:'idle'},
+  isVoid(){ return VS.game==='plinkovoid' },
+  rows(){ return this.isVoid()?VOID_T.plinkoVoid.rows:(vPrefs.rows|0)||12 },
+  table(){ return this.isVoid()?VOID_T.plinkoVoid.mult:VOID_T.plinko[vPrefs.risk][this.rows()] },
+  reset(){ this.st={ph:'idle',flash:{},slotHit:-1} },
+  opts(box){
+    if(this.isVoid()){ box.innerHTML=''; return }
+    box.innerHTML=`<div class="vrow"><span>Risiko</span><div class="vseg" role="radiogroup" aria-label="Risiko"><button role="radio" data-risk="low">Niedrig</button><button role="radio" data-risk="mid">Mittel</button><button role="radio" data-risk="high">Hoch</button></div></div>
+      <div class="vrow"><span>Reihen</span><div class="vseg" role="radiogroup" aria-label="Reihen"><button role="radio" data-rows="8">8</button><button role="radio" data-rows="12">12</button><button role="radio" data-rows="16">16</button></div></div>`;
+    for(const b of box.querySelectorAll('[data-risk]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.risk=b.dataset.risk; vSavePrefs(); this.sync() });
+    for(const b of box.querySelectorAll('[data-rows]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.rows=+b.dataset.rows; vSavePrefs(); this.sync() });
+    this.sync();
+  },
+  sync(){
+    if(!VOID_T.plinko[vPrefs.risk]) vPrefs.risk='mid'; if(![8,12,16].includes(vPrefs.rows|0)) vPrefs.rows=12;
+    for(const b of document.querySelectorAll('#voidOpts [data-risk]')) b.setAttribute('aria-checked',String(b.dataset.risk===vPrefs.risk));
+    for(const b of document.querySelectorAll('#voidOpts [data-rows]')) b.setAttribute('aria-checked',String(+b.dataset.rows===(vPrefs.rows|0)));
+    if(VS.info) vRenderInfo();
+  },
+  args(){ return this.isVoid()?{void:true}:{risk:vPrefs.risk,rows:this.rows()} },
+  info(){
+    const n=this.rows(), T=this.table(), pr=k=>{ let c=1; for(let i=0;i<k;i++) c=c*(n-i)/(i+1); return c/Math.pow(2,n) };
+    const half=T.slice(0,Math.floor(n/2)+1);
+    const rows=half.map((m,k)=>{ const p=k===n-k?pr(k):2*pr(k); return `<tr><td><i class="sw" style="background:${vMultColor(m)}"></i>${k===n-k?'Mitte':`${k+1}. von außen`}</td><td>${vX(m)}</td><td>${vPct(p)}</td>${this.isVoid()?`<td>${VOID_T.plinkoVoid.item[k]?vPct(VOID_T.plinkoVoid.item[k]):'–'}</td>`:''}</tr>` }).join('');
+    if(this.isVoid()) return `<h3>Void-Modus · ${n} Reihen · Einsatz ✦ ${VOID_T.plinkoVoid.bet}</h3>
+      <table><tr><th>Feld (je Seite)</th><th>Auszahlung</th><th>Chance</th><th>Void-Item</th></tr>${rows}</table>
+      <p>Void-Item pro Drop insgesamt: <b>${vPct(VOID_T.rtp.plinkoVoidItem)}</b> (etwa 1 zu ${Math.round(1/VOID_T.rtp.plinkoVoidItem)}). Besitzt du schon alle Void-Items, gibt es stattdessen ✦ ${vNum(VOID_T.consolation)}.</p>
+      <span class="rtp">Erwartete Rückgabe in ✦: ${vPct(VOID_T.rtp.plinkoVoid)} + Item-Chance</span>`;
+    const name={low:'Niedrig',mid:'Mittel',high:'Hoch'}[vPrefs.risk];
+    return `<h3>Plinko · Risiko ${name} · ${n} Reihen</h3><p style="margin:0 0 6px">An jedem Stern springt der Komet mit 50 % nach links oder rechts.</p>
+      <table><tr><th>Feld (je Seite)</th><th>Auszahlung</th><th>Chance</th></tr>${rows}</table>
+      <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.plinko[vPrefs.risk][n])}</span>`;
+  },
+  geo(w,h){ const n=this.rows(), top=h*.1, bottom=h*.84, sy=(bottom-top)/n, sx=Math.min(w*.97/(n+1.4),sy*1.3), cx=w/2; return {n,top,sy,sx,cx,slotY:top+n*sy+sy*.15} },
+  charge(t){ this.st.ph='charge'; this.st.t0=t },
+  abort(){ this.reset() },
+  land(r,t){ const s=this.st; s.ph='fall'; s.t0=t; s.path=r.result.path; s.slot=r.result.slot; s.item=!!r.item||!!r.result.consolation; s.trail=[]; s.hitRow=-1; s.flash={}; s.slotHit=-1; Sfx.launch(.3) },
+  pos(G,s,e){ // ball position after e seconds of fall
+    const step=this.isVoid()?.14:G.n>12?.105:.125, fall0=.22;
+    if(e<fall0){ const p=e/fall0; return {x:G.cx,y:G.top-G.sy*1.2+p*p*(G.sy*1.2-G.sy*.42),row:-1,done:false} }
+    let k=(e-fall0)/step, i=Math.floor(k), p=k-i;
+    const off=j=>{ let r=0; for(let q=0;q<j;q++) r+=s.path[q]; return r-j/2 };
+    if(i>=G.n){ const q=Math.min(1,(e-fall0-G.n*step)/.14), y0=G.top+G.n*G.sy-G.sy*.42; return {x:G.cx+off(G.n)*G.sx,y:y0+q*q*(G.slotY+G.sy*.3-y0),row:G.n,done:q>=1} }
+    const x0=G.cx+off(i)*G.sx, x1=G.cx+off(i+1)*G.sx, y0=G.top+i*G.sy-G.sy*.42, y1=y0+G.sy;
+    return {x:vLerp(x0,x1,vOutCubic(p)),y:vLerp(y0,y1,p*p)-G.sy*.55*Math.sin(Math.PI*p)*(1-p*.4),row:i,done:false};
+  },
+  draw(g,w,h,t,dt){
+    const s=this.st, G=this.geo(w,h), T=this.table(), vd=this.isVoid(), skin=mySkin(), col=skinColor(skin,t);
+    // pegs: little stars
+    for(let i=0;i<G.n;i++) for(let j=0;j<i+3;j++){
+      const x=G.cx+(j-(i+2)/2)*G.sx, y=G.top+i*G.sy, key=i*100+j, fl=s.flash&&s.flash[key]?Math.max(0,1-(t-s.flash[key])*3):0;
+      if(fl>0) radialHex(g,x,y,G.sx*.7,vd?'#ff3b5c':'#2ee6ff',fl*.7);
+      g.fillStyle=fl>0?'#fff':vd?'rgba(255,170,190,.85)':'rgba(220,210,255,.85)'; star(g,x,y,Math.max(2.2,G.sx*.15)*(1+fl*.6)); g.fill();
+    }
+    // slots: gravity wells
+    const sw=G.sx*.9, sh=Math.min(G.sy*.85,26);
+    for(let k=0;k<=G.n;k++){
+      const m=T[k], x=G.cx+(k-G.n/2)*G.sx, hit=s.slotHit===k?Math.max(0,1-(t-s.slotAt)*1.2):0, y=G.slotY+hit*5;
+      const voidSlot=vd&&VOID_T.plinkoVoid.item[k]>0, c=voidSlot?'#a24dff':vd?(m>=1?'#ff4f8b':'#5a1830'):vMultColor(m);
+      g.fillStyle=rgba(c,.22+hit*.5); g.strokeStyle=rgba(c,.85); g.lineWidth=1.2;
+      roundRect(g,x-sw/2,y,sw,sh,Math.min(5,sw*.25)); g.fill(); g.stroke();
+      if(voidSlot){ g.save(); g.translate(x,y+sh/2); g.rotate(t*3); g.strokeStyle='rgba(255,120,200,.7)'; g.lineWidth=1; for(let q=0;q<3;q++){ g.rotate(2.09); g.beginPath(); g.arc(sw*.12,0,sw*.22,-1,1); g.stroke() } g.restore() }
+      const label=m>=100?String(m):String(m).replace('.',','), fs=Math.max(7,Math.min(12,sw/(label.length*.62+.4)));
+      vText(g,label,x,y+sh/2+.5,fs,hit>0?'#fff':'#f3eeff');
+      if(hit>0) radialHex(g,x,y+sh/2,sw*1.8,c,hit*.6);
+    }
+    if(vd){ vText(g,'VOID',G.cx-(G.n/2-.5)*G.sx,G.slotY+sh+10,8,'#d7a0ff'); vText(g,'VOID',G.cx+(G.n/2-.5)*G.sx,G.slotY+sh+10,8,'#d7a0ff') }
+    // ball: the player's own shot, with its trail
+    let P=null;
+    if(s.ph==='charge'){ const e=t-s.t0; P={x:G.cx+Math.sin(e*14)*2,y:G.top-G.sy*1.2} ; radialHex(g,P.x,P.y,22,col,.3+.2*Math.sin(e*18)) }
+    else if(s.ph==='fall'){
+      const e=t-s.t0; P=this.pos(G,s,e);
+      if(P.row>s.hitRow&&P.row<G.n&&P.row>=0){ s.hitRow=P.row; let off=0; for(let q=0;q<P.row;q++) off+=s.path[q]; s.flash[P.row*100+off+1]=t; Sfx.tick(.15+.8*P.row/G.n) }
+      s.trail.push([P.x,P.y]); if(s.trail.length>14) s.trail.shift();
+      if(P.done){ s.ph='land'; s.t0=t; s.slotHit=s.slot; s.slotAt=t; s.trail=[];
+        const m=T[s.slot], x=G.cx+(s.slot-G.n/2)*G.sx;
+        vFloat(vX(m),x,G.slotY-12,m>=1?'#ffd34f':'#a99cd6',m>=10?24:18);
+        if(s.item){ VS.flash={c:'#a24dff',a:1}; VS.shake=14; vBurst(x,G.slotY,70,['#a24dff','#ff3b5c','#ffffff','#ff6bd6'],260,'star') }
+        else if(m>=3){ vBurst(x,G.slotY,m>=10?50:24,['#ffd34f','#ff4f8b','#fff'],200); VS.shake=m>=10?9:4 }
+        voidReveal() }
+    } else if(s.ph==='land'){ if(t-s.t0>.45){ s.ph='idle'; voidDone() } }
+    if(s.trail&&s.trail.length>1) drawStyledTrail(g,s.trail,col,skin.trail,t,.85);
+    if(P){ g.save(); g.translate(P.x,P.y); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0 }
+    if(s.ph==='idle'&&!P){ g.globalAlpha=.55+.3*Math.sin(t*3); g.save(); g.translate(G.cx,G.top-G.sy*1.2); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0; g.globalAlpha=1 }
+  }
+};
+
+/* ---------- 3 · Space-Slot ---------- */
+const VSlot={
+  st:null,
+  reset(){
+    const prev=this.st&&this.st.grid;
+    this.st={ph:'idle',grid:prev||[['m','r','a'],['k','w','e'],['s','x','g'],['e','a','m'],['g','r','k']],reels:[0,1,2,3,4].map(()=>({off:0,v:0,tape:{},mode:'stop'})),spins:null,idx:0,total:0,shown:0,hl:null,banner:null,orb:null,fsLeft:0,fsDone:0};
+    this.st.reels.forEach((R,j)=>{ const gcol=this.st.grid[j]; R.tape[2]=gcol[0]; R.tape[1]=gcol[1]; R.tape[0]=gcol[2] });
+  },
+  opts(box){ box.innerHTML='' },
+  args(){ return {} },
+  info(){
+    const P=VOID_T.slot.pay, rows=Object.keys(P).map(k=>`<tr><td>${VOID_SYM[k]}${k==='w'?' (Wild)':''}</td><td>${P[k][0]}</td><td>${P[k][1]}</td><td>${P[k][2]}</td></tr>`).join('');
+    const S=VOID_T.slot, orbs=S.orbs.map(([m,w])=>`${m}× (${w} %)`).join(', ');
+    return `<h3>Space-Slot · 5 Walzen · 10 Linien</h3><p style="margin:0 0 6px">Gewinne in Linieneinsätzen (Einsatz ÷ 10), von links, mindestens 3 gleiche:</p>
+      <table><tr><th>Symbol</th><th>3×</th><th>4×</th><th>5×</th></tr>${rows}</table>
+      <p><b>Schwarzes Loch</b> ersetzt jedes Symbol außer dem Wurmloch. <b>Wurmloch</b> zahlt überall: 3 = ${S.scatter[3]}×, 4 = ${S.scatter[4]}×, 5+ = ${S.scatter[5]}× Einsatz, und 3+ starten <b>${S.freeSpins} Freispiele</b> (Chance ${vPct(.0203)} je Dreh, ab 3 in den Freispielen +${S.retrigger}, höchstens ${S.maxSpins}).</p>
+      <p>In Freispielen gibt es mehr Schwarze Löcher, und mit ${vPct(S.orbChance)} erscheint ein <b>Multiplikator-Orb</b>: ${orbs}. 5 Schwarze Löcher auf einer Linie in den Freispielen: Void-Item (etwa 1 zu 700.000).</p>
+      <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.slot)}</span>`;
+  },
+  tape(R,i){ if(!(i in R.tape)) R.tape[i]=vChoose(VOID_T.slot.syms.slice(0,7).concat(['a','m','e','w','x'])); return R.tape[i] },
+  charge(t){ const s=this.st; s.ph='spin'; s.pt=0; s.spins=null; s.idx=0; s.total=0; s.shown=0; s.hl=null; s.banner=null; s.orb=null; s.fsLeft=0; s.fsDone=0; s.free=false; s.stopsSet=false;
+    for(const R of s.reels){ R.mode='spin'; R.v=0; R.tape={...Object.fromEntries(Object.entries(R.tape).filter(([k])=>+k>=Math.floor(R.off)-1&&+k<=Math.floor(R.off)+3))} } Sfx.launch(.4) },
+  abort(){ const s=this.st; for(const R of s.reels){ R.mode='stop'; R.v=0; R.off=Math.round(R.off) } s.ph='idle' },
+  land(r,t){ const s=this.st, res=r.result; s.spins=[res.base,...res.free]; s.idx=0; s.fsTotal=res.free.length; s.jackpot=res.jackpot },
+  startSpin(){ const s=this.st; s.ph='spin'; s.pt=0; s.hl=null; s.orb=null; s.stopsSet=false; for(const R of s.reels){ R.mode='spin' } Sfx.tick(.2) },
+  setStops(){
+    const s=this.st, sp=s.spins[s.idx], fast=s.idx>0, gap=(fast?.13:.2)/VS.speed; let at=s.pt+(fast?.12:.25)/VS.speed, sc=0;
+    s.reels.forEach((R,j)=>{ if(j>=2&&sc>=2){ at+=.75/VS.speed; R.tease=true } else R.tease=false; R.stopAt=at; R.res=sp.grid[j]; at+=gap; sc+=sp.grid[j].filter(x=>x==='x').length });
+    s.stopsSet=true;
+  },
+  update(dt,t){
+    const s=this.st, vmax=16;
+    if(s.ph==='spin'||s.ph==='stopping'){
+      s.pt+=dt;
+      if(s.spins&&!s.stopsSet&&s.pt>(s.idx?.2:.45)/VS.speed) this.setStops();
+      let all=true;
+      s.reels.forEach((R,j)=>{
+        if(R.mode==='spin'){ R.v=Math.min(vmax*(R.tease?1.35:1),R.v+60*dt); R.off+=R.v*dt; all=false;
+          if(s.stopsSet&&s.pt>=R.stopAt){ const F=Math.ceil(R.off+R.v*.35/3)+(s.idx?2:3); R.tape[F]=R.res[2]; R.tape[F+1]=R.res[1]; R.tape[F+2]=R.res[0];
+            R.mode='decel'; R.o0=R.off; R.D=F-R.off; R.T=3*R.D/R.v; R.d=0 } }
+        else if(R.mode==='decel'){ all=false; R.d+=dt*VS.speed; const p=Math.min(1,R.d/R.T); R.off=R.o0+R.D*vOutCubic(p);
+          if(p>=1){ R.mode='settle'; R.d=0; R.off=R.o0+R.D; Sfx.tick(.25+j*.12); const sc=R.res.filter(x=>x==='x').length; if(sc) Sfx.portal(); if(R.res.includes('w')) Sfx.moon() } }
+        else if(R.mode==='settle'){ all=false; R.d+=dt*VS.speed; R.bounce=Math.sin(Math.min(1,R.d/.22)*Math.PI)*.1*(1-Math.min(1,R.d/.22)); if(R.d>=.22){ R.mode='stop'; R.bounce=0; R.off=Math.round(R.off) } }
+      });
+      if(s.spins&&s.stopsSet&&all) this.afterStop(t);
+      return;
+    }
+    if(s.ph==='orb'){ s.pt+=dt*VS.speed; if(s.pt>.75) this.showWins(t); return }
+    if(s.ph==='wins'){ s.pt+=dt*VS.speed; if(s.pt>s.wdur) this.afterWins(t); return }
+    if(s.ph==='banner'){ s.pt+=dt*VS.speed; if(s.pt>s.banner.dur){ const nx=s.banner.next; s.banner=null; nx() } return }
+  },
+  afterStop(t){
+    const s=this.st, sp=s.spins[s.idx]; s.grid=sp.grid;
+    if(s.idx>0){ s.fsDone++; s.fsLeft-- }
+    if(s.idx>0&&sp.orb>1){ s.ph='orb'; s.pt=0; s.orb={m:sp.orb,t0:t}; Sfx.split(); return }
+    this.showWins(t);
+  },
+  showWins(t){
+    const s=this.st, sp=s.spins[s.idx]; s.ph='wins'; s.pt=0;
+    const any=sp.lines.length||sp.scatPay>0;
+    s.hl={lines:sp.lines,t0:t,scat:sp.scat>=3}; s.wdur=any?(s.idx?.9:1.1)+.25*Math.min(4,sp.lines.length):(s.idx?.25:.15);
+    if(any){ s.total+=sp.win; const W=this.lastW, H=this.lastH;
+      if(sp.win>0) vFloat('+'+vNum(sp.win)+' ✦',W/2,H*.5,'#ffd34f',sp.win>=VS.round.bet*5?28:20,1.2);
+      if(sp.win>=VS.round.bet*10){ Sfx.crateOpen('legendary'); VS.shake=10; vBurst(W/2,H*.5,60,['#ffd34f','#ff4f8b','#fff'],260) } else if(sp.win>VS.round.bet){ Sfx.win(); vBurst(W/2,H*.5,20,['#ffd34f','#fff'],160) } else if(sp.win>0) Sfx.buy() }
+  },
+  afterWins(t){
+    const s=this.st, sp=s.spins[s.idx];
+    s.hl=null;
+    if(s.idx===0&&sp.scat>=3&&s.spins.length>1){ s.fsLeft=VOID_T.slot.freeSpins; s.free=true; Sfx.portal(); Sfx.levelup(); VS.flash={c:'#3dffd0',a:1}; vBurst(this.lastW/2,this.lastH/2,60,['#3dffd0','#ff6bd6','#fff'],240,'star');
+      s.planned=VOID_T.slot.freeSpins; s.ph='banner'; s.pt=0; s.banner={text:`${VOID_T.slot.freeSpins} FREISPIELE`,sub:'Mehr Schwarze Löcher · Multiplikator-Orbs',c:'#3dffd0',dur:1.9,t0:t,next:()=>{ s.idx++; VS.speed=Math.max(VS.speed,1.5); this.startSpin() }}; return }
+    if(s.idx>0&&sp.add>0){ s.planned+=sp.add; Sfx.portal(); s.ph='banner'; s.pt=0; s.banner={text:`+${sp.add} FREISPIELE`,sub:'',c:'#3dffd0',dur:1.1,t0:t,next:()=>this.next(t)}; return }
+    this.next(t);
+  },
+  next(t){
+    const s=this.st;
+    if(s.idx<s.spins.length-1){ s.idx++; this.startSpin(); return }
+    const fin=()=>{ s.ph='idle'; s.free=false; s.orb=null; voidReveal(); voidDone() };
+    if(s.spins.length>1){ const fsWin=s.spins.slice(1).reduce((a,x)=>a+x.win,0); s.ph='banner'; s.pt=0; VS.flash={c:'#ffd34f',a:.8};
+      s.banner={text:`+${vNum(fsWin)} ✦`,sub:`aus ${s.spins.length-1} Freispielen`,c:'#ffd34f',dur:1.6,t0:t,next:fin}; if(fsWin>0) Sfx.crateOpen('epic'); return }
+    fin();
+  },
+  draw(g,w,h,t,dt){
+    if(!this.st) this.reset(); const s=this.st; this.lastW=w; this.lastH=h; this.update(dt,t);
+    const head=h*.12, cs=Math.min(w*.94/5,(h-head-h*.06)/3), gx=(w-cs*5)/2, gy=head+(h-head-cs*3)/2;
+    // frame
+    g.fillStyle='rgba(8,3,24,.75)'; roundRect(g,gx-6,gy-6,cs*5+12,cs*3+12,12); g.fill();
+    g.strokeStyle=s.free?rgba('#3dffd0',.6+.3*Math.sin(t*4)):'rgba(167,123,255,.45)'; g.lineWidth=s.free?2:1.2; g.stroke();
+    for(let j=0;j<5;j++){
+      const R=s.reels[j], x=gx+j*cs, cx=x+cs/2, blur=R.mode==='spin'||R.mode==='decel'?Math.min(1,R.v/16):0;
+      g.save(); g.beginPath(); g.rect(x,gy,cs,cs*3); g.clip();
+      if(j) { g.fillStyle='rgba(167,123,255,.12)'; g.fillRect(x,gy,1,cs*3) }
+      if(R.tease&&R.mode!=='stop'){ radialHex(g,cx,gy+cs*1.5,cs*1.4,'#3dffd0',.25+.15*Math.sin(t*14)) }
+      const off=R.off+(R.bounce||0), base=Math.floor(off), frac=off-base;
+      for(let i=base-1;i<=base+3;i++){
+        const y=gy+(2-i+off)*cs+cs/2; if(y<gy-cs||y>gy+cs*4) continue;
+        const id=this.tape(R,i), row=Math.round((y-gy-cs/2)/cs);
+        const hot=s.hl&&R.mode==='stop'&&row>=0&&row<3&&this.isHot(j,row,id);
+        g.globalAlpha=blur>.3?.75:1;
+        if(blur>.3){ g.save(); g.translate(cx,y); g.scale(1,1+blur*.35); vSym(g,id,0,0,cs,t,false); g.restore() } else vSym(g,id,cx,y,cs*(hot?1+.06*Math.sin(t*10):1),t,hot);
+        g.globalAlpha=1;
+      }
+      g.restore();
+    }
+    // winning lines
+    if(s.hl&&s.hl.lines.length){
+      const L=s.hl.lines, e=t-s.hl.t0, cyc=e<.6?-1:Math.floor((e-.6)/.55)%L.length;
+      L.forEach((ln,q)=>{ if(cyc>=0&&q!==cyc) return; const pts=VOID_T.slot.lines[ln.i], col=['#ffd34f','#2ee6ff','#ff4f8b','#3dffd0','#c46bff'][ln.i%5];
+        g.save(); g.strokeStyle=col; g.lineWidth=3; g.shadowColor=col; g.shadowBlur=12; g.lineJoin='round'; g.globalAlpha=.9; g.beginPath();
+        pts.forEach((r,j)=>{ const x=gx+j*cs+cs/2, y=gy+r*cs+cs/2; j?g.lineTo(x,y):g.moveTo(x,y) }); g.stroke(); g.restore();
+        if(cyc>=0){ vText(g,`${ln.n}× ${VOID_SYM[ln.sym]}`,w/2,gy+cs*3+14,11,col,undefined,600) } });
+    }
+    // orb
+    if(s.orb){ const e=Math.min(1,(t-s.orb.t0)/.5), x=w/2, y=vLerp(-20,gy+cs*1.5,vOutBack(e)), R0=cs*.42*(s.ph==='orb'?1:.7);
+      radialHex(g,x,y,R0*2.4,'#ff6bd6',.55); const og=g.createRadialGradient(x-R0*.3,y-R0*.3,2,x,y,R0); og.addColorStop(0,'#fff'); og.addColorStop(.5,'#ff6bd6'); og.addColorStop(1,'#5a0640');
+      g.fillStyle=og; g.globalAlpha=s.ph==='orb'?1:.85; g.beginPath(); g.arc(x,y,R0,0,7); g.fill(); g.globalAlpha=1; vText(g,'×'+s.orb.m,x,y+1,R0*.8,'#fff') }
+    // header
+    g.fillStyle='rgba(8,3,24,.6)'; g.fillRect(0,0,w,head);
+    if(s.free&&s.idx>0){ vText(g,`FREISPIEL ${s.idx} / ${s.planned}`,12,head/2,13,'#3dffd0','left') }
+    else if(s.free) vText(g,'FREISPIELE',12,head/2,13,'#3dffd0','left');
+    else vText(g,s.total>0?'10 Linien':'10 Linien · Wild · Freispiele',12,head/2,11,'rgba(169,156,214,.9)','left',500);
+    s.shown=s.shown<s.total?Math.min(s.total,s.shown+Math.max(1,(s.total-s.shown)*dt*6)):s.total;
+    if(s.total>0||s.ph!=='idle') vText(g,`Gewinn ✦ ${vNum(s.shown)}`,w-12,head/2,14,s.total>0?'#ffd34f':'rgba(243,238,255,.6)','right');
+    // banner
+    if(s.banner){ const e=t-s.banner.t0, k=Math.min(1,e/.3), out=s.pt>s.banner.dur-.25?(s.banner.dur-s.pt)/.25:1, B=s.banner;
+      g.save(); g.globalAlpha=Math.max(0,out); g.fillStyle='rgba(6,2,20,.82)'; g.fillRect(0,h*.36,w,h*.28);
+      g.translate(w/2,h*.47); g.scale(vOutBack(k),vOutBack(k)); g.shadowColor=B.c; g.shadowBlur=20; vText(g,B.text,0,0,Math.min(34,w*.09),B.c); g.shadowBlur=0;
+      if(B.sub) vText(g,B.sub,0,h*.075,12,'rgba(243,238,255,.85)',undefined,500); g.restore() }
+  },
+  isHot(j,row,id){ const s=this.st; if(!s.hl) return false; if(s.hl.scat&&id==='x') return true;
+    return s.hl.lines.some(ln=>j<ln.n&&VOID_T.slot.lines[ln.i][j]===row) },
+  tap(){ if(VS.busy&&this.st.spins&&this.st.spins.length>1) VS.speed=3 }
+};
+
+/* ---------- 4 · Ereignishorizont (crash) ---------- */
+const VCrash={
+  st:{ph:'idle'}, K:.35,
+  mAt(e){ return Math.exp(this.K*Math.pow(Math.max(0,e),1.25)) },
+  tOf(m){ return Math.pow(Math.log(m)/this.K,.8) },
+  reset(){ this.st={ph:'idle'} },
+  target(){ const v=+vPrefs.target; return VOID_TARGETS.includes(v)?v:2 },
+  opts(box){
+    box.innerHTML=`<div class="vrow"><span>Ausstieg</span><div class="vtarget"><button class="vbb" data-t="-1" aria-label="Ausstieg niedriger">−</button><b id="voidTarget"></b><button class="vbb" data-t="1" aria-label="Ausstieg höher">+</button></div></div>
+      <div class="vchips" role="radiogroup" aria-label="Schnellwahl">${[1.5,2,3,5,10,50].map(x=>`<button role="radio" data-q="${x}">${vX(x)}</button>`).join('')}</div>`;
+    for(const b of box.querySelectorAll('[data-t]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); const i=VOID_TARGETS.indexOf(this.target()); vPrefs.target=VOID_TARGETS[vClamp(i+(+b.dataset.t),0,VOID_TARGETS.length-1)]; Sfx.tick(i/VOID_TARGETS.length); vSavePrefs(); this.sync() });
+    for(const b of box.querySelectorAll('[data-q]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.target=+b.dataset.q; vSavePrefs(); this.sync() });
+    this.sync();
+  },
+  sync(){ const m=this.target(), el=document.getElementById('voidTarget'); if(el) el.innerHTML=`${vX(m)}<small>Chance ${vPct(Math.min(1,VOID_T.crash.edge/m))}</small>`;
+    for(const b of document.querySelectorAll('#voidOpts [data-q]')) b.setAttribute('aria-checked',String(+b.dataset.q===m)); if(VS.info) vRenderInfo() },
+  args(){ return {target:this.target()} },
+  info(){ const ex=[1.5,2,3,5,10,25,100].map(m=>`<tr><td>${vX(m)}</td><td>${vPct(VOID_T.crash.edge/m)}</td><td>${vPct(1-VOID_T.crash.edge/m)}</td></tr>`).join('');
+    return `<h3>Ereignishorizont</h3><p style="margin:0 0 6px">Vor dem Start wählst du, bei welchem Faktor dein Schiff aussteigt. Der Server lost aus, wann das Schwarze Loch es zurückholt. Die Chance, Faktor m zu erreichen, ist 97 % ÷ m. In 3 % der Runden wird das Schiff sofort verschluckt.</p>
+      <table><tr><th>Ausstieg bei</th><th>Gewinnchance</th><th>Verschluckt</th></tr>${ex}</table><span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.crash)} bei jedem Ausstieg</span>` },
+  charge(t){ this.st={ph:'charge',t0:t,trail:[]}; Sfx.crateShake() },
+  abort(){ this.reset() },
+  land(r,t){ const s=this.st, R=r.result; s.ph='fly'; s.t0=t; s.target=R.target; s.crash=R.crash; s.win=R.win; s.trail=[]; s.ticks=1; s.end=s.win?this.tOf(R.target):this.tOf(Math.max(1.0001,R.crash)); if(R.crash<=1){ s.end=0 } Sfx.boost() },
+  draw(g,w,h,t,dt){
+    const s=this.st, skin=mySkin(), col=skinColor(skin,t), bh={x:w*.13,y:h*.84}, bhr=Math.min(w,h)*.06;
+    // the black hole
+    drawBody(g,{kind:'moon',type:'b',x:bh.x,y:bh.y,r:bhr,m0:bhr*bhr*10},t,0);
+    // a warped grid: lines bend toward the hole
+    g.strokeStyle='rgba(167,123,255,.13)'; g.lineWidth=1;
+    for(let k=1;k<7;k++){ g.beginPath(); for(let x=0;x<=w;x+=8){ const y=h*.84-k*h*.12, d=Math.hypot(x-bh.x,y-bh.y), pull=1800/(d+40); x?g.lineTo(x,y+pull*.5):g.moveTo(x,y+pull*.5) } g.stroke() }
+    let e=0, m=1, view={tx:6,lm:Math.log(Math.max(2,this.target()*1.25))};
+    if(s.ph==='fly'||s.ph==='ghost'||s.ph==='boom'||s.ph==='out'){ e=Math.min(t-s.t0,s.ph==='fly'?s.end:s.end); m=this.mAt(e);
+      view={tx:Math.max(6,e*1.18),lm:Math.max(Math.log(Math.max(2,s.target*1.15)),Math.log(m)*1.12)} }
+    const X=tt=>bh.x+bhr*1.8+(w*.92-bh.x-bhr*1.8)*Math.min(1,tt/view.tx), Y=mm=>bh.y-bhr*1.2-(h*.72)*Math.min(1.1,Math.log(mm)/view.lm);
+    // target line
+    const tg=s.ph==='idle'||s.ph==='charge'?this.target():s.target, ty=Y(tg);
+    g.setLineDash([5,6]); g.strokeStyle='rgba(61,255,208,.6)'; g.beginPath(); g.moveTo(bh.x+bhr*2,ty); g.lineTo(w-8,ty); g.stroke(); g.setLineDash([]);
+    vText(g,'Ausstieg '+vX(tg),w-10,ty-10,11,'#3dffd0','right',600);
+    // flight
+    let P={x:X(0),y:Y(1)};
+    if(s.ph==='charge'){ const k=t-s.t0; P={x:X(0)+Math.sin(k*45)*1.5,y:Y(1)+Math.cos(k*38)*1.5}; radialHex(g,P.x,P.y,26,col,.25+.2*Math.sin(k*20)) }
+    if(s.ph==='fly'){
+      const pts=[]; for(let q=0;q<=40;q++){ const tt=e*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,col,skin.trail,t,.9);
+      P={x:X(e),y:Y(m)};
+      while(s.ticks<20&&m>=[1.25,1.5,2,3,5,7.5,10,15,20,30,50,75,100][s.ticks-1]){ Sfx.tick(Math.min(1,s.ticks/10)); s.ticks++ }
+      if(Math.random()<.6) VS.parts.push({x:P.x,y:P.y,vx:-60-Math.random()*40,vy:30+Math.random()*30,life:.4,max:.4,c:col,r:1.3,k:'dot'});
+      if(t-s.t0>=s.end){
+        if(s.win){ s.ph='out'; s.t0b=t; Sfx.target(); VS.flash={c:'#3dffd0',a:.9}; vBurst(P.x,P.y,40,['#3dffd0','#ffffff',col],220,'star'); vFloat('Entkommen!',w/2,h*.38,'#3dffd0',22,1.4); voidReveal() }
+        else { s.ph='boom'; s.t0b=t; s.from={...P} }
+      }
+    }
+    if(s.ph==='out'||s.ph==='ghost'){
+      const pts=[]; for(let q=0;q<=40;q++){ const tt=s.end*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,col,skin.trail,t,.55);
+      const k=t-s.t0b; P={x:X(s.end)+k*k*300,y:Y(s.target)-k*k*160}; // warp away
+      // ghost: where the hole would have caught it
+      if(s.crash>s.target){ const ge=Math.min(this.tOf(Math.max(1.0001,s.crash)),s.end+k*3), gm=this.mAt(ge);
+        if(ge>s.end){ g.setLineDash([2,5]); g.strokeStyle='rgba(255,79,139,.5)'; g.beginPath(); g.moveTo(X(s.end),Y(s.target)); for(let q=1;q<=20;q++){ const tt=s.end+(ge-s.end)*q/20; g.lineTo(X(tt),Y(Math.min(this.mAt(tt),Math.exp(view.lm*1.1)))) } g.stroke(); g.setLineDash([]) }
+        if(ge>=this.tOf(Math.max(1.0001,s.crash))) vText(g,'Loch bei '+vX2(s.crash),w*.66,h*.7+34,12,'#ff8aa0',undefined,600) }
+      if(k>1.6&&s.ph==='out'){ s.ph='ghost'; voidDone() }
+    }
+    if(s.ph==='boom'){
+      const k=Math.min(1,(t-s.t0b)/.9), a0=Math.atan2(s.from.y-bh.y,s.from.x-bh.x), d0=Math.hypot(s.from.x-bh.x,s.from.y-bh.y), a=a0+k*k*4, d=d0*(1-vInOut(k));
+      P={x:bh.x+Math.cos(a)*d,y:bh.y+Math.sin(a)*d};
+      const pts=[]; for(let q=0;q<=40;q++){ const tt=s.end*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,'#ff4f8b',skin.trail,t,.4*(1-k));
+      if(k>=1&&!s.swallowed){ s.swallowed=true; Sfx.swallow(); VS.shake=12; VS.flash={c:'#ff3b5c',a:1}; vBurst(bh.x,bh.y,40,['#ffb15c','#ff4f8b','#fff'],200); vFloat('Verschluckt',w/2,h*.38,'#ff8aa0',22,1.4); voidReveal() }
+      if(k>=1&&t-s.t0b>1.5){ s.ph='done'; voidDone() }
+    }
+    if(s.ph!=='boom'||!s.swallowed){ g.save(); g.translate(P.x,P.y); g.rotate(-.6); g.scale(1.6,1.6); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0 }
+    // big multiplier
+    let big=1, bc='#f3eeff';
+    if(s.ph==='fly') big=m; else if(s.ph==='out'||s.ph==='ghost'){ big=s.target; bc='#3dffd0' } else if(s.ph==='boom'||s.ph==='done'){ big=s.crash; bc='#ff8aa0' }
+    if(s.ph==='fly'&&m>=s.target*.85&&s.win) bc='#3dffd0';
+    g.save(); const pulse=s.ph==='fly'?1+.03*Math.sin(t*20):1; g.translate(w*.66,h*.7); g.scale(pulse,pulse); vText(g,vX2(big),0,0,Math.min(44,w*.12),bc); g.restore();
+    if(s.ph==='idle'||s.ph==='charge') vText(g,s.ph==='charge'?'Zündung …':'Wähle deinen Ausstieg',w*.66,h*.7+30,12,'rgba(169,156,214,.9)',undefined,500);
+  }
+};
+
+/* ---------- 5 · Orbit-Rad ---------- */
+const VWheel={
+  st:{a:-Math.PI/2,v:0,ph:'idle',seg:-1},
+  reset(){ this.st={a:this.st.a,v:0,ph:'idle',seg:-1} },
+  opts(box){ box.innerHTML='' },
+  args(){ return {} },
+  info(){ const cnt={}; for(const m of VOID_T.wheel) cnt[m]=(cnt[m]||0)+1; const n=VOID_T.wheel.length;
+    const rows=Object.keys(cnt).map(Number).sort((a,b)=>b-a).map(m=>`<tr><td><i class="sw" style="background:${vMultColor(m)}"></i>${vX(m)}</td><td>${cnt[m]} von ${n}</td><td>${vPct(cnt[m]/n)}</td></tr>`).join('');
+    return `<h3>Orbit-Rad · ${n} Felder</h3><table><tr><th>Auszahlung</th><th>Felder</th><th>Chance</th></tr>${rows}</table><span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.wheel)}</span>` },
+  segAt(a){ const n=VOID_T.wheel.length; return Math.floor((((a+Math.PI/2)%(2*Math.PI))+2*Math.PI)%(2*Math.PI)/(2*Math.PI/n)) },
+  charge(t){ const s=this.st; s.ph='spin'; s.v=s.v||0; s.seg=-1; s.res=null },
+  abort(){ this.st.ph='idle'; this.st.v=0 },
+  land(r,t){ const s=this.st, n=VOID_T.wheel.length, w=2*Math.PI/n; s.res=r.result;
+    // decelerate from the current speed so the moon ends inside the drawn segment
+    const goal=-Math.PI/2+(r.result.seg+.5+(Math.random()-.5)*.6)*w; let D=(goal-s.a)%(2*Math.PI); if(D<0) D+=2*Math.PI;
+    const v=Math.max(s.v,6); while(D<v*2.2/3) D+=2*Math.PI;
+    s.ph='decel'; s.a0=s.a; s.D=D; s.T=3*D/v; s.d=0 },
+  draw(g,w,h,t,dt){
+    const s=this.st, n=VOID_T.wheel.length, cx=w/2, cy=h*.5, R=Math.min(w,h)*.4, sw=2*Math.PI/n, skin=mySkin();
+    // move
+    if(s.ph==='spin'){ s.v=Math.min(9,s.v+18*dt); s.a+=s.v*dt }
+    else if(s.ph==='decel'){ s.d+=dt; const p=Math.min(1,s.d/s.T); s.a=s.a0+s.D*vOutCubic(p); s.v=3*s.D/s.T*Math.pow(1-p,2);
+      if(p>=1){ s.ph='landed'; s.t0=t; s.v=0; const m=s.res.mult; Sfx.moon(); vFloat(vX(m),cx,cy+R*.05,m>=1?'#ffd34f':'#a99cd6',26);
+        const px=cx+Math.cos(s.a)*R, py=cy+Math.sin(s.a)*R; if(m>=2){ vBurst(px,py,m>=5?60:28,['#ffd34f','#ff4f8b','#fff'],200); VS.shake=m>=5?9:4 } voidReveal() } }
+    else if(s.ph==='landed'){ if(t-s.t0>.6){ s.ph='idle'; voidDone() } }
+    else if(!s.res) s.a+=.15*dt;
+    const cur=this.segAt(s.a); if(cur!==s.seg){ if(s.ph==='spin'||s.ph==='decel') Sfx.tick(.2+.6*Math.min(1,s.v/9)); s.seg=cur }
+    // segments
+    for(let i=0;i<n;i++){ const m=VOID_T.wheel[i], a0=-Math.PI/2+i*sw, c=vMultColor(m), on=i===cur&&(s.ph==='landed'||s.ph==='idle'&&s.res);
+      const pulse=on?.5+.5*Math.sin(t*10):0;
+      g.strokeStyle=rgba(c,m?(.55+.35*pulse):.3); g.lineWidth=R*.2*(on?1.15:1); g.beginPath(); g.arc(cx,cy,R,a0+.015,a0+sw-.015); g.stroke();
+      const am=a0+sw/2; if(m) { g.save(); g.translate(cx+Math.cos(am)*R*.73,cy+Math.sin(am)*R*.73); g.rotate(am+Math.PI/2); vText(g,String(m).replace('.',','),0,0,Math.max(8,R*.075),on?'#fff':rgba(c,.95)); g.restore() } }
+    g.strokeStyle='rgba(167,123,255,.25)'; g.lineWidth=1; g.beginPath(); g.arc(cx,cy,R*.62,0,7); g.stroke();
+    // the player's planet in the middle
+    drawSkinnedPlanet(g,cx,cy,R*.22,skin,t,false); g.shadowBlur=0;
+    // the moon on its orbit (with a short trail)
+    const tr=[]; for(let q=8;q>=0;q--){ const aa=s.a-q*Math.min(.6,s.v*.02); tr.push([cx+Math.cos(aa)*R,cy+Math.sin(aa)*R]) }
+    if(s.v>.5) drawStyledTrail(g,tr,'#e9e2ff','basic',t,.6);
+    const mx=cx+Math.cos(s.a)*R, my=cy+Math.sin(s.a)*R;
+    drawBody(g,{kind:'moon',type:'n',x:mx,y:my,r:R*.085,m0:1,craters:[{a:.6,d:.4,s:.25},{a:2.6,d:.35,s:.18}]},t,0);
+  }
+};
+
+const VGAME={coinflip:VCoin,plinko:VPlinko,plinkovoid:VPlinko,slot:VSlot,crash:VCrash,wheel:VWheel};
+
+/* ---------- screens ---------- */
+function openVoid(){ vRenderPicker(); show('void') }
+function vDust(bump){ const el=$('voidDust'); el.textContent=`✦ ${vNum(VS.shownDust??profile.dust)}`; if(bump){ el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'),220) } }
+function vRenderPicker(){
+  VS.game=null; $('void').classList.remove('degen'); $('void').removeAttribute('data-game');
+  $('voidPicker').hidden=false; $('voidStage').hidden=true; $('voidTitle').textContent='Void'; $('voidLabel').textContent='Shop · Spielecke';
+  const box=$('voidGames'); box.innerHTML=''; VS.tiles=[];
+  for(const G of VOID_GAMES){
+    const b=document.createElement('button'); b.className='vgame'+(G.degen?' degen':''); b.id='vg-'+G.id;
+    b.innerHTML=`<canvas aria-hidden="true"></canvas><span class="tag">${G.tag}</span><span class="vt"><b>${G.name}</b><span>${G.sub}</span></span>`;
+    b.addEventListener('click',()=>{ Sfx.init(); Sfx.select(); vOpenGame(G.id) });
+    box.appendChild(b); VS.tiles.push({cv:b.querySelector('canvas'),id:G.id});
+  }
+  vDust();
+}
+function vOpenGame(id){
+  const G=VOID_GAMES.find(x=>x.id===id), M=VGAME[id]; VS.game=id; VS.parts=[]; VS.floats=[]; VS.prize=null; VS.info=false;
+  $('void').classList.toggle('degen',!!G.degen); $('void').dataset.game=id;
+  $('voidPicker').hidden=true; $('voidStage').hidden=false; $('voidPrize').hidden=true; $('voidInfo').hidden=true; $('voidInfoBtn').setAttribute('aria-expanded','false');
+  $('voidGameName').textContent=G.name; $('voidTitle').textContent=G.degen?'Void-Modus':'Void'; $('voidLabel').textContent=G.degen?'Achtung · hohes Risiko':'Shop · Spielecke';
+  $('voidWarn').hidden=!G.degen; $('voidBetRow').hidden=false;
+  M.reset(); M.opts($('voidOpts')); vMsg(G.degen?'Fester Einsatz ✦ 500':'',''); vSyncBet();
+}
+function vSyncBet(){
+  const b=vBet(), dg=VS.game==='plinkovoid';
+  $('voidBet').textContent=`✦ ${vNum(b)}`;
+  for(const id of ['voidBetHalf','voidBetMinus','voidBetPlus','voidBetDouble']) $(id).disabled=VS.busy||dg;
+  if(!dg){ $('voidBetMinus').disabled||=b<=VOID_LADDER[0]; $('voidBetHalf').disabled||=b<=VOID_LADDER[0]; $('voidBetPlus').disabled||=b>=VOID_LADDER.at(-1); $('voidBetDouble').disabled||=b>=VOID_LADDER.at(-1) }
+  $('voidPlay').disabled=VS.busy;
+  $('voidPlay').textContent=VS.busy?'Läuft …':VS.game==='plinkovoid'?'In den Abgrund · ✦ 500':VS.game==='slot'?`Drehen · ✦ ${vNum(b)}`:VS.game==='plinko'?`Fallen lassen · ✦ ${vNum(b)}`:VS.game==='crash'?`Starten · ✦ ${vNum(b)}`:VS.game==='wheel'?`Mond schicken · ✦ ${vNum(b)}`:`Werfen · ✦ ${vNum(b)}`;
+  $('voidToPicker').disabled=VS.busy;
+  for(const el of document.querySelectorAll('#voidOpts button')) el.disabled=VS.busy;
+}
+function vSetBet(b){ if(VS.busy||VS.game==='plinkovoid') return; const L=VOID_LADDER; let best=L[0]; for(const x of L) if(x<=b) best=x; vPrefs.bet[VS.game]=best; vSavePrefs(); Sfx.tick(L.indexOf(best)/L.length); vSyncBet() }
+function vStepBet(d){ const L=VOID_LADDER, i=L.indexOf(vBet()); vSetBet(L[vClamp(i+d,0,L.length-1)]) }
+function vMsg(text,cls){ const el=$('voidMsg'); el.textContent=text; el.className='vmsg'+(cls?' '+cls:'') }
+function vRenderInfo(){ const M=VGAME[VS.game]; if(!M) return; $('voidInfo').innerHTML=M.info()+`<p>Void ist reines Spielgeld: Sternenstaub ✦ verdienst du im Spiel, er ist nicht käuflich und nicht auszahlbar. Jedes Ergebnis lost der Server aus. Einsatz ✦ ${VOID_T.minBet}–${vNum(VOID_T.maxBet)}.</p>` }
+
+/* ---------- one round: bet → server → animation → reveal ---------- */
+async function voidPlay(){
+  if(VS.busy||!VS.game) return;
+  const M=VGAME[VS.game], bet=vBet();
+  if(!SERVER_ECON){ toast('Void braucht eine Verbindung zum Server'); return }
+  if(!econReady()){ toast('Keine Verbindung zum Server'); return }
+  if(profile.dust<bet){ toast('Nicht genug Sternenstaub'); Sfx.miss(); return }
+  VS.busy=true; VS.speed=1; VS.round=null; $('voidPrize').hidden=true; VS.prize=null; vSyncBet(); vMsg('','');
+  VS.shownDust=profile.dust-bet; vDust(true);
+  const t0=performance.now()/1000; M.charge(t0);
+  const wait=VOID_T.cooldown*1000+80-(Date.now()-VS.lastAt); // the server allows one round per second
+  const minCharge=vSleep(VS.game==='slot'||VS.game==='wheel'?120:300);
+  if(wait>0) await vSleep(wait);
+  let r;
+  try{ VS.lastAt=Date.now(); r=await rpc('gd_void_play',{p_game:VS.game==='plinkovoid'?'plinko':VS.game,p_bet:bet,p_opts:M.args()}); await minCharge }
+  catch(e){ M.abort(); VS.busy=false; VS.shownDust=null; vDust(); vSyncBet(); toast(voidErr(e)); econRefresh().catch(()=>{}); return }
+  if(current!=='void'||!VS.game||VGAME[VS.game]!==M){ applyEcon(r.state); VS.busy=false; VS.shownDust=null; return } // left while waiting
+  VS.round={r,bet:r.bet||bet,game:VS.game,revealed:false};
+  M.land(r,performance.now()/1000);
+}
+function voidReveal(){
+  const R=VS.round; if(!R||R.revealed) return; R.revealed=true;
+  applyEcon(R.r.state); VS.shownDust=null; vDust(true);
+  const pay=R.r.payout|0, bet=R.bet, ratio=pay/bet, res=R.r.result||{};
+  if(R.game==='coinflip') VS.hist.push(res.side);
+  if(res.consolation){ vFloat(`+${vNum(res.consolation)} ✦`,(VS.w||300)/2,(VS.h||300)*.4,'#d7a0ff',24,2); toast(`Alle Void-Items gesammelt: Trostpreis ✦ ${vNum(res.consolation)}`) }
+  if(pay>bet) vMsg(`Gewinn ${R.game==='slot'?'':vX(ratio)+' · '}✦ ${vNum(pay)}`,'win'+(ratio>=10?' big':''));
+  else if(pay>0) vMsg(`${R.game==='slot'?'':vX(ratio)+' · '}✦ ${vNum(pay)} zurück`,'');
+  else vMsg(R.game==='crash'?`Verschluckt bei ${vX2(res.crash)}`:'Diesmal nichts','lose');
+  if(R.r.item) vShowPrize(R.r.item);
+  else if(R.game==='slot'){ if(pay===0) Sfx.miss() } // the slot already played its own win sounds
+  else if(ratio>=10){ Sfx.crateOpen('legendary'); vibrate([30,40,90]) }
+  else if(ratio>=2) Sfx.win();
+  else if(ratio>1) Sfx.buy();
+  else if(pay>0) Sfx.select();
+  else Sfx.miss();
+}
+function voidDone(){ VS.busy=false; VS.speed=1; vSyncBet() }
+function vShowPrize(it){
+  const list=SHOP[it.cat], item=list&&list.find(x=>x.id===it.id);
+  const skin=mySkin(); if(item){ if(it.cat==='color'){ skin.color=item.color; skin.c2=item.c2; skin.anim=item.anim } else skin[it.cat]=it.id }
+  VS.prize={cat:it.cat,item,skin,parts:[],fx:[],next:0,t0:performance.now()/1000};
+  const cat={color:'Farbe',aura:'Aura',trail:'Spur',shot:'Geschossform',pattern:'Planetenmuster',impact:'Treffereffekt',title:'Titel',emote:'Emote'}[it.cat]||it.cat;
+  $('voidPrizeName').textContent=(item?item.name:it.name||it.id); $('voidPrizeRar').textContent=`${RARITY.void.name} · ${cat}`; $('voidPrizeRar').style.color=RARITY.void.color;
+  $('voidPrize').hidden=false; Sfx.crateOpen('mythic'); vibrate([40,40,40,40,160]);
+  vMsg(`Void-Fund: ${item?item.name:it.name||it.id}!`,'win big');
+}
+function vLeave(){ // finish a running round at once (the server has already paid)
+  const R=VS.round; if(R&&!R.revealed){ R.revealed=true; applyEcon(R.r.state); if(R.r.item) toast(`Void-Fund: ${(SHOP[R.r.item.cat]||[]).find(x=>x.id===R.r.item.id)?.name||R.r.item.name||R.r.item.id}`) }
+  if(VS.game) VGAME[VS.game].reset(); VS.busy=false; VS.shownDust=null; VS.round=null; VS.parts=[]; VS.floats=[];
+}
+
+/* ---------- drawing, called from the main loop ---------- */
+function voidTick(t){
+  if(current!=='void') return;
+  const dt=Math.min(.05,Math.max(0,t-(VS.lastT||t))); VS.lastT=t;
+  if(!VS.game){ for(const T of VS.tiles) vTile(T,t); return }
+  const cv=$('voidCv'), g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return; VS.w=w; VS.h=h;
+  g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  vSky(g,w,h,t,VS.game==='plinkovoid');
+  if(VS.shake>.2){ VS.shake*=Math.pow(.02,dt); g.translate((Math.random()-.5)*VS.shake,(Math.random()-.5)*VS.shake) } else VS.shake=0;
+  VGAME[VS.game].draw(g,w,h,t,dt*(VS.game==='slot'?1:1));
+  g.setTransform(dpr,0,0,dpr,0,0); vDrawFx(g,dt);
+  if(VS.prize&&!$('voidPrize').hidden){ const P=VS.prize, pc=$('voidPrizeCv');
+    if(P.item) drawSkinPreview(pc,P.skin,t,P);
+    else { const c=pc.getContext('2d'); c.setTransform(1,0,0,1,0,0); c.clearRect(0,0,pc.width,pc.height); vSym(c,'w',pc.width/2,pc.height/2,pc.height*.9,t,true) } }
+}
+/* the little moving pictures on the game tiles */
+function vTile(T,t){
+  const cv=T.cv, g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return;
+  g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  const dg=T.id==='plinkovoid'; vSky(g,w,h,t,dg);
+  if(T.id==='coinflip'){ const a=t*3, c=Math.cos(a), R=h*.3, y=h*.5-Math.abs(Math.sin(t*1.5))*h*.12;
+    g.save(); g.translate(w/2,y); g.scale(1,Math.max(.05,Math.abs(c))); const d=g.createRadialGradient(-R*.3,-R*.3,1,0,0,R); d.addColorStop(0,'#fff3c2'); d.addColorStop(1,'#b8860b'); g.fillStyle=d; g.beginPath(); g.arc(0,0,R,0,7); g.fill();
+    g.fillStyle='#14082e'; g.beginPath(); g.arc(0,0,R*.82,0,7); g.fill(); g.fillStyle=c>0?'#ff4f8b':'#a77bff'; g.beginPath(); g.arc(0,0,R*.45,0,7); g.fill(); g.restore() }
+  if(T.id==='plinko'||dg){ const n=dg?7:6, sx=w/(n+4), sy=h/(n+2);
+    for(let i=0;i<n;i++) for(let j=0;j<i+3;j++){ g.fillStyle=dg?'rgba(255,160,180,.8)':'rgba(220,210,255,.8)'; star(g,w/2+(j-(i+2)/2)*sx,sy*.8+i*sy,2); g.fill() }
+    const k=(t*.9)%1, i=Math.floor(k*n), x=w/2+Math.sin(i*2.1+Math.floor(t*.9))*sx*i*.3, y=sy*.4+k*n*sy; radialHex(g,x,y,10,dg?'#ff3b5c':'#2ee6ff',.8); g.fillStyle='#fff'; g.beginPath(); g.arc(x,y,2.6,0,7); g.fill();
+    if(dg){ drawBody(g,{kind:'moon',type:'b',x:w*.12,y:h*.55,r:h*.13,m0:100},t,0); drawBody(g,{kind:'moon',type:'b',x:w*.88,y:h*.55,r:h*.13,m0:100},t+1,0) } }
+  if(T.id==='slot'){ const s=Math.min(w/3.4,h*.8); ['w','x','s'].forEach((id,i)=>vSym(g,id,w/2+(i-1)*s*1.05,h*.5+Math.sin(t*2+i)*3,s,t,i===((t*.7|0)%3))) }
+  if(T.id==='crash'){ const bx=w*.18, by=h*.78; drawBody(g,{kind:'moon',type:'b',x:bx,y:by,r:h*.1,m0:100},t,0); const k=(t*.35)%1, pts=[];
+    for(let q=0;q<=20;q++){ const kk=k*q/20; pts.push([bx+20+kk*w*.7,by-10-Math.pow(kk,1.6)*h*.6]) } drawStyledTrail(g,pts,'#2ee6ff','basic',t,.8);
+    const e=pts[pts.length-1]; g.fillStyle='#fff'; g.beginPath(); g.arc(e[0],e[1],3,0,7); g.fill(); vText(g,vX2(Math.exp(k*2.5)),w*.7,h*.6,15,'#f3eeff') }
+  if(T.id==='wheel'){ const R=h*.38, cx=w/2, cy=h*.52, n=VOID_T.wheel.length, sw=6.283/n;
+    for(let i=0;i<n;i++){ g.strokeStyle=rgba(vMultColor(VOID_T.wheel[i]),VOID_T.wheel[i]?.8:.3); g.lineWidth=R*.18; g.beginPath(); g.arc(cx,cy,R,-1.571+i*sw+.02,-1.571+(i+1)*sw-.02); g.stroke() }
+    drawSkinnedPlanet(g,cx,cy,R*.3,mySkin(),t,false); g.shadowBlur=0; const a=t*1.6; g.fillStyle='#e9e2ff'; g.beginPath(); g.arc(cx+Math.cos(a)*R,cy+Math.sin(a)*R,R*.12,0,7); g.fill() }
+  if(dg) vText(g,'VOID',w/2,h*.5,Math.min(30,h*.3),rgba('#ff3b5c',.7+.3*Math.sin(t*3)));
+}
+
+/* ---------- buttons of the Void screen ---------- */
+$('voidBack').addEventListener('click',()=>{ Sfx.init(); vLeave(); renderShop(); show('shop') });
+$('voidToPicker').addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vLeave(); vRenderPicker() });
+$('voidPlay').addEventListener('click',()=>{ Sfx.init(); voidPlay() });
+$('voidBetHalf').addEventListener('click',()=>{ Sfx.init(); vSetBet(Math.floor(vBet()/2)) });
+$('voidBetDouble').addEventListener('click',()=>{ Sfx.init(); vSetBet(vBet()*2) });
+$('voidBetMinus').addEventListener('click',()=>{ Sfx.init(); vStepBet(-1) });
+$('voidBetPlus').addEventListener('click',()=>{ Sfx.init(); vStepBet(1) });
+$('voidInfoBtn').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); VS.info=!VS.info; $('voidInfo').hidden=!VS.info; $('voidInfoBtn').setAttribute('aria-expanded',String(VS.info)); if(VS.info) vRenderInfo() });
+$('voidCv').addEventListener('click',()=>{ const M=VGAME[VS.game]; if(M&&M.tap) M.tap() });
+$('voidPrizeOk').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); $('voidPrize').hidden=true; VS.prize=null });
+$('voidPrizeInv').addEventListener('click',()=>{ Sfx.init(); const P=VS.prize; $('voidPrize').hidden=true; VS.prize=null; vLeave(); openInventory(P&&P.cat) });
+if($('tab-void')) $('tab-void').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); openVoid() });
+document.addEventListener('keydown',e=>{ if(current!=='void'||!VS.game||e.repeat) return; if(e.key===' '||e.key==='Enter'){ if(document.activeElement&&/^(BUTTON|INPUT|SUMMARY)$/.test(document.activeElement.tagName)) return; e.preventDefault(); voidPlay() } });
+if(window.__GD_TEST__) window.__void={state:()=>({game:VS.game,busy:VS.busy,dust:profile.dust,msg:$('voidMsg').textContent,prize:!$('voidPrize').hidden,slot:VSlot.st&&{ph:VSlot.st.ph,idx:VSlot.st.idx,n:VSlot.st.spins&&VSlot.st.spins.length}}),open:openVoid,game:vOpenGame,refresh:()=>econRefresh()};
+
 /* ---------- buttons ---------- */
 const tap=(id,fn)=>$(id).addEventListener('click',()=>{Sfx.init();fn()});
 tap('campPlay',()=>{ const gi=activeGalaxy(), g=GALAXIES[gi], n=nextLevelIn(g); galIdx=gi; n===null?goLevels(gi):startLevel(n) });
@@ -5993,7 +6823,7 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); invTick(t); pickerTick(t); seasonTick(t); crateTick(t);
+  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT) openSetup('wait'); requestAnimationFrame(loop); netInit();
