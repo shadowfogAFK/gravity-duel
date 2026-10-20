@@ -269,7 +269,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .ii{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:6px 4px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);box-shadow:none;color:var(--ink);font:inherit;cursor:pointer}
 .ii:active{transform:scale(.97)}
 .ii canvas{width:100%;max-width:96px;aspect-ratio:1;height:auto}
-.invgrid.wide{grid-template-columns:repeat(2,1fr)}.invgrid.wide .iname{display:none}.invgrid.wide .ii{padding:10px 4px}.invgrid.wide canvas{max-width:none;aspect-ratio:5/2}
+.invgrid.wide{grid-template-columns:repeat(2,1fr)}.invgrid.wide .iname{display:none}.invgrid.wide .ii{padding:10px 4px}.invgrid.wide canvas{max-width:none;aspect-ratio:24/11}
 .ii .iname{font-family:var(--display);font-weight:700;font-size:.74rem;line-height:1.15;text-align:center;overflow-wrap:anywhere}
 .ii .rar{width:24px;height:3px;border-radius:2px;margin-top:3px}
 .ii.on{border-color:var(--gold);background:rgba(255,211,79,.08);box-shadow:0 0 14px rgba(255,211,79,.18)}
@@ -4327,7 +4327,7 @@ function renderInv(){
     const b=document.createElement('button'); b.id=`inv-${invTab}-${it.id}`;
     b.className='ii'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
     b.setAttribute('aria-pressed',String(on)); b.setAttribute('aria-label',`${it.name}, ${rar.name}${on?', ausgerüstet':', ausrüsten'}`);
-    b.innerHTML=`<canvas width="${invTab==='title'?240:192}" height="${invTab==='title'?96:192}" aria-hidden="true"></canvas><span class="iname">${it.name}</span><i class="rar" style="background:${rar.color}"></i>`;
+    b.innerHTML=`<canvas width="${invTab==='title'?240:192}" height="${invTab==='title'?110:192}" aria-hidden="true"></canvas><span class="iname">${it.name}</span><i class="rar" style="background:${rar.color}"></i>`;
     if(!on) b.onclick=()=>{ if(SERVER_ECON) return econEquip(invTab,it.id,b); profile.equip[invTab]=it.id; saveProfile(); Sfx.select(); renderInv() };
     box.appendChild(b);
     invPreviews.push({cv:b.querySelector('canvas'),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
@@ -4348,7 +4348,9 @@ function invTick(t){
 }
 /* a name plate as it appears in the profile, centred on (0,0) */
 function drawNamePlate(ctx,it,t,pw,ph){
-  const name=it.id==='none'?'—':it.name, rc=RARITY[it.rarity].color, fs=Math.min(ph*.42,pw/(name.length*.62+1));
+  const name=it.id==='none'?'—':it.name, rc=RARITY[it.rarity].color;
+  let fs=ph*.42; ctx.font=`700 ${fs}px "Chakra Petch", ui-monospace, monospace`;
+  const room=pw-ph*.9, tw=ctx.measureText(name).width; if(tw>room) fs*=room/tw; // the name always fits inside the plate
   ctx.fillStyle='rgba(22,10,52,.92)';ctx.strokeStyle=rc;ctx.lineWidth=Math.max(1.2,ph*.045);roundRect(ctx,-pw/2,-ph/2,pw,ph,ph/2);ctx.fill();ctx.stroke();
   ctx.font=`700 ${fs}px "Chakra Petch", ui-monospace, monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
   if(it.rarity==='mythic'){ ctx.shadowColor='#ff2a2a';ctx.shadowBlur=8+6*Math.sin(t*3) }
@@ -4360,7 +4362,7 @@ function drawItemIcon(cv,skin,t,P){
   const ctx=cv.getContext('2d'), s=cv.width/100, cat=P.cat, it=P.item;
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(s,0,0,s,0,0);
   const c=skinColor(skin,t), plain={...skin,aura:'none',pattern:'none'};
-  if(cat==='title'){ ctx.save();ctx.translate(50,20);drawNamePlate(ctx,it,t,78,24);ctx.restore(); return }
+  if(cat==='title'){ ctx.save();ctx.translate(50,27);drawNamePlate(ctx,it,t,94,26);ctx.restore(); return }
   if(cat==='color'){ drawSkinnedPlanet(ctx,50,50,24,plain,t,false); return }
   if(cat==='pattern'){ drawSkinnedPlanet(ctx,50,50,28,{...skin,aura:'none'},t,false); return }
   if(cat==='aura'){ drawSkinnedPlanet(ctx,50,50,19,{...skin,pattern:'none'},t,false); return }
