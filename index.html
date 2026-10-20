@@ -260,6 +260,23 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.invtabs{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 10px;padding:2px 4px 4px;scrollbar-width:none}
+.invtabs::-webkit-scrollbar{display:none}
+.invtabs .tab{flex:none;padding:7px 12px;border-radius:99px;font-size:.8rem;white-space:nowrap}
+.invtabs .tab small{margin-left:5px;font-size:.68rem;opacity:.7}
+.invtabs .tab[aria-selected="true"] small{opacity:1}
+.invgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.ii{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:6px 4px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);box-shadow:none;color:var(--ink);font:inherit;cursor:pointer}
+.ii:active{transform:scale(.97)}
+.ii canvas{width:100%;max-width:96px;aspect-ratio:1;height:auto}
+.invgrid.wide{grid-template-columns:repeat(2,1fr)}.invgrid.wide .iname{display:none}.invgrid.wide .ii{padding:10px 4px}.invgrid.wide canvas{max-width:none;aspect-ratio:5/2}
+.ii .iname{font-family:var(--display);font-weight:700;font-size:.74rem;line-height:1.15;text-align:center;overflow-wrap:anywhere}
+.ii .rar{width:24px;height:3px;border-radius:2px;margin-top:3px}
+.ii.on{border-color:var(--gold);background:rgba(255,211,79,.08);box-shadow:0 0 14px rgba(255,211,79,.18)}
+.ii.on::after{content:'✓';position:absolute;top:5px;right:6px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#1a0f3d;font-size:.7rem;font-weight:800;line-height:18px;text-align:center}
+.ii.myth{border-color:rgba(255,42,42,.5)}
+.ii[disabled]{opacity:.55}
+.invempty2{grid-column:1/-1;text-align:center;font-size:.8rem;color:var(--muted);padding:6px 0}
 .herobtn{display:block;width:100%;padding:0;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.35)}
 .herobtn:active{transform:scale(.99)}
 #page-ranked .herobtn{flex:1 1 auto;min-height:190px}
@@ -288,7 +305,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .stier canvas{width:72px;height:48px}
 .stier button{font-size:.75rem;padding:6px 10px;white-space:nowrap}
 .stier .st{font-size:.72rem;color:var(--muted);white-space:nowrap}
-.invhero{width:100%;height:auto;aspect-ratio:12/5;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:8px}
+.invhero{width:100%;height:auto;aspect-ratio:48/23;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:8px}
 .invempty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85rem;padding:18px 8px}
 .phead{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
 .pwho{flex:1;min-width:0}.pwho h2{margin:0;overflow-wrap:anywhere}.pwho .fine{margin:2px 0 0;display:block}
@@ -663,13 +680,12 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
   <div class="overlay" id="inventory" hidden>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">
-        <div><span class="label">Dein Look</span><h2>Inventar</h2></div>
+        <div><span class="label" id="invCount">Dein Look</span><h2>Inventar</h2></div>
         <button class="ghost mini" id="invToShop">Zum Shop</button>
       </div>
-      <canvas id="invHero" class="invhero" width="480" height="200" aria-hidden="true"></canvas>
-      <p class="fine" id="invCount"></p>
-      <div class="tabs" role="tablist" id="invTabs"></div>
-      <div class="items" id="invItems"></div>
+      <canvas id="invHero" class="invhero" width="480" height="230" aria-hidden="true"></canvas>
+      <div class="invtabs" role="tablist" id="invTabs"></div>
+      <div class="invgrid" id="invItems"></div>
       <button class="ghost" id="invBack">Zurück</button>
     </div>
   </div>
@@ -4298,36 +4314,79 @@ function renderInv(){
   const tabs=$('invTabs'); tabs.innerHTML='';
   for(const [t,label] of SHOP_TABS){ if(t==='crate') continue;
     const n=SHOP[t].filter(it=>profile.owned[t+':'+it.id]).length;
-    const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(t===invTab)); b.textContent=`${label} ${n}`;
+    const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(t===invTab)); b.innerHTML=`${label}<small>${n}</small>`;
     b.onclick=()=>{ invTab=t; Sfx.select(); renderInv() }; tabs.appendChild(b) }
   const all=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].length,0), have=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].filter(it=>profile.owned[c+':'+it.id]).length,0);
-  $('invCount').textContent=`${have} von ${all} Items gesammelt`;
-  const box=$('invItems'); box.innerHTML=''; invPreviews=[];
+  $('invCount').textContent=`${have} von ${all} gesammelt`;
+  const box=$('invItems'); box.innerHTML=''; invPreviews=[]; box.classList.toggle('wide',invTab==='title');
   const list=SHOP[invTab].filter(it=>profile.owned[invTab+':'+it.id]);
   for(const it of list){
     const on=profile.equip[invTab]===it.id, skin=mySkin();
     if(invTab==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else skin[invTab]=it.id;
     const rar=RARITY[it.rarity];
-    const el=document.createElement('div'); el.className='item'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
-    el.innerHTML=`<canvas width="240" height="160" aria-hidden="true"></canvas><span class="iname">${it.name}</span><span class="rar" style="color:${rar.color}">${rar.name}</span>`;
     const b=document.createElement('button'); b.id=`inv-${invTab}-${it.id}`;
-    if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
-    else { b.className='own'; b.textContent='Ausrüsten'; b.onclick=()=>{ if(SERVER_ECON) return econEquip(invTab,it.id,b); profile.equip[invTab]=it.id; saveProfile(); Sfx.select(); renderInv() } }
-    el.appendChild(b); box.appendChild(el);
-    invPreviews.push({cv:el.querySelector('canvas'),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
+    b.className='ii'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
+    b.setAttribute('aria-pressed',String(on)); b.setAttribute('aria-label',`${it.name}, ${rar.name}${on?', ausgerüstet':', ausrüsten'}`);
+    b.innerHTML=`<canvas width="${invTab==='title'?240:192}" height="${invTab==='title'?96:192}" aria-hidden="true"></canvas><span class="iname">${it.name}</span><i class="rar" style="background:${rar.color}"></i>`;
+    if(!on) b.onclick=()=>{ if(SERVER_ECON) return econEquip(invTab,it.id,b); profile.equip[invTab]=it.id; saveProfile(); Sfx.select(); renderInv() };
+    box.appendChild(b);
+    invPreviews.push({cv:b.querySelector('canvas'),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
   }
-  if(list.length<=1){ const e=document.createElement('div'); e.className='invempty'; e.textContent='Mehr gibt es im Shop, in Kisten und als Belohnung für Aufgaben.'; box.appendChild(e) }
+  if(list.length<=1){ const e=document.createElement('div'); e.className='invempty2'; e.textContent='Mehr gibt es im Shop, in Kisten und als Belohnung für Aufgaben.'; box.appendChild(e) }
   invHero={cv:$('invHero'),parts:[],fx:[],next:0};
 }
 function invTick(t){
   if(current!=='inventory') return;
-  for(const p of invPreviews) drawSkinPreview(p.cv,p.skin,t,p);
+  for(const p of invPreviews) drawItemIcon(p.cv,p.skin,t,p);
   if(invHero){ const cv=invHero.cv, g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return; g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
-    const skin=mySkin(), tr=[]; for(let i=0;i<=50;i++){ const k=i/50; tr.push([w*.3+k*w*.55,h*.62-Math.sin(k*Math.PI)*h*.42+k*h*.1]) }
+    const skin=mySkin(), plate=profile.equip.title&&profile.equip.title!=='none', sh=plate?h*.8:h;
+    const tr=[]; for(let i=0;i<=50;i++){ const k=i/50; tr.push([w*.3+k*w*.55,sh*.66-Math.sin(k*Math.PI)*sh*.44+k*sh*.08]) }
     drawStyledTrail(g,tr,skinColor(skin,t),skin.trail,t,.9);
     const e=tr[50], q=tr[49]; g.save(); g.translate(e[0],e[1]); g.rotate(Math.atan2(e[1]-q[1],e[0]-q[0])); g.scale(1.5,1.5); drawShotHead(g,skin.shot,skinColor(skin,t),t); g.restore();
-    drawSkinnedPlanet(g,w*.22,h*.6,Math.min(34,h*.2),skin,t,false);
-    const tt=titleName(profile.equip.title); if(tt){ g.font='700 13px "Chakra Petch", ui-monospace, monospace'; g.textAlign='center'; g.fillStyle=COL.gold; g.fillText(tt,w*.22,h*.93) } }
+    drawSkinnedPlanet(g,w*.22,sh*.6,Math.min(34,sh*.2),skin,t,false);
+    if(plate){ const it=shopItem('title',profile.equip.title); g.save(); g.translate(w/2,h*.87); drawNamePlate(g,it,t,Math.min(w*.62,240),28); g.restore() } }
+}
+/* a name plate as it appears in the profile, centred on (0,0) */
+function drawNamePlate(ctx,it,t,pw,ph){
+  const name=it.id==='none'?'—':it.name, rc=RARITY[it.rarity].color, fs=Math.min(ph*.42,pw/(name.length*.62+1));
+  ctx.fillStyle='rgba(22,10,52,.92)';ctx.strokeStyle=rc;ctx.lineWidth=Math.max(1.2,ph*.045);roundRect(ctx,-pw/2,-ph/2,pw,ph,ph/2);ctx.fill();ctx.stroke();
+  ctx.font=`700 ${fs}px "Chakra Petch", ui-monospace, monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+  if(it.rarity==='mythic'){ ctx.shadowColor='#ff2a2a';ctx.shadowBlur=8+6*Math.sin(t*3) }
+  ctx.fillStyle=it.rarity==='season'?`hsl(${170+20*Math.sin(t*2)},90%,70%)`:it.rarity==='legendary'?`hsl(${(t*60)%360},90%,72%)`:it.rarity==='mythic'?`hsl(0,100%,${76+8*Math.sin(t*3)}%)`:'#f3eeff';
+  ctx.fillText(name,0,1); ctx.shadowBlur=0;
+}
+/* inventory: only the item itself, on a 100×100 square */
+function drawItemIcon(cv,skin,t,P){
+  const ctx=cv.getContext('2d'), s=cv.width/100, cat=P.cat, it=P.item;
+  ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);ctx.setTransform(s,0,0,s,0,0);
+  const c=skinColor(skin,t), plain={...skin,aura:'none',pattern:'none'};
+  if(cat==='title'){ ctx.save();ctx.translate(50,20);drawNamePlate(ctx,it,t,78,24);ctx.restore(); return }
+  if(cat==='color'){ drawSkinnedPlanet(ctx,50,50,24,plain,t,false); return }
+  if(cat==='pattern'){ drawSkinnedPlanet(ctx,50,50,28,{...skin,aura:'none'},t,false); return }
+  if(cat==='aura'){ drawSkinnedPlanet(ctx,50,50,19,{...skin,pattern:'none'},t,false); return }
+  if(cat==='trail'){
+    const tr=[]; for(let i=0;i<=40;i++){ const k=i/40; tr.push([12+k*76,78-Math.sin(k*Math.PI)*46-k*14]) }
+    drawStyledTrail(ctx,tr,c,it.id,t,1);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(88,64,3,0,7);ctx.fill(); return
+  }
+  if(cat==='shot'){
+    const tr=[]; for(let i=0;i<=20;i++){ const k=i/20; tr.push([14+k*44,70-k*28+Math.sin(k*Math.PI)*-4]) }
+    ctx.globalAlpha=.45; drawStyledTrail(ctx,tr,c,'basic',t,.6); ctx.globalAlpha=1;
+    ctx.save();ctx.translate(60,40);ctx.rotate(-0.55);ctx.scale(3.2,3.2);drawShotHead(ctx,it.id,c,t);ctx.restore(); return
+  }
+  if(cat==='impact'){
+    // the effect goes off again and again in the middle
+    if(t>P.next){ P.next=t+1.6; P.parts=impactParticles(it.id,50,50,c); P.fx=impactFx(it.id,50,50,c); P.t0=t }
+    const dt=1/60;
+    drawSkinnedPlanet(ctx,50,50,11,{color:'#5f6f9a',aura:'none',trail:'basic',pattern:'none'},t,false);
+    ctx.globalCompositeOperation='lighter';
+    for(const p of P.parts){ if(p.delay>0){p.delay-=dt;continue} p.x+=p.vx*dt*.28;p.y+=p.vy*dt*.28;p.vy+=p.rect?40*dt:0;p.life-=dt; const a=Math.max(0,p.life/p.max); ctx.globalAlpha=a; ctx.fillStyle=p.color;
+      if(p.star){ star(ctx,p.x,p.y,3);ctx.fill() } else if(p.rect){ ctx.fillRect(p.x-2,p.y-1,4,2) } else ctx.fillRect(p.x-1.4,p.y-1.4,2.8,2.8) }
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+    for(const f of P.fx){ f.t+=dt; ctx.save();ctx.translate(50,50);ctx.scale(.6,.6);ctx.translate(-50,-50);drawFx(ctx,f);ctx.restore() }
+    return
+  }
+  drawSkinPreview(cv,skin,t,P);
 }
 function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return crateCardsTick(t); for(const p of shopPreviews) drawSkinPreview(p.cv,p.skin,t,p) }
 
