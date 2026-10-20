@@ -262,6 +262,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.linkbtn{display:block;margin:6px 0 0 auto;padding:4px 2px;background:none;border:0;box-shadow:none;color:var(--p2);font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
 .invtabs{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 10px;padding:2px 4px 4px;scrollbar-width:none}
 .invtabs::-webkit-scrollbar{display:none}
 .invtabs .tab{flex:none;padding:7px 12px;border-radius:99px;font-size:.8rem;white-space:nowrap}
@@ -641,6 +642,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <p class="fine" id="acctInfo"></p>
       <input id="acctEmail" class="text" type="email" placeholder="E-Mail" autocomplete="email" spellcheck="false" aria-label="E-Mail">
       <input id="acctPw" class="text" type="password" placeholder="Passwort (mind. 6 Zeichen)" autocomplete="new-password" aria-label="Passwort">
+      <button type="button" class="linkbtn" id="acctForgot" hidden>Passwort vergessen?</button>
       <p class="fine" id="acctHint" aria-live="polite"></p>
       <div class="btns">
         <button type="submit" id="acctGo">Konto erstellen</button>
@@ -3882,7 +3884,8 @@ function cleanUrl(){ try{ history.replaceState(null,'',location.pathname) }catch
 async function afterReady(){
   // a sign-in through Google that came back with an error
   const err=(()=>{ try{ const q=new URLSearchParams(location.search+'&'+location.hash.slice(1)); return q.get('error_description') }catch(e){ return null } })();
-  if(err){ cleanUrl(); toast(/already|exists|linked/i.test(err)?'Dieses Google-Konto hat schon einen Spielstand. Melde dich unter „Anmelden“ damit an.':'Anmeldung fehlgeschlagen: '+err.slice(0,60)) }
+  if(err){ cleanUrl(); toast(/already|exists|linked/i.test(err)?'Dieses Google-Konto hat schon einen Spielstand. Melde dich unter „Anmelden“ damit an.':/expired|invalid/i.test(err)?'Der Link ist abgelaufen oder wurde schon benutzt. Fordere bitte einen neuen an.':'Anmeldung fehlgeschlagen: '+err.slice(0,60)) }
+  else if(RESET_RETURN){ cleanUrl(); if(isAccount()){ await switchedAccount('Angemeldet über den Link aus der E-Mail.'); return openAccount('reset') } }
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(LINK_CODE){
     cleanUrl();
@@ -3896,6 +3899,8 @@ async function afterReady(){
 /* ---------- economy: the server decides stardust, XP, items, stars and tasks (supabase/schema-3-wirtschaft.sql) ----------
    The game only reports what happened; the answer is the new state, which replaces this browser's copy. */
 const PENDING_PW='gravityDuel.pendingPw.v1', PENDING_LVL='gravityDuel.pendingLevels.v1';
+// back from a "reset password" e-mail: read before the sign-in library tidies up the address
+const RESET_RETURN=/[?&]reset=1/.test(location.search)||/type=recovery/.test(location.hash);
 let pendingLevels=load(PENDING_LVL,[]), lvlBusy=false, lvlTimer=null, evPending={}, evTimer=null, evLast=0;
 const lvlCb=new Map();
 const rewardLine=rw=>`+${rw.xp|0} XP · +${rw.dust|0} ✦`;
@@ -4014,10 +4019,12 @@ function renderAccountRow(){
 function setAcctMode(m){
   acctMode=m;
   $('acct-new').setAttribute('aria-checked',String(m==='new')); $('acct-login').setAttribute('aria-checked',String(m==='login'));
-  $('acctTabs').hidden=m==='setpw'; $('acctEmail').hidden=m==='setpw'; $('acctGoogle').hidden=m==='setpw';
-  $('acctTitle').textContent=m==='setpw'?'Passwort festlegen':'Konto';
+  const pwOnly=m==='setpw'||m==='reset';
+  $('acctTabs').hidden=pwOnly; $('acctEmail').hidden=pwOnly; $('acctGoogle').hidden=pwOnly; $('acctForgot').hidden=m!=='login';
+  $('acctTitle').textContent=m==='setpw'?'Passwort festlegen':m==='reset'?'Neues Passwort':'Konto';
   $('acctInfo').textContent=m==='new'?'Dein Spielstand wird mit dem Konto verbunden. Dann kannst du dich auf jedem Gerät anmelden.'
-    :m==='login'?'Melde dich mit deinem Konto an. Danach spielst du mit dem Spielstand dieses Kontos.':'Deine E-Mail ist bestätigt. Leg jetzt dein Passwort fest.';
+    :m==='login'?'Melde dich mit deinem Konto an. Danach spielst du mit dem Spielstand dieses Kontos.'
+    :m==='reset'?`Leg ein neues Passwort für ${(Net.user&&Net.user.email)||'dein Konto'} fest.`:'Deine E-Mail ist bestätigt. Leg jetzt dein Passwort fest.';
   $('acctPw').autocomplete=m==='login'?'current-password':'new-password';
   $('acctGo').textContent=m==='new'?'Konto erstellen':m==='login'?'Anmelden':'Speichern';
   $('acctHint').textContent='';
@@ -4042,7 +4049,7 @@ const authErr=e=>{ const m=String(e&&(e.message||e)||'');
 async function accountSubmit(){
   const sb=Net.backend&&Net.backend.sb, hint=$('acctHint'); if(!sb) return;
   const email=$('acctEmail').value.trim(), pw=$('acctPw').value;
-  if(acctMode!=='setpw'&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ hint.textContent='Bitte eine gültige E-Mail eingeben.'; return }
+  if(acctMode!=='setpw'&&acctMode!=='reset'&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ hint.textContent='Bitte eine gültige E-Mail eingeben.'; return }
   if(pw.length<6){ hint.textContent='Das Passwort braucht mindestens 6 Zeichen.'; return }
   $('acctGo').disabled=true; hint.textContent='Einen Moment …';
   try{
@@ -4051,10 +4058,10 @@ async function accountSubmit(){
       const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) throw error;
       return await switchedAccount('Angemeldet. Dein Spielstand ist synchronisiert.');
     }
-    if(acctMode==='setpw'){
+    if(acctMode==='setpw'||acctMode==='reset'){
       const {error}=await sb.auth.updateUser({password:pw}); if(error) throw error;
       try{ localStorage.removeItem(PENDING_PW) }catch(e){}
-      Net.user=(await sb.auth.getUser()).data.user; toast('Passwort gespeichert'); renderAccountRow(); return show('settings');
+      Net.user=(await sb.auth.getUser()).data.user; toast(acctMode==='reset'?'Neues Passwort gespeichert. Du bist angemeldet.':'Passwort gespeichert'); renderAccountRow(); return show('settings');
     }
     const r=await sb.auth.updateUser({email}); if(r.error) throw r.error;
     const u=r.data.user;
@@ -4066,6 +4073,19 @@ async function accountSubmit(){
     hint.textContent='Fast fertig: Öffne den Bestätigungslink in der E-Mail, die wir dir geschickt haben. Danach legst du hier dein Passwort fest.';
   }catch(e){ hint.textContent=authErr(e) }
   finally{ $('acctGo').disabled=false }
+}
+/* "forgot password": the e-mail link brings you back signed in, then you pick a new password */
+async function accountForgot(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('acctHint'); if(!sb) return;
+  const email=$('acctEmail').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ hint.textContent='Gib oben deine E-Mail ein, dann schicken wir dir einen Link.'; $('acctEmail').focus(); return }
+  const base=/^https?:/.test(location.protocol)?location.origin+location.pathname:WEB_URL;
+  $('acctForgot').disabled=true; hint.textContent='Einen Moment …';
+  try{
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:base+'?reset=1'}); if(error) throw error;
+    hint.textContent='Falls es ein Konto mit dieser E-Mail gibt, ist jetzt ein Link unterwegs. Öffne ihn auf diesem Gerät, dann legst du ein neues Passwort fest.';
+  }catch(e){ hint.textContent=authErr(e) }
+  finally{ setTimeout(()=>$('acctForgot').disabled=false,20000) }
 }
 async function accountGoogle(){
   const sb=Net.backend&&Net.backend.sb, hint=$('acctHint'); if(!sb) return;
@@ -4814,6 +4834,7 @@ tap('acctBack',()=>{ renderAccountRow(); show('settings') });
 tap('acct-new',()=>setAcctMode('new'));
 tap('acct-login',()=>setAcctMode('login'));
 tap('acctGoogle',accountGoogle);
+tap('acctForgot',accountForgot);
 $('acctForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); accountSubmit() });
 tap('copyCode',()=>{
   const code=$('friendCode').textContent, btn=$('copyCode');
