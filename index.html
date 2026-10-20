@@ -226,13 +226,16 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .me .dust{font-size:.9rem}
 .xpline{position:absolute;left:44px;right:12px;bottom:4px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
 .xpline i{display:block;height:100%;background:linear-gradient(90deg,var(--p1),var(--gold))}
-.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
-.tile{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;height:32px;min-width:0;padding:0 4px;
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.toprow{display:flex;align-items:stretch;gap:6px}.toprow .me{flex:1}
+.gear{flex:none;width:46px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:14px;background:rgba(22,10,52,.72);border:1px solid var(--line);color:var(--ink);box-shadow:none}
+.gear svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tile{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;height:36px;min-width:0;padding:0 4px;
   border-radius:11px;background:rgba(22,10,52,.72);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:.7rem;letter-spacing:.01em}
 .tile svg{flex:none;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tile.shop{color:var(--gold);border-color:rgba(255,211,79,.5)}
 .tile .badge{font-family:var(--body);top:-7px;right:-5px}
-@media (max-width:370px){.tile span{display:none}.tile svg{width:19px;height:19px}}
+@media (max-width:370px){.tile{gap:3px;padding:0 2px;font-size:.68rem}.tile svg{width:15px;height:15px}}
 .xprow{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0 8px;min-width:0}
 .xprow .xptext{overflow:visible;white-space:nowrap}
 .xprow .dust{font-size:.82rem}
@@ -339,13 +342,15 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 
   <div id="home">
     <div class="topbar">
-      <button class="me" id="me" aria-label="Profil, Namen ändern"></button>
+      <div class="toprow">
+        <button class="me" id="me" aria-label="Profil und Erfolge"></button>
+        <button class="gear" id="toSettings" aria-label="Optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg></button>
+      </div>
       <nav class="tiles" aria-label="Menü">
         <button class="tile" id="toQuests" aria-label="Aufgaben"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg><span>Aufgaben</span><b class="badge" id="questBadge" hidden>0</b></button>
         <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span></button>
         <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span></button>
         <button class="tile shop" id="toShop" aria-label="Shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Shop</span></button>
-        <button class="tile" id="toSettings" aria-label="Optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Optionen</span></button>
       </nav>
     </div>
     <div class="pager" id="pager">
