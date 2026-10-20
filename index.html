@@ -57,6 +57,10 @@ button:active{transform:translateY(1px)}
 #homeMusic{font-size:1.2rem}
 .topbar .iconbtn.round[aria-pressed="true"]{opacity:.45;text-decoration:line-through}
 #back{left:calc(10px + env(safe-area-inset-left,0px))}
+#emoteBtn{left:calc(10px + env(safe-area-inset-left,0px));top:calc(50px + env(safe-area-inset-top,0px));font-size:1.05rem;padding-left:12px;padding-right:12px}
+#emotes{position:absolute;z-index:3;left:calc(10px + env(safe-area-inset-left,0px));top:calc(92px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#emotes button{font-size:.8rem;padding:8px 10px;text-align:left;white-space:nowrap;background:rgba(255,255,255,.05);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+#emotes button.mute{grid-column:1/-1;color:var(--muted);text-align:center}
 .reward{font-family:var(--display);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .levelup{font-family:var(--display);font-weight:700;color:var(--p2);text-shadow:0 0 12px rgba(46,230,255,.6)}
 
@@ -296,6 +300,8 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 <div id="wrap">
   <canvas id="game" aria-label="Spielfeld"></canvas>
   <button id="back" class="chip" hidden>Menü</button>
+  <button id="emoteBtn" class="chip" hidden aria-label="Emote senden" aria-expanded="false">💬</button>
+  <div id="emotes" hidden role="menu" aria-label="Emotes"></div>
   <button id="mute" class="chip" aria-pressed="false" hidden>Ton an</button>
   <button id="music" class="chip" aria-pressed="false" hidden>Musik an</button>
   <div id="weapons" hidden aria-label="Geschoss wählen"></div>
@@ -1890,7 +1896,7 @@ function rand(a,b){return a+Math.random()*(b-a)}
 function mkPlanet(owner){ const fy=owner===0?(H-PLANET_GAP)/H:PLANET_GAP/H; return {x:W/2,fy,y:fy*H,r:24,m0:24*24*PHYS.PLANET_DENSITY,owner,kind:'planet',type:'planet'} }
 function withCraters(b){ b.craters=Array.from({length:3},()=>({a:rand(0,6.28),d:rand(0,.55),s:rand(.12,.26)})); return b }
 function mkTarget(x,fy){ return {x,fy,y:fy*H,r:12,m0:0,owner:-1,kind:'target',type:'target',spin:rand(0,6.28)} }
-function resetShotState(){ lastTrail=[null,null]; lastPower=[null,null]; particles=[]; fx=[]; proj=[]; volley=null; aim=null; shake=0; flash=0; flightT=0; visT=0 }
+function resetShotState(){ emoteBubbles=[]; lastTrail=[null,null]; lastPower=[null,null]; particles=[]; fx=[]; proj=[]; volley=null; aim=null; shake=0; flash=0; flightT=0; visT=0 }
 function mkPlayer(name,ammo,skin){ return {lives:3,planet:null,color:skinColor(skin,0),skin,name,ammo:{...ammo},weapon:'std'} }
 
 /* duel arenas: every match picks a galaxy look and its kinds of bodies. Layouts are point-symmetric
@@ -2186,6 +2192,50 @@ function fire(v){
   launch(v?[makeShot(turn,v)]:[]);
 }
 
+/* ---------- emotes: a fixed set of short reactions in online and AI matches (no free text) ---------- */
+const EMOTES=[['👍','Guter Schuss!'],['😅','Knapp daneben!'],['😮','Wow!'],['🔥','Jetzt geht’s los!'],['🤝','GG'],['😏','Zu leicht!']];
+let emoteBubbles=[], emoteLast=0, emoteShown=[0,0], emotesMuted=load('gravityDuel.emotesMuted.v1',false);
+function renderEmotes(){
+  const box=$('emotes'); box.innerHTML='';
+  EMOTES.forEach(([e,txt],i)=>{ const b=document.createElement('button'); b.textContent=`${e} ${txt}`; b.setAttribute('role','menuitem'); b.onclick=()=>sendEmote(i); box.appendChild(b) });
+  const m=document.createElement('button'); m.className='mute'; m.textContent=emotesMuted?'Emotes des Gegners einblenden':'Emotes des Gegners ausblenden';
+  m.onclick=()=>{ emotesMuted=!emotesMuted; save('gravityDuel.emotesMuted.v1',emotesMuted); renderEmotes() }; box.appendChild(m);
+}
+function toggleEmotes(){ const box=$('emotes'), open=box.hidden; if(open) renderEmotes(); box.hidden=!open; $('emoteBtn').setAttribute('aria-expanded',String(open)) }
+function sendEmote(i){
+  $('emotes').hidden=true; $('emoteBtn').setAttribute('aria-expanded','false');
+  if(performance.now()-emoteLast<2500) return toast('Kurz warten, dann kannst du wieder reagieren');
+  emoteLast=performance.now(); Sfx.select();
+  showEmote(meIdx(),i);
+  if(online) try{ online.ch.send({e:i}) }catch(e){}
+  if(ai&&Math.random()<.5) setTimeout(()=>{ if(ai) showEmote(1,[0,4,2][Math.floor(Math.random()*3)]) },900+Math.random()*900);
+}
+/* o: player index on this phone; the opponent's emotes are limited, so nobody can flood the screen */
+function showEmote(o,i){
+  if(!EMOTES[i]||!players[o]) return;
+  if(o!==meIdx()){ if(emotesMuted||performance.now()-emoteShown[o]<1500) return; Sfx.turn() }
+  emoteShown[o]=performance.now();
+  emoteBubbles=emoteBubbles.filter(b=>b.o!==o); emoteBubbles.push({o,i,t:2.6});
+}
+function drawEmotes(dt){
+  if(!emoteBubbles.length) return;
+  ctx.save(); if(viewRot()){ ctx.translate(W,H); ctx.rotate(Math.PI) } // bubbles stay upright for both players
+  for(const b of emoteBubbles){
+    b.t-=dt; const pl=players[b.o]; if(!pl||!pl.planet) continue;
+    const px=viewRot()?W-pl.planet.x:pl.planet.x, py=viewRot()?H-pl.planet.y:pl.planet.y, up=py>H/2;
+    const [e,txt]=EMOTES[b.i], a=Math.min(1,b.t*3,(2.6-b.t)*6);
+    ctx.globalAlpha=Math.max(0,a);
+    ctx.font='600 13px "Figtree", system-ui, sans-serif';
+    const w=ctx.measureText(txt).width+44, x=Math.max(8,Math.min(W-w-8,px-w/2)), y=up?py-pl.planet.r-58:py+pl.planet.r+22;
+    ctx.fillStyle='rgba(22,10,52,.92)'; ctx.strokeStyle=pl.color; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect?ctx.roundRect(x,y,w,32,16):ctx.rect(x,y,w,32); ctx.fill(); ctx.stroke();
+    ctx.font='18px system-ui, sans-serif'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle='#fff'; ctx.fillText(e,x+10,y+17);
+    ctx.font='600 13px "Figtree", system-ui, sans-serif'; ctx.fillStyle=COL.ink; ctx.fillText(txt,x+34,y+17);
+  }
+  ctx.globalAlpha=1; ctx.restore();
+  emoteBubbles=emoteBubbles.filter(b=>b.t>0);
+}
+
 /* ---------- AI opponent: steps in for the Wettkampf when nobody else is searching ----------
    It plays player 2 of a local duel. It tries a few hundred shots in the same physics the game uses,
    keeps the ones that would hit and fires one of them; how often it uses a hit (instead of a near miss)
@@ -2293,6 +2343,7 @@ function resolveProjectile(s,hit){
       per.planetHits.add(hit.owner);
       if(mode==='duel'&&!tiebreak&&!online) players[hit.owner].lives=Math.max(0,players[hit.owner].lives-1);
       if(hit.owner===s.o) Sfx.selfhit(); else Sfx.hit();
+      if(ai&&mode==='duel'&&!replaying&&Math.random()<.35) setTimeout(()=>{ if(ai) showEmote(1,hit.owner===0&&s.o===1?5:hit.owner===1&&s.o===0?(Math.random()<.5?0:2):1) },700);
       vibrate(hit.owner===s.o?[40,40,40]:80);
     }
     shake=14; flash=.5;
@@ -2403,6 +2454,7 @@ function endMatch(w,byTiebreak,how){
   $('overReward').textContent=r.line+(w===0||SERVER_ECON?'':' (für Spieler 1)');
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
   $('again').textContent=ai?`Revanche gegen ${players[1].name}`:`Revanche · ${players[nextStarter].name} beginnt`;
+  if(ai) setTimeout(()=>{ if(ai) showEmote(1,4) },400);
   if(ai){ $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ohne Gravitonen`; $('winner').textContent=w===0?'Du gewinnst':players[1].name+' gewinnt' }
   show('over');
 }
@@ -2705,6 +2757,7 @@ function draw(t){
     ctx.fillStyle=c;ctx.shadowColor=c;ctx.shadowBlur=10;
     ctx.beginPath();ctx.arc(cx,cy,5,0,7);ctx.fill();ctx.shadowBlur=0;
   }
+  if(mode==='duel'&&(online||ai||emoteBubbles.length)) drawEmotes(1/60);
   if(banner.t>0){
     const bp=players[banner.player]||players[0], flip=flipFor(banner.player)&&!banner.center;
     const y=banner.center?H*.5:flip?H*0.36:H*0.64;
@@ -3514,6 +3567,7 @@ function onlineSend(t,d){ const o=online; if(!o) return; const msg={s:o.seq++,t,
 function onlineRecv(msg){
   const o=online; if(!o||!msg) return;
   o.lastHeard=performance.now();
+  if(msg.e!=null){ showEmote(1-meIdx(),msg.e|0); return }
   if(msg.a!=null){ o.out=o.out.filter(x=>x.msg.s!==msg.a); return }
   if(msg.s==null) return; // heartbeat
   try{ o.ch.send({a:msg.s}) }catch(e){}
@@ -3698,6 +3752,7 @@ function show(name){
   for(const s of screens) $(s).hidden=s!==name;
   const inGame=name===null||name==='intro';
   $('back').hidden=!inGame; $('mute').hidden=!inGame; $('music').hidden=!inGame;
+  $('emoteBtn').hidden=!(name===null&&(online||ai)); $('emotes').hidden=true; $('emoteBtn').setAttribute('aria-expanded','false');
   // battle music while a match or level is on (including its result screen), menu music everywhere else
   const battle=inGame||name==='clear'||name==='over'||name==='cover';
   Sfx.music(battle?'battle':'menu',battle&&mode==='campaign'?galIdx:0);
@@ -3981,6 +4036,7 @@ tap('setName',()=>{ $('nameInput').value=playerName(); show('nameEdit'); setTime
 tap('findMatch',findMatch);
 tap('searchCancel',cancelSearch);
 tap('searchAi',playAi);
+tap('emoteBtn',toggleEmotes);
 tap('inviteYes',()=>answerInvite(true));
 tap('inviteNo',()=>answerInvite(false));
 tap('toBoard',openBoard);
