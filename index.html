@@ -262,6 +262,11 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.setup .card{max-width:400px}.setup section,.setup form{display:none}.setup [data-step].on{display:block}
+.setup input.text{margin-top:8px}.setup p{margin:10px 0}
+.setuplogo{position:relative;width:74px;height:74px;margin:2px auto 8px}.setuplogo i{position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb3cf,#ff4f8b 55%,#7a1640);box-shadow:0 0 24px rgba(255,79,139,.5)}
+.setuplogo b{position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(46,230,255,.6);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .linkbtn{display:block;margin:6px 0 0 auto;padding:4px 2px;background:none;border:0;box-shadow:none;color:var(--p2);font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
 .invtabs{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 10px;padding:2px 4px 4px;scrollbar-width:none}
 .invtabs::-webkit-scrollbar{display:none}
@@ -346,6 +351,10 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .netstate .dot{width:8px;height:8px;border-radius:50%;background:#5cff9d;box-shadow:0 0 8px #5cff9d}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:12px;background:rgba(22,10,52,.72);border:1px solid var(--line)}
 .seg button{font-size:.85rem;padding:9px 6px;background:transparent;color:var(--muted);box-shadow:none}
+.diffseg{grid-template-columns:repeat(3,1fr);margin:10px 0 2px}.diffseg button{font-size:.78rem;padding:7px 4px;line-height:1.15}.diffseg button small{display:block;font-size:.62rem;opacity:.75;font-family:var(--body)}
+.diffseg button[data-d="2"][aria-checked="true"]{background:rgba(255,211,79,.14);box-shadow:inset 0 0 0 1px rgba(255,211,79,.6)}
+.diffseg button[data-d="3"][aria-checked="true"]{background:rgba(255,59,59,.16);box-shadow:inset 0 0 0 1px rgba(255,59,59,.65)}
+.gal .grw{display:block;font-size:.7rem;margin-top:3px;color:var(--muted)}.gal .grw b{font-weight:600}
 .seg button[aria-checked="true"]{background:rgba(46,230,255,.16);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(46,230,255,.6)}
 button.mini{font-size:.75rem;padding:7px 10px;border-radius:8px;box-shadow:none}
 button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--line);padding:7px 9px}
@@ -403,6 +412,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
           <div class="stat"><b id="campTotal">★ 0</b><span>Sterne gesamt</span></div>
         </div>
         <div class="bar" aria-hidden="true"><i id="campBar"></i></div>
+        <div class="seg diffseg" role="radiogroup" aria-label="Schwierigkeit" data-diffseg></div>
         <div class="btns">
           <button id="campPlay">Weiter: Level 1</button>
           <button class="ghost" id="campAll">Alle Galaxien</button>
@@ -445,6 +455,8 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
     <div class="card">
       <span class="label">Kampagne</span>
       <h2>Galaxie wählen</h2>
+      <div class="seg diffseg" role="radiogroup" aria-label="Schwierigkeit" data-diffseg></div>
+      <p class="fine" id="diffInfo"></p>
       <div class="btns" id="galaxyList"></div>
       <button class="ghost" id="galaxiesBack">Zurück</button>
     </div>
@@ -454,7 +466,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
     <div class="card">
       <span class="label" id="levelsLabel">Nova-Nebel</span>
       <h2>Level wählen</h2>
-      <p>Triff alle goldenen Ziele. Je weniger Schüsse du brauchst, desto mehr Sterne bekommst du.</p>
+      <p id="levelsInfo">Triff alle goldenen Ziele. Je weniger Schüsse du brauchst, desto mehr Sterne bekommst du.</p>
       <p class="score" id="starTotal">0 / 90 Sterne</p>
       <div class="grid" id="grid"></div>
       <button class="ghost" id="levelsBack">Zurück zu den Galaxien</button>
@@ -507,6 +519,37 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <h2 id="coverTitle">Spieler 1 zielt</h2>
       <p id="coverText"></p>
       <button id="coverGo">Bereit</button>
+    </div>
+  </div>
+
+  <div class="overlay setup" id="setup" hidden>
+    <div class="card center">
+      <div class="setuplogo" aria-hidden="true"><i></i><b></b></div>
+      <span class="label">Willkommen</span>
+      <h2>Gravity Duel</h2>
+      <section data-step="wait"><p id="setupWait">Verbinde …</p><button id="setupRetry" hidden>Erneut versuchen</button></section>
+      <section data-step="welcome">
+        <p>Zum Spielen brauchst du ein Konto. So bleiben dein Fortschritt, deine Items und deine Gravitonen sicher – auf jedem Gerät.</p>
+        <div class="btns"><button id="setupNew">Konto erstellen</button><button class="alt" id="setupGoogle">Mit Google</button><button class="ghost" id="setupHave">Ich habe schon ein Konto</button></div>
+      </section>
+      <form data-step="create" id="setupCreate">
+        <p>Wähle deinen Spielernamen und gib deine E-Mail ein. Dein Passwort legst du gleich danach fest.</p>
+        <input id="setupName" class="text" maxlength="16" autocomplete="nickname" spellcheck="false" placeholder="Spielername (2–16 Zeichen)" aria-label="Spielername">
+        <input id="setupEmail" class="text" type="email" autocomplete="email" spellcheck="false" placeholder="E-Mail" aria-label="E-Mail">
+        <div class="btns"><button type="submit" id="setupCreateGo">Konto erstellen</button><button type="button" class="ghost" data-goto="welcome">Zurück</button></div>
+      </form>
+      <form data-step="login" id="setupLogin">
+        <p>Melde dich mit deinem Konto an.</p>
+        <input id="setupLEmail" class="text" type="email" autocomplete="email" spellcheck="false" placeholder="E-Mail" aria-label="E-Mail">
+        <input id="setupLPw" class="text" type="password" autocomplete="current-password" placeholder="Passwort" aria-label="Passwort">
+        <button type="button" class="linkbtn" id="setupForgot">Passwort vergessen?</button>
+        <div class="btns"><button type="submit" id="setupLoginGo">Anmelden</button><button type="button" class="alt" id="setupGoogle2">Mit Google anmelden</button><button type="button" class="ghost" data-goto="welcome">Zurück</button></div>
+      </form>
+      <section data-step="confirm">
+        <p id="setupConfirmText">Wir haben dir eine E-Mail geschickt. Öffne den Link darin, dann geht es los.</p>
+        <div class="btns"><button id="setupConfirmed">Ich habe bestätigt</button><button class="alt" id="setupResend">E-Mail erneut senden</button><button class="ghost" data-goto="create">Andere E-Mail</button></div>
+      </section>
+      <p class="fine" id="setupHint" aria-live="polite"></p>
     </div>
   </div>
 
@@ -1967,7 +2010,15 @@ let progress=load(KEYS.progress,null);
 if(!progress||typeof progress!=='object'||Array.isArray(progress)){
   const old=load(KEYS.oldProgress,[]); progress={nova:Array.isArray(old)?old.slice(0,30):[]}; save(KEYS.progress,progress);
 }
-for(const g of GALAXIES) if(!Array.isArray(progress[g.id])) progress[g.id]=[];
+/* campaign difficulty: 1 as always, 2 a few shots more than the best solution, 3 exactly the best solution.
+   Each one has its own progress (key "nova", "nova@2", "nova@3") and its own reward for every galaxy. */
+const DIFFS=[null,{name:'Stufe 1',short:'Entspannt',info:'Unbegrenzt viele Schüsse.'},
+  {name:'Stufe 2',short:'Knapp',info:'Begrenzte Schüsse: 4 mehr als die beste Lösung.'},
+  {name:'Stufe 3',short:'Perfekt',info:'Nur so viele Schüsse wie die beste Lösung braucht.'}];
+let campDiff=Math.min(3,Math.max(1,load('gravityDuel.campDiff.v1',1)|0));
+const pkey=(g,d=campDiff)=>d===1?g.id:g.id+'@'+d;
+const shotLimit=L=>campDiff===2?L.par+4:campDiff===3?L.par:0;
+for(const g of GALAXIES) for(const d of [1,2,3]) if(!Array.isArray(progress[pkey(g,d)])) progress[pkey(g,d)]=[];
 let seen=load(KEYS.seen,{});
 
 /* ---------- profile: XP, player level, stardust, skins, trophies ---------- */
@@ -2152,6 +2203,7 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,opp:{
   resetShotState();
   layoutDuel(o&&o.specs);
 }
+let levelDiff=1; // the difficulty the running level was started with
 const curGalaxy=()=>GALAXIES[galIdx];
 const curLevel=()=>curGalaxy().levels[levelIdx];
 function newLevelMap(){
@@ -2261,6 +2313,7 @@ function coverFor(o){
 function coverReady(){ show(null); startTurn() }
 function startLevel(i){
   mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
+  levelDiff=campDiff; if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
   const L=curLevel();
   banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:`Level ${i+1}`,sub:L.name,t:1.8,player:0};
   // explain new weapons and new kinds of bodies the first time they show up
@@ -2338,6 +2391,28 @@ function fire(v){
     return launch(blitzOrder.filter(o=>blitzQueue[o]!=='skip').map(o=>makeShot(o,blitzQueue[o])));
   }
   launch(v?[makeShot(turn,v)]:[]);
+}
+
+/* ---------- campaign rewards: one item per galaxy and difficulty, never sold in the shop ----------
+   difficulty 1: a title (rare), 2: a colour (epic), 3: a galaxy relic (legendary/mythic, see the item lists).
+   A new galaxy needs one entry here for 1 and 2, a relic with gal/diff:3, and rows in gd_items + gd_galaxy_rewards. */
+const CAMP_REWARDS={
+  nova:    ['Nova-Kadett',       'Novaviolett', '#b06bff','#ff4f8b'],
+  ice:     ['Eisläufer',         'Gletscherherz','#9fe8ff','#3d7bff'],
+  glut:    ['Glutbändiger',      'Magmaherz',   '#ff6a1f','#ffd34f'],
+  spiral:  ['Spiraltänzer',      'Spiralgold',  '#ffcf5a','#8a6bff'],
+  dunkel:  ['Schattenflieger',   'Schattenblau','#5a63e0','#b06bff'],
+  prisma:  ['Prismenbrecher',    'Prismenglanz','#3dffd0','#ff6bd5'],
+  rand:    ['Randgänger',        'Randglühen',  '#ff8a5b','#5bd1ff'],
+  nebel:   ['Nebelseher',        'Nebelperle',  '#c9b8ff','#6be3ff'],
+  wind:    ['Sturmreiter',       'Sonnenwind',  '#ffe066','#ff7a3d'],
+  kristall:['Spiegelmeister',    'Kristallklar','#e9f7ff','#7fd4ff'],
+  asteroid:['Felsbrecher',       'Felsgestein', '#c79a74','#f0dcb8'],
+  zwilling:['Zwillingsbezwinger','Doppelglut',  '#ff9a3d','#5ad8ff']
+};
+for(const [gal,[tn,cn,c1,c2]] of Object.entries(CAMP_REWARDS)){
+  SHOP.title.push({id:'t_'+gal,name:tn,price:0,rarity:'rare',src:'campaign',gal,diff:1});
+  SHOP.color.push({id:'c_'+gal,name:cn,color:c1,c2,anim:'shift',price:0,rarity:'epic',src:'campaign',gal,diff:2});
 }
 
 /* ---------- emotes: "Gravi", a little planet with a face, in the player's own colour ----------
@@ -2748,15 +2823,16 @@ function aiSkin(arena){
   const max=150+arena*450;
   return skinFromEquip({color:pick('color',max),aura:pick('aura',max),trail:pick('trail',max),shot:pick('shot',max),pattern:pick('pattern',max),impact:'basic',title:'none'});
 }
-function startAiDuel(arena,dmode){
+function startAiDuel(arena,dmode,rk){
   const prevMode=ai?ai.prevMode:duelMode;
-  ai={arena,skill:Math.min(.82,.32+.04*arena),prevMode,v:null,at:0};
+  ai={arena,skill:Math.min(.82,.32+.04*arena),prevMode,v:null,at:0,ranked:!!(rk&&rk.ranked),stake:rk||null};
   duelMode=dmode; mode='duel';
   newDuelMap({arena,seed:Math.floor(Math.random()*1e5),opp:{name:`KI-Pilot ${AI_NAMES[Math.floor(Math.random()*AI_NAMES.length)]}`,skin:aiSkin(arena)}});
   starter=nextStarter; nextStarter=otherOf(starter);
   roundShot=0; round=1; tiebreak=false; tbMarks=[];
   matchLeft=MATCH_TIME; timeUp=false; missRounds=0; roundHit=false;
-  show(null); $('back').textContent='Menü'; toast(`Arena ${arena+1}: ${ARENAS[arena].name} · gegen ${players[1].name}`);
+  show(null); $('back').textContent='Menü';
+  toast(`Arena ${arena+1}: ${ARENAS[arena].name} · gegen ${players[1].name}`+(ai.ranked?` · Sieg +${rk.win}, Niederlage −${rk.loss}`:rk&&rk.reason==='daily'?' · heute ohne Gravitonen (Tageslimit)':''));
   if(duelMode==='blitz') startBlitzRound(); else { turn=starter; startTurn() }
 }
 function endAi(){ if(!ai) return; duelMode=ai.prevMode; ai=null }
@@ -2929,6 +3005,7 @@ const distText=dc=>{ const r=27 /* planet radius plus the hit margin */, s=Math.
 function afterBoom(){
   if(mode==='campaign'){
     if(targetsLeft()===0) return levelCleared();
+    const lim=shotLimit(curLevel()); if(lim&&shotCount>=lim) return levelFailed();
     phase='aim';
     const pl=players[0]; if(pl.weapon!=='std'&&!(pl.ammo[pl.weapon]>0)) pl.weapon='std';
     renderWeapons(); return;
@@ -2992,25 +3069,41 @@ function endMatch(w,byTiebreak,how){
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
   $('again').textContent=ai?`Revanche gegen ${players[1].name}`:`Revanche · ${players[nextStarter].name} beginnt`;
   if(ai) aiEmote('gg',400);
-  if(ai){ $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ohne Gravitonen`; $('winner').textContent=w===0?'Du gewinnst':players[1].name+' gewinnt' }
+  if(ai){ $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ${ai.ranked?'wird gewertet …':'ohne Gravitonen'}`; $('winner').textContent=w===0?'Du gewinnst':players[1].name+' gewinnt'
+    if(ai.ranked){ ai.ranked=false; // the rematch is a friendly game
+      rpc('gd_ai_finish',{p_won:w===0}).then(r=>{ if(typeof r.gravitons==='number'){ profile.trophies=r.gravitons; saveProfile() }
+        if(current==='over'&&r.ranked) $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ${r.delta>=0?'+':'−'}${Math.abs(r.delta)} ${CURRENCY}` }).catch(()=>{}) } }
   show('over');
 }
 
+function levelFailed(){
+  phase='over'; Sfx.selfhit();
+  const g=curGalaxy(), L=curLevel(), lim=shotLimit(L);
+  $('clearLabel').textContent=`${g.name} · Level ${levelIdx+1} · ${DIFFS[campDiff].name}`;
+  $('clearTitle').textContent='Keine Schüsse mehr';
+  $('clearStars').innerHTML='<span class="off">★</span><span class="off">★</span><span class="off">★</span>'; $('clearStars').setAttribute('aria-label','Nicht geschafft');
+  $('clearInfo').textContent=`Noch ${targetsLeft()} ${targetsLeft()===1?'Ziel':'Ziele'} übrig · ${DIFFS[campDiff].name}: höchstens ${lim} ${lim===1?'Schuss':'Schüsse'}`;
+  $('clearReward').textContent=''; $('clearLevelUp').hidden=true;
+  $('next').hidden=true; $('retry').hidden=false; $('retry').textContent='Nochmal versuchen';
+  show('clear');
+}
 function levelCleared(){
   phase='over';
-  const g=curGalaxy(), L=curLevel(), prog=progress[g.id];
-  const st=starsFor(shotCount,L.par), prev=prog[levelIdx]||0;
+  const g=curGalaxy(), L=curLevel(), prog=progress[pkey(g)]||(progress[pkey(g)]=[]);
+  const st=campDiff===3?3:starsFor(shotCount,L.par), prev=prog[levelIdx]||0;
+  $('next').hidden=false; $('retry').textContent='Nochmal für mehr Sterne';
   prog[levelIdx]=Math.max(st,prev); save(KEYS.progress,progress);
   track('level'); if(st===3) track('stars3'); track('newstars',Math.max(0,st-prev));
   // rewards only for stars you did not have yet, so replaying is never a grind
   const newStars=Math.max(0,st-prev), first=prev===0;
   const r=SERVER_ECON?{line:'Belohnung wird gutgeschrieben …',up:null}:grant(newStars?10+15*newStars:3, 10*newStars+(first?5:0));
-  if(SERVER_ECON) econLevel(g.id,levelIdx,st,rw=>{ if(current!=='clear') return; $('clearReward').textContent=levelLine(rw); $('clearLevelUp').hidden=!rw.up; $('clearLevelUp').textContent=upLine(rw) });
-  $('clearLabel').textContent=`${g.name} · Level ${levelIdx+1}`+(newStars&&!first?' · neuer Rekord':'');
+  if(SERVER_ECON) econLevel(g.id,levelIdx,st,rw=>{ if(rw.galaxyReward) galaxyRewardWon(rw.galaxyReward); if(current!=='clear') return; $('clearReward').textContent=levelLine(rw); $('clearLevelUp').hidden=!rw.up; $('clearLevelUp').textContent=upLine(rw) },campDiff);
+  else if(prev===0&&prog.filter(Boolean).length>=g.levels.length){ const it=galaxyReward(g,campDiff); if(it&&!profile.owned[it.cat+':'+it.id]){ profile.owned[it.cat+':'+it.id]=1; saveProfile(); setTimeout(()=>galaxyRewardWon({cat:it.cat,id:it.id,diff:campDiff}),600) } }
+  $('clearLabel').textContent=`${g.name} · Level ${levelIdx+1}`+(campDiff>1?` · ${DIFFS[campDiff].name}`:'')+(newStars&&!first?' · neuer Rekord':'');
   $('clearTitle').textContent=L.name;
   $('clearStars').innerHTML=[0,1,2].map(i=>`<span class="${i<st?'on':'off'}">★</span>`).join('');
   $('clearStars').setAttribute('aria-label',`${st} von 3 Sternen`);
-  $('clearInfo').textContent=`${shotCount} ${shotCount===1?'Schuss':'Schüsse'} · 3 Sterne bei höchstens ${L.par}, 2 Sterne bei höchstens ${L.par+2}`;
+  $('clearInfo').textContent=campDiff===3?`Perfekt gelöst mit ${shotCount} ${shotCount===1?'Schuss':'Schüssen'}`:`${shotCount} ${shotCount===1?'Schuss':'Schüsse'} · 3 Sterne bei höchstens ${L.par}, 2 Sterne bei höchstens ${L.par+2}`;
   $('clearReward').textContent=r.line;
   $('clearLevelUp').hidden=!r.up; $('clearLevelUp').textContent=r.up||'';
   const last=levelIdx===g.levels.length-1, nextGal=GALAXIES[galIdx+1];
@@ -3250,10 +3343,11 @@ function drawLastPower(){
 }
 function drawCampaignHud(){
   const L=curLevel(), top=safeTop/scale+26; // level with the menu/sound chips
-  textAt(`${curGalaxy().name.toUpperCase()} · ${levelIdx+1}`,W/2,top,false,COL.ink,13);
+  textAt(`${curGalaxy().name.toUpperCase()} · ${levelIdx+1}${campDiff>1?' · '+DIFFS[campDiff].name.toUpperCase():''}`,W/2,top,false,campDiff===3?'#ff8a8a':campDiff===2?COL.gold:COL.ink,13);
   // stars still reachable: while aiming this counts the shot about to be fired
   const nextStars=starsFor(phase==='aim'?shotCount+1:shotCount,L.par);
-  textAt(`Schüsse ${shotCount}`,W/2-72,top+22,false,COL.muted,12,BODY_FONT);
+  const lim=shotLimit(L), left=lim-shotCount;
+  textAt(lim?`Schüsse ${shotCount}/${lim}`:`Schüsse ${shotCount}`,W/2-72,top+22,false,lim&&left<=1?'#ff4f6b':COL.muted,12,BODY_FONT);
   const boss=bodies.find(b=>b.boss);
   textAt(boss?`Boss ${'♥'.repeat(boss.hp)}`:`Ziele ${targetsLeft()}`,W/2+72,top+22,false,boss?'#ff4f6b':COL.muted,12,BODY_FONT);
   textAt('★'.repeat(nextStars)+'☆'.repeat(3-nextStars),W/2,top+22,false,COL.gold,14,'system-ui, sans-serif');
@@ -3679,17 +3773,82 @@ function gravStakes(mine,theirs){
 }
 const niceErr=e=>{ const m=String(e&&(e.message||e)||'Fehler'); return /fetch|network|load/i.test(m)?'keine Verbindung zum Server':/anonymous/i.test(m)?'anonyme Anmeldung ist im Supabase-Projekt noch nicht erlaubt':m.slice(0,80) };
 
+/* playing needs an account (switched on in the database: gd_settings require_account).
+   New players go through a short setup: name + e-mail (confirmation link, then password) or Google. */
+let NEED_ACCOUNT=load('gravityDuel.needAccount.v1',false), setupStep='welcome';
+function openSetup(step,msg){
+  setupStep=step; save('gravityDuel.needAccount.v1',true);
+  for(const el of document.querySelectorAll('#setup [data-step]')) el.classList.toggle('on',el.dataset.step===step);
+  $('setupHint').textContent=''; $('setupRetry').hidden=!msg; $('setupWait').textContent=msg||'Verbinde …';
+  if(step==='create'&&!$('setupName').value) $('setupName').value=profile.name||'';
+  const pend=load(PENDING_PW,null); if(step==='confirm'&&pend) $('setupConfirmText').textContent=`Wir haben eine E-Mail an ${pend} geschickt. Öffne den Link darin (auch im Spam-Ordner schauen), danach legst du dein Passwort fest.`;
+  show('setup');
+}
+async function setupCreate(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('setupHint'); if(!sb) return;
+  const name=$('setupName').value.replace(/\s+/g,' ').trim().slice(0,16), email=$('setupEmail').value.trim();
+  if(name.length<2) return hint.textContent='Bitte einen Spielernamen mit mindestens 2 Zeichen.';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return hint.textContent='Bitte eine gültige E-Mail eingeben.';
+  profile.name=name; saveProfile();
+  $('setupCreateGo').disabled=true; hint.textContent='Einen Moment …';
+  try{
+    const r=await sb.auth.updateUser({email}); if(r.error) throw r.error;
+    const u=r.data.user;
+    save(PENDING_PW,email.toLowerCase());
+    if(u&&u.email&&u.email.toLowerCase()===email.toLowerCase()){ Net.user=u; return setupDone('Konto erstellt. Leg jetzt dein Passwort fest.') } // no confirmation needed
+    openSetup('confirm');
+  }catch(e){ hint.textContent=authErr(e) }
+  finally{ $('setupCreateGo').disabled=false }
+}
+async function setupLogin(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('setupHint'); if(!sb) return;
+  const email=$('setupLEmail').value.trim(), pw=$('setupLPw').value;
+  if(!email||!pw) return hint.textContent='Bitte E-Mail und Passwort eingeben.';
+  $('setupLoginGo').disabled=true; hint.textContent='Einen Moment …';
+  try{ const {data,error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) throw error; Net.user=data.user; setupDone('Angemeldet. Willkommen zurück!') }
+  catch(e){ hint.textContent=authErr(e) }
+  finally{ $('setupLoginGo').disabled=false }
+}
+async function setupGoogle(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('setupHint'); if(!sb) return;
+  const redirectTo=/^https?:/.test(location.protocol)?location.origin+location.pathname:WEB_URL;
+  hint.textContent='Weiter zu Google …';
+  try{ const {error}=setupStep==='login'?await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo}}):await sb.auth.linkIdentity({provider:'google',options:{redirectTo}}); if(error) throw error }
+  catch(e){ hint.textContent=authErr(e) }
+}
+async function setupCheck(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('setupHint'); if(!sb) return;
+  try{ await sb.auth.refreshSession(); const {data}=await sb.auth.getUser(); Net.user=data.user;
+    if(isAccount()) return setupDone('E-Mail bestätigt.');
+    hint.textContent='Noch nicht bestätigt. Öffne den Link in der E-Mail – am besten auf diesem Gerät.' }
+  catch(e){ hint.textContent=authErr(e) }
+}
+async function setupResend(){
+  const sb=Net.backend&&Net.backend.sb, hint=$('setupHint'), email=load(PENDING_PW,null); if(!sb||!email) return openSetup('create');
+  try{ const r=await sb.auth.updateUser({email}); if(r.error) throw r.error; hint.textContent='E-Mail ist erneut unterwegs.' }catch(e){ hint.textContent=authErr(e) }
+}
+async function setupDone(msg){
+  save('gravityDuel.needAccount.v1',false);
+  const {data:{session}}=await Net.backend.sb.auth.getSession(); if(session){ Net.backend.uid=session.user.id; Net.user=session.user }
+  goHome(); toast(msg); netInit();
+}
 async function netInit(){
   if(!NET_CFG&&!window.__GD_MOCK__){ Net.state='nocfg'; return renderOnline() }
   Net.state='connecting'; renderOnline();
   try{
     Net.backend=window.__GD_MOCK__?await window.__GD_MOCK__.create():await supabaseBackend();
     Net.user=Net.backend.user||null;
+    try{ const c=await rpc('gd_public_settings'); NEED_ACCOUNT=!!(c&&c.requireAccount) }catch(e){}
+    if(NEED_ACCOUNT&&!isAccount()){ Net.state='needaccount'; renderOnline(); openSetup(load(PENDING_PW,null)?'confirm':'welcome');
+      const er=(()=>{ try{ return new URLSearchParams(location.search+'&'+location.hash.slice(1)).get('error_description') }catch(e){ return null } })();
+      if(er){ cleanUrl(); $('setupHint').textContent=/already|exists|linked/i.test(er)?'Dieses Google-Konto hat schon einen Spielstand: Tippe auf „Ich habe schon ein Konto“ und melde dich mit Google an.':/expired|invalid/i.test(er)?'Der Link ist abgelaufen oder wurde schon benutzt.':'Anmeldung fehlgeschlagen: '+er.slice(0,60) }
+      return }
+    if(current==='setup') goHome();
     try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
     await netSyncProfile();
     Net.state='ready'; schedulePing(1500); econPump();
     afterReady();
-  }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e) }
+  }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e); if(NEED_ACCOUNT&&current==='setup') openSetup('wait',`Keine Verbindung: ${Net.err}`) }
   renderOnline();
 }
 async function netSyncProfile(){
@@ -3794,12 +3953,15 @@ async function pollSearch(){
   }catch(e){} finally{ s.busy=false }
 }
 function searchFailed(e){ const s=search; if(s) clearInterval(s.poll); search=null; $('searchTitle').textContent='Das hat nicht geklappt'; $('searchText').textContent=niceErr(e); $('searchCancel').textContent='Zurück' }
-/* nobody else is searching: an AI match in your own arena (no Gravitonen) */
-function playAi(){
+/* nobody else is searching: an AI match in your own arena. It counts for Gravitonen, but less than a real opponent;
+   the server books the loss at the start and refunds it on a win (gd_ai_start / gd_ai_finish) */
+async function playAi(){
   const s=search; if(!s||s.kind!=='ranked') return;
   search=null; clearInterval(s.poll); $('searchAi').hidden=true;
-  if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{});
-  startAiDuel(arenaIndex(profile.trophies),s.mode);
+  let rk=null;
+  if(s.matchId){ try{ rk=await rpc('gd_ai_start',{p_match:s.matchId}) }catch(e){ rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{}) } }
+  if(rk&&typeof rk.gravitons==='number'){ profile.trophies=rk.gravitons; saveProfile() }
+  startAiDuel(arenaIndex(profile.trophies+(rk&&rk.ranked?rk.loss|0:0)),s.mode,rk);
 }
 function cancelSearch(){
   const s=search; search=null; $('searchCancel').textContent='Abbrechen'; $('searchAi').hidden=true;
@@ -3916,8 +4078,8 @@ function applyEcon(st){
   profile.equip=Object.assign({},DEFAULT_PROFILE.equip,st.equip);
   if(st.quests) profile.quests=st.quests;
   if(st.progress&&typeof st.progress==='object'){
-    for(const g of GALAXIES) progress[g.id]=Array.isArray(st.progress[g.id])?st.progress[g.id].map(v=>v|0):[];
-    for(const x of pendingLevels){ const a=progress[x.g]||(progress[x.g]=[]); a[x.i]=Math.max(a[x.i]|0,x.st) } // still on its way
+    for(const g of GALAXIES) for(const d of [1,2,3]){ const k=pkey(g,d); progress[k]=Array.isArray(st.progress[k])?st.progress[k].map(v=>v|0):[] }
+    for(const x of pendingLevels){ const k=(x.d|0)>1?x.g+'@'+x.d:x.g, a=progress[k]||(progress[k]=[]); a[x.i]=Math.max(a[x.i]|0,x.st) } // still on its way
     save(KEYS.progress,progress);
   }
   saveProfile();
@@ -3934,8 +4096,8 @@ async function econRefresh(){ if(!Net.backend) return; applyEcon(await rpc('gd_e
 function econFail(e,btn){ if(btn) btn.disabled=false; toast(econReady()?econErr(e):'Keine Verbindung zum Server') }
 const econErr=e=>{ const m=String(e&&(e.message||e)||''); return /not enough/.test(m)?'Nicht genug Sternenstaub':/level too low/.test(m)?'Dein Spielerlevel ist zu niedrig':/already/.test(m)?'Schon erledigt':/emotes full/.test(m)?'Schon 6 Emotes ausgewählt':niceErr(e) };
 /* campaign: every cleared level is queued and sent in order, so nothing gets lost when the connection drops */
-function econLevel(g,i,st,cb){
-  const x={g,i,st,id:Date.now()+Math.random()}; pendingLevels.push(x); save(PENDING_LVL,pendingLevels);
+function econLevel(g,i,st,cb,d=1){
+  const x={g,i,st,d,id:Date.now()+Math.random()}; pendingLevels.push(x); save(PENDING_LVL,pendingLevels);
   if(cb) lvlCb.set(x.id,cb);
   if(!econReady()&&cb) cb({xp:0,dust:0,up:0,offline:true,pending:true});
   econPump();
@@ -3944,7 +4106,7 @@ async function econPump(){
   if(lvlBusy||!econReady()||!pendingLevels.length) return;
   lvlBusy=true; const x=pendingLevels[0];
   try{
-    const r=await rpc('gd_level_done',{p_gal:x.g,p_level:x.i,p_stars:x.st});
+    const r=await rpc('gd_level_done',x.d>1?{p_gal:x.g,p_level:x.i,p_stars:x.st,p_diff:x.d}:{p_gal:x.g,p_level:x.i,p_stars:x.st});
     if(r&&r.wait){ lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,2200); return }
     pendingLevels.shift(); save(PENDING_LVL,pendingLevels);
     const cb=lvlCb.get(x.id); lvlCb.delete(x.id);
@@ -3952,7 +4114,7 @@ async function econPump(){
     if(cb) cb(r.reward||{xp:0,dust:0});
   }catch(e){
     const m=String(e&&e.message||'');
-    if(/bad level|level locked/.test(m)){ pendingLevels.shift(); save(PENDING_LVL,pendingLevels); lvlCb.delete(x.id); econRefresh().catch(()=>{}) } // the server does not accept it
+    if(/bad level|level locked|not started/.test(m)){ pendingLevels.shift(); save(PENDING_LVL,pendingLevels); lvlCb.delete(x.id); econRefresh().catch(()=>{}) } // the server does not accept it
     else { lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,8000); return }
   }
   lvlBusy=false; if(pendingLevels.length) econPump();
@@ -4107,6 +4269,7 @@ async function switchedAccount(msg){
   let {data:{session}}=await sb.auth.getSession();
   if(!session){ const r=await sb.auth.signInAnonymously(); if(r.error){ Net.state='error'; Net.err=niceErr(r.error); renderOnline(); return } session=r.data.session }
   Net.backend.uid=session.user.id; Net.user=session.user; Net.friends=[];
+  if(NEED_ACCOUNT&&!isAccount()){ Net.state='needaccount'; renderOnline(); return openSetup('welcome') }
   try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
   try{ await netSyncProfile() }catch(e){}
   toast(msg); renderAccountRow(); renderHome(); show('settings');
@@ -4174,7 +4337,7 @@ async function pinBadge(id){
 /* ---------- season: XP also counts as season points, rewards per tier (gd_season) ---------- */
 var seasonData=null, seasonAt=-1e9, qTab='tasks', seasonPreviews=[];
 const CRATE_NAME=id=>(CRATES.find(c=>c.id===id)||{name:'Kiste'}).name;
-const CAT_NAME={color:'Farbe',aura:'Aura',trail:'Spur',shot:'Geschossform',pattern:'Planetenmuster',impact:'Treffereffekt',title:'Titel'};
+const CAT_NAME={color:'Farbe',aura:'Aura',trail:'Spur',shot:'Geschossform',pattern:'Planetenmuster',impact:'Treffereffekt',title:'Titel',emote:'Emote'};
 function seasonLevel(){ return seasonData&&seasonData.active?Math.min(seasonData.tiers.length,Math.floor(seasonData.sp/seasonData.tierSp)):0 }
 function seasonClaimable(){ if(!seasonData||!seasonData.active) return 0; const l=seasonLevel(); return seasonData.tiers.filter(t=>t.tier<=l&&!t.claimed).length }
 async function loadSeason(force){
@@ -4480,7 +4643,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas'];
+const screens=['setup','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas'];
 let current='home';
 function show(name){
   current=name;
@@ -4493,9 +4656,9 @@ function show(name){
   Sfx.music(battle?'battle':'menu',battle&&mode==='campaign'?galIdx:0);
   renderWeapons();
 }
-const galStars=g=>(progress[g.id]||[]).reduce((a,b)=>a+(b||0),0);
-const galDone=g=>(progress[g.id]||[]).filter(Boolean).length;
-const galUnlocked=i=>i===0||((progress[GALAXIES[i-1].id]||[])[GALAXIES[i-1].levels.length-1]||0)>0;
+const galStars=g=>(progress[pkey(g)]||[]).reduce((a,b)=>a+(b||0),0);
+const galDone=g=>(progress[pkey(g)]||[]).filter(Boolean).length;
+const galUnlocked=i=>i===0||((progress[pkey(GALAXIES[i-1])]||[])[GALAXIES[i-1].levels.length-1]||0)>0;
 /* the galaxy the player is working on: the newest unlocked one with open levels */
 function activeGalaxy(){
   let idx=0;
@@ -4503,7 +4666,7 @@ function activeGalaxy(){
   for(let i=0;i<=idx;i++) if(galDone(GALAXIES[i])<GALAXIES[i].levels.length) return i;
   return idx;
 }
-const nextLevelIn=g=>{ const p=progress[g.id]||[]; const i=g.levels.findIndex((_,k)=>!(p[k]>0)); return i<0?null:i };
+const nextLevelIn=g=>{ const p=progress[pkey(g)]||[]; const i=g.levels.findIndex((_,k)=>!(p[k]>0)); return i<0?null:i };
 
 /* ---------- home ---------- */
 const pager=$('pager');
@@ -4525,7 +4688,7 @@ function renderHome(){
   renderMe(); updateQuestBadge();
   const gi=activeGalaxy(), g=GALAXIES[gi], th=THEMES[g.id];
   const done=galDone(g), nxt=nextLevelIn(g);
-  $('campLabel').textContent=`Kampagne · Galaxie ${gi+1} von ${GALAXIES.length}`;
+  $('campLabel').textContent=`Kampagne · Galaxie ${gi+1} von ${GALAXIES.length}`; renderDiffSegs();
   $('campName').textContent=g.name;
   $('campSub').textContent=th.sub;
   $('campLevels').textContent=`${done}/${g.levels.length}`;
@@ -4627,15 +4790,36 @@ function homeTick(t){
 
 /* ---------- galaxies and levels ---------- */
 let galCards=[];
+function setDiff(d){ if(d===campDiff) return; campDiff=d; save('gravityDuel.campDiff.v1',d); Sfx.select(); if(current==='galaxies') goGalaxies(); else renderHome() }
+function renderDiffSegs(){
+  for(const box of document.querySelectorAll('[data-diffseg]')){
+    if(!box.children.length) [1,2,3].forEach(d=>{ const b=document.createElement('button'); b.type='button'; b.dataset.d=d; b.setAttribute('role','radio');
+      b.innerHTML=`${DIFFS[d].name}<small>${DIFFS[d].short}</small>`; b.addEventListener('click',()=>{ Sfx.init(); setDiff(d) }); box.appendChild(b) });
+    for(const b of box.children) b.setAttribute('aria-checked',String(+b.dataset.d===campDiff));
+  }
+}
+/* the item for finishing a galaxy on a difficulty (items carry src:'campaign', gal, diff) */
+function galaxyReward(g,d){ for(const cat of COSMETIC_CATS){ const it=SHOP[cat].find(x=>x.src==='campaign'&&x.gal===g.id&&x.diff===d); if(it) return {cat,id:it.id,item:it} } return null }
+function galRewardLine(g){
+  const r=galaxyReward(g,campDiff); if(!r) return '';
+  const have=!!profile.owned[r.cat+':'+r.id], rar=RARITY[r.item.rarity];
+  return `<span class="grw">${have?'✓ ':'Belohnung: '}<b style="color:${rar.color}">${esc(r.item.name)}</b> · ${CAT_NAME[r.cat]} · ${rar.name}</span>`;
+}
+function galaxyRewardWon(r){
+  const it=shopItem(r.cat,r.id); if(!it) return;
+  Sfx.levelup(); vibrate([30,40,80]);
+  toast(`Galaxie auf ${DIFFS[r.diff||campDiff].name} geschafft! Neu: ${it.name} (${CAT_NAME[r.cat]}, ${RARITY[it.rarity].name})`);
+  if(current==='clear') $('clearLevelUp').hidden=false, $('clearLevelUp').textContent=`Belohnung freigeschaltet: ${it.name} · ${RARITY[it.rarity].name}`;
+}
 function goGalaxies(){
-  phase='menu'; bodies=[]; players=[];
+  phase='menu'; bodies=[]; players=[]; renderDiffSegs(); $('diffInfo').textContent=`${DIFFS[campDiff].name} · ${DIFFS[campDiff].info} Jede Stufe hat ihren eigenen Fortschritt und eigene Belohnungen.`;
   const list=$('galaxyList'); list.innerHTML=''; galCards=[];
   GALAXIES.forEach((g,i)=>{
     const th=THEMES[g.id], open=galUnlocked(i);
     const b=document.createElement('button');
     b.className='gal'; b.id='gal-'+g.id; b.disabled=!open;
     b.innerHTML=`<canvas aria-hidden="true"></canvas><span class="gtext"><span class="label">Galaxie ${i+1}</span><span class="gname">${g.name}</span>
-      <span class="gsub">${open?`${th.sub} · ${galDone(g)}/${g.levels.length} Level · ★ ${galStars(g)}/${g.levels.length*3}`:`Gesperrt · schließe ${GALAXIES[i-1].name} ab`}</span></span>`;
+      <span class="gsub">${open?`${th.sub} · ${galDone(g)}/${g.levels.length} Level · ★ ${galStars(g)}/${g.levels.length*3}`:`Gesperrt · schließe ${GALAXIES[i-1].name} ab`}</span>${galRewardLine(g)}</span>`;
     b.addEventListener('click',()=>{ Sfx.init(); goLevels(i) });
     list.appendChild(b);
     galCards.push({cv:b.querySelector('canvas'),id:g.id});
@@ -4645,9 +4829,10 @@ function goGalaxies(){
 function goLevels(gi){
   if(gi!==undefined) galIdx=gi;
   phase='menu'; bodies=[]; players=[];
-  const g=curGalaxy(), prog=progress[g.id], grid=$('grid'); grid.innerHTML='';
+  const g=curGalaxy(), prog=progress[pkey(g)]||(progress[pkey(g)]=[]), grid=$('grid'); grid.innerHTML='';
   scene=makeScene(g.id,3);
-  $('levelsLabel').textContent=`Galaxie ${galIdx+1} · ${g.name}`;
+  $('levelsLabel').textContent=`Galaxie ${galIdx+1} · ${g.name} · ${DIFFS[campDiff].name}`;
+  $('levelsInfo').textContent=campDiff===1?'Triff alle goldenen Ziele. Je weniger Schüsse du brauchst, desto mehr Sterne bekommst du.':campDiff===2?'Triff alle goldenen Ziele, bevor dir die Schüsse ausgehen. Jedes Level zeigt, wie viele du hast.':'Perfekt: Jedes Level muss mit der kleinstmöglichen Zahl an Schüssen geschafft werden.';
   g.levels.forEach((L,i)=>{
     const st=prog[i]||0, unlocked=i===0||(prog[i-1]||0)>0;
     const b=document.createElement('button');
@@ -4683,6 +4868,8 @@ function renderShop(){
     if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
     else if(owned){ b.className='own'; b.textContent='Im Inventar'; b.onclick=()=>openInventory(shopTab) }
     else if(it.season){ b.textContent=`Saison ${it.season}`; b.disabled=true }
+    else if(it.src==='campaign'){ const gi=GALAXIES.findIndex(g=>g.id===it.gal); b.textContent=`Kampagne · ${gi>=0?GALAXIES[gi].name:''} · ${DIFFS[it.diff].name}`; b.disabled=true; b.className='src' }
+    else if(it.src==='void'){ b.textContent='Nur im Void'; b.disabled=true; b.className='src void' }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
       b.onclick=()=>{ if(profile.dust<it.price) return; if(SERVER_ECON) return econBuy(shopTab,it.id,b); profile.dust-=it.price; profile.owned[key]=1; equipLocal(shopTab,it.id); saveProfile(); Sfx.buy(); emoteBoughtHint(shopTab,it.id); renderShop() } }
@@ -4837,6 +5024,12 @@ tap('acct-new',()=>setAcctMode('new'));
 tap('acct-login',()=>setAcctMode('login'));
 tap('acctGoogle',accountGoogle);
 tap('acctForgot',accountForgot);
+tap('setupNew',()=>openSetup('create')); tap('setupHave',()=>openSetup('login')); tap('setupGoogle',setupGoogle); tap('setupGoogle2',setupGoogle);
+tap('setupConfirmed',setupCheck); tap('setupResend',setupResend); tap('setupRetry',()=>{ openSetup('wait'); netInit() });
+tap('setupForgot',()=>{ $('acctEmail').value=$('setupLEmail').value; accountForgot().then(()=>$('setupHint').textContent=$('acctHint').textContent) });
+for(const b of document.querySelectorAll('#setup [data-goto]')) b.addEventListener('click',()=>openSetup(b.dataset.goto));
+$('setupCreate').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); setupCreate() });
+$('setupLogin').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); setupLogin() });
 $('acctForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); accountSubmit() });
 tap('copyCode',()=>{
   const code=$('friendCode').textContent, btn=$('copyCode');
@@ -4896,7 +5089,7 @@ function loop(now){
   step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); invTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
-resize(); goHome(); requestAnimationFrame(loop); netInit();
+resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT) openSetup('wait'); requestAnimationFrame(loop); netInit();
 /* test hook: only present when a test harness asks for it before the page loads */
 if(window.__GD_TEST__) window.__gd={
   state:()=>({phase,turn,round,roundShot,tiebreak,lives:players.map(p=>p.lives),wins:[...wins],duelMode,current,marks:tbMarks.length,online:online?{host:online.host,k:online.k,over:online.over,q:online.queue.length,out:online.out.length}:null,net:Net.state,H,flightN,matchLeft,timeUp}),
