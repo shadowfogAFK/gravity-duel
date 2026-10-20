@@ -1636,7 +1636,9 @@ const starsFor=(n,par)=>n<=par?3:n<=par+2?2:1;
 /* ---------- storage (per browser) ---------- */
 const KEYS={progress:'gravityDuel.campaign.v2',oldProgress:'gravityDuel.campaign.v1',seen:'gravityDuel.seenWeapons.v1',profile:'gravityDuel.profile.v1',page:'gravityDuel.homePage.v1'};
 function load(k,d){ try{ const v=JSON.parse(localStorage.getItem(k)||'null'); return v??d }catch(e){ return d } }
-let onSaved=()=>{}; // set by online.js: game data changed, sync it to the account
+/* web version: stardust, XP, items, stars and tasks belong to the server (see econ in online.js); this browser only keeps a copy */
+const SERVER_ECON=!!(window.GD_CONFIG||window.__GD_MOCK__);
+let onSaved=()=>{}; // unused since the server economy
 function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} if(k===KEYS.progress||k===KEYS.profile||k===KEYS.seen) onSaved() }
 let progress=load(KEYS.progress,null);
 if(!progress||typeof progress!=='object'||Array.isArray(progress)){
@@ -2149,8 +2151,9 @@ function endMatch(w,byTiebreak,how){
   $('winner').style.color=players[w].color;
   const tt=w===0?titleName(profile.equip.title):''; $('tally').dataset.title=tt;
   $('tally').textContent=`${tt?tt+' · ':''}${duelMode==='blitz'?'Blitzduell':'Klassisch'} · Gesamt ${wins[0]} : ${wins[1]}`;
-  const r=grant(w===0?25:12,w===0?15:5);
-  $('overReward').textContent=r.line+(w===0?'':' (für Spieler 1)');
+  const r=SERVER_ECON?{line:'Belohnung wird gutgeschrieben …',up:null}:grant(w===0?25:12,w===0?15:5);
+  if(SERVER_ECON) econDuel(w===0,rw=>{ if(current!=='over') return; $('overReward').textContent=rw.limited?'Keine Belohnung: höchstens alle 15 s und 25 Duelle pro Tag':rewardLine(rw)+(w===0?'':' (für Spieler 1)'); $('overLevelUp').hidden=!rw.up; $('overLevelUp').textContent=upLine(rw) });
+  $('overReward').textContent=r.line+(w===0||SERVER_ECON?'':' (für Spieler 1)');
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
   $('again').textContent=`Revanche · ${players[nextStarter].name} beginnt`;
   show('over');
@@ -2164,7 +2167,8 @@ function levelCleared(){
   track('level'); if(st===3) track('stars3'); track('newstars',Math.max(0,st-prev));
   // rewards only for stars you did not have yet, so replaying is never a grind
   const newStars=Math.max(0,st-prev), first=prev===0;
-  const r=grant(newStars?10+15*newStars:3, 10*newStars+(first?5:0));
+  const r=SERVER_ECON?{line:'Belohnung wird gutgeschrieben …',up:null}:grant(newStars?10+15*newStars:3, 10*newStars+(first?5:0));
+  if(SERVER_ECON) econLevel(g.id,levelIdx,st,rw=>{ if(current!=='clear') return; $('clearReward').textContent=levelLine(rw); $('clearLevelUp').hidden=!rw.up; $('clearLevelUp').textContent=upLine(rw) });
   $('clearLabel').textContent=`${g.name} · Level ${levelIdx+1}`+(newStars&&!first?' · neuer Rekord':'');
   $('clearTitle').textContent=L.name;
   $('clearStars').innerHTML=[0,1,2].map(i=>`<span class="${i<st?'on':'off'}">★</span>`).join('');
@@ -2546,11 +2550,15 @@ function crateCardsTick(t){
   }
 }
 let crateFrom='shop';
-function openCrate(c,free){
+function openCrate(c,free,given){
+  if(SERVER_ECON&&!given){ // the server takes the stardust and rolls the prize; the animation starts with its answer
+    if(profile.dust<c.price) return;
+    return econCrate(c.id,rw=>openCrate(c,true,rw));
+  }
   if(!free&&profile.dust<c.price) return;
   if(!free) profile.dust-=c.price;
-  const reward=rollCrate(c);
-  applyReward(reward); // saved right away, so closing the page mid-animation changes nothing
+  const reward=given||rollCrate(c);
+  if(!given) applyReward(reward); // saved right away, so closing the page mid-animation changes nothing
   track('crate');
   crateAnim={c,reward,start:performance.now()/1000,revealed:false};
   $('crateTitle').textContent=c.name; $('crateSub').textContent='Tippe, um schneller zu öffnen';
@@ -2648,6 +2656,7 @@ function seededPick(list,n,key){
 }
 /* makes sure today's and this week's tasks exist; old ones expire at local midnight / Monday */
 function ensureQuests(){
+  if(SERVER_ECON){ const q=profile.quests; return q&&Array.isArray(q.daily)&&Array.isArray(q.weekly)?q:{daily:[],weekly:[],dailyBonus:true,weeklyBonus:true} }
   const now=new Date(), dk=dayKey(now), wk=dayKey(weekStart(now));
   const q=profile.quests||(profile.quests={});
   if(q.dayKey!==dk){ q.dayKey=dk; q.daily=seededPick(QUEST_POOL.daily,DAILY_COUNT,'d'+dk).map(t=>({id:t.id,p:0,claimed:false})); q.dailyBonus=false }
@@ -2659,8 +2668,10 @@ function ensureQuests(){
 }
 const questDef=id=>QUEST_POOL.daily.find(t=>t.id===id)||QUEST_POOL.weekly.find(t=>t.id===id);
 /* the game reports events here; finished tasks show a short note */
+const CLIENT_EVENTS=['shot','special','target','longshot','portal']; // everything else the server counts itself
 function track(ev,n=1){
   if(!n) return;
+  if(SERVER_ECON){ if(CLIENT_EVENTS.includes(ev)) econEvent(ev,n); return }
   const q=ensureQuests(); let done=[];
   for(const list of [q.daily,q.weekly]) for(const s of list){
     const d=questDef(s.id); if(!d||d.ev!==ev||s.p>=d.goal) continue;
@@ -2688,8 +2699,9 @@ function untilText(ms){
 function renderQuests(){
   const q=ensureQuests(), now=new Date();
   const tomorrow=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1), nextWeek=weekStart(now); nextWeek.setDate(nextWeek.getDate()+7);
-  $('dailyReset').textContent=`Neue Aufgaben in ${untilText(tomorrow-now)}`;
-  $('weeklyReset').textContent=`Neue Aufgaben in ${untilText(nextWeek-now)}`;
+  const dEnd=SERVER_ECON&&q.dayEnds?new Date(q.dayEnds):tomorrow, wEnd=SERVER_ECON&&q.weekEnds?new Date(q.weekEnds):nextWeek;
+  $('dailyReset').textContent=SERVER_ECON&&!q.daily.length?'Lade Aufgaben …':`Neue Aufgaben in ${untilText(Math.max(0,dEnd-now))}`;
+  $('weeklyReset').textContent=`Neue Aufgaben in ${untilText(Math.max(0,wEnd-now))}`;
   const row=(s)=>{
     const d=questDef(s.id), done=s.p>=d.goal;
     const el=document.createElement('div'); el.className='quest'+(s.claimed?' claimed':done?' ready':'');
@@ -2697,7 +2709,7 @@ function renderQuests(){
       <span class="qnum">${s.p} / ${d.goal}</span></div><span class="qrew">✦ ${d.dust}</span>`;
     const b=document.createElement('button'); b.className='qbtn'; b.id='claim-'+s.id;
     if(s.claimed){ b.textContent='Erledigt'; b.disabled=true }
-    else if(done){ b.textContent='Abholen'; b.onclick=()=>{ s.claimed=true; profile.dust+=d.dust; saveProfile(); Sfx.buy(); renderQuests(); renderMe() } }
+    else if(done){ b.textContent='Abholen'; b.onclick=()=>{ if(SERVER_ECON) return econClaim(s.id,b); s.claimed=true; profile.dust+=d.dust; saveProfile(); Sfx.buy(); renderQuests(); renderMe() } }
     else { b.textContent='Offen'; b.disabled=true }
     el.appendChild(b); return el;
   };
@@ -2711,9 +2723,9 @@ function renderQuests(){
     el.appendChild(b); box.appendChild(el);
   };
   bonus('dailyBonus',q.daily.every(s=>s.claimed),q.dailyBonus,`Bonus für alle ${DAILY_COUNT} Tagesaufgaben: ✦ ${DAILY_BONUS}`,
-    ()=>{ q.dailyBonus=true; profile.dust+=DAILY_BONUS; saveProfile(); Sfx.buy(); renderQuests(); renderMe() });
+    ()=>{ if(SERVER_ECON) return econClaim('daily_bonus',$('dailyBonusBtn')); q.dailyBonus=true; profile.dust+=DAILY_BONUS; saveProfile(); Sfx.buy(); renderQuests(); renderMe() });
   bonus('weeklyBonus',q.weekly.every(s=>s.claimed),q.weeklyBonus,`Bonus für alle ${WEEKLY_COUNT} Wochenaufgaben: eine Nebelkiste gratis`,
-    ()=>{ q.weeklyBonus=true; saveProfile(); crateFrom='quests'; openCrate(CRATES.find(c=>c.id==='nebula'),true) });
+    ()=>{ if(SERVER_ECON) return econClaim('weekly_bonus',$('weeklyBonusBtn')); q.weeklyBonus=true; saveProfile(); crateFrom='quests'; openCrate(CRATES.find(c=>c.id==='nebula'),true) });
   updateQuestBadge();
 }
 
@@ -2787,9 +2799,9 @@ async function netInit(){
   try{
     Net.backend=window.__GD_MOCK__?await window.__GD_MOCK__.create():await supabaseBackend();
     Net.user=Net.backend.user||null;
-    try{ await cloudPull() }catch(e){ console.warn('cloud',e) }
+    try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
     await netSyncProfile();
-    Net.state='ready'; schedulePing(1500);
+    Net.state='ready'; schedulePing(1500); econPump();
     afterReady();
   }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e) }
   renderOnline();
@@ -2982,46 +2994,113 @@ async function afterReady(){
   }
 }
 
-/* ---------- cloud save: campaign, skins, stardust and XP follow the account to every device ---------- */
-const SYNC_KEY='gravityDuel.sync.v1', PENDING_PW='gravityDuel.pendingPw.v1';
-let sync=load(SYNC_KEY,{uid:null,at:null,dirty:true}), pushTimer=null, pushing=false;
-const keepSync=()=>{ try{ localStorage.setItem(SYNC_KEY,JSON.stringify(sync)) }catch(e){} };
-function cloudData(){ const p={...profile}; delete p.trophies; return {v:1,progress,seen,profile:p} }
-onSaved=()=>{ if(!sync.dirty){ sync.dirty=true; keepSync() } clearTimeout(pushTimer); pushTimer=setTimeout(cloudPush,3000) };
-async function cloudPush(){
-  if(Net.state!=='ready'||!Net.backend||pushing||!sync.dirty) return;
-  pushing=true;
-  try{ const at=await rpc('gd_save_put',{p_data:cloudData()}); sync={uid:Net.backend.uid,at,dirty:false}; keepSync() }
-  catch(e){ clearTimeout(pushTimer); pushTimer=setTimeout(cloudPush,20000) }
-  finally{ pushing=false }
-}
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') cloudPush() });
-/* merges a saved state into this device: levels, stars and items are never lost; stardust, look and name come from the newer side */
-function mergeSave(r,remoteNewer){
-  if(!r||typeof r!=='object') return;
-  if(r.progress&&typeof r.progress==='object') for(const g of GALAXIES){
-    const a=progress[g.id]||[], b=Array.isArray(r.progress[g.id])?r.progress[g.id]:[], o=[];
-    for(let i=0;i<Math.max(a.length,b.length);i++) o[i]=Math.max(+a[i]||0,Math.min(3,+b[i]||0));
-    progress[g.id]=o;
+/* ---------- economy: the server decides stardust, XP, items, stars and tasks (supabase/schema-3-wirtschaft.sql) ----------
+   The game only reports what happened; the answer is the new state, which replaces this browser's copy. */
+const PENDING_PW='gravityDuel.pendingPw.v1', PENDING_LVL='gravityDuel.pendingLevels.v1';
+let pendingLevels=load(PENDING_LVL,[]), lvlBusy=false, lvlTimer=null, evPending={}, evTimer=null, evLast=0;
+const lvlCb=new Map();
+const rewardLine=rw=>`+${rw.xp|0} XP · +${rw.dust|0} ✦`;
+const upLine=rw=>rw&&rw.up?`Aufstieg auf Spielerlevel ${rw.level}! Bonus ✦ ${rw.bonus}`:'';
+const econReady=()=>Net.state==='ready'&&!!Net.backend;
+function applyEcon(st){
+  if(!st||typeof st!=='object') return;
+  const before=profile.quests;
+  profile.xp=st.xp|0; profile.dust=st.dust|0;
+  profile.owned=Object.assign({},DEFAULT_PROFILE.owned,st.owned);
+  profile.equip=Object.assign({},DEFAULT_PROFILE.equip,st.equip);
+  if(st.quests) profile.quests=st.quests;
+  if(st.progress&&typeof st.progress==='object'){
+    for(const g of GALAXIES) progress[g.id]=Array.isArray(st.progress[g.id])?st.progress[g.id].map(v=>v|0):[];
+    for(const x of pendingLevels){ const a=progress[x.g]||(progress[x.g]=[]); a[x.i]=Math.max(a[x.i]|0,x.st) } // still on its way
+    save(KEYS.progress,progress);
   }
-  if(r.seen&&typeof r.seen==='object') seen=Object.assign({},r.seen,seen);
-  const rp=r.profile&&typeof r.profile==='object'?r.profile:{};
-  const base=remoteNewer?{...profile,...rp}:{...rp,...profile};
-  base.owned=Object.assign({},DEFAULT_PROFILE.owned,rp.owned,profile.owned);
-  base.equip=Object.assign({},DEFAULT_PROFILE.equip,base.equip);
-  for(const c of COSMETIC_CATS) if(!base.owned[c+':'+base.equip[c]]) base.equip[c]=DEFAULT_PROFILE.equip[c];
-  base.xp=Math.max(+profile.xp||0,+rp.xp||0); base.dust=Math.max(0,+base.dust||0); base.trophies=profile.trophies;
-  profile=base;
-  save(KEYS.progress,progress); save(KEYS.seen,seen); saveProfile();
+  saveProfile();
+  // tasks that just got finished
+  if(before&&Array.isArray(before.daily)&&st.quests){
+    const old=new Map([...before.daily,...before.weekly].map(x=>[x.id,x.p|0]));
+    const done=[...(st.quests.daily||[]),...(st.quests.weekly||[])].map(x=>({x,d:questDef(x.id)})).find(({x,d})=>d&&x.p>=d.goal&&(old.get(x.id)??0)<d.goal);
+    if(done){ toast(`Aufgabe erledigt: ${done.d.text(done.d.goal)}`); Sfx.select() }
+  }
+  renderMe(); updateQuestBadge();
+  if(current==='home') renderHome(); else if(current==='shop') renderShop(); else if(current==='quests') renderQuests(); else if(current==='levels') goLevels();
 }
-async function cloudPull(){
-  const uid=Net.backend.uid;
-  if(sync.uid!==uid){ sync={uid,at:null,dirty:true}; keepSync() } // another account on this device: its state is the reference
-  const r=await rpc('gd_save_get');
-  if(r&&r.data) mergeSave(r.data,!sync.at||new Date(r.updated_at)>new Date(sync.at));
-  sync.dirty=true; keepSync(); await cloudPush();
-  if(current==='home') renderHome();
+async function econRefresh(){ if(!Net.backend) return; applyEcon(await rpc('gd_econ')) }
+function econFail(e,btn){ if(btn) btn.disabled=false; toast(econReady()?econErr(e):'Keine Verbindung zum Server') }
+const econErr=e=>{ const m=String(e&&(e.message||e)||''); return /not enough/.test(m)?'Nicht genug Sternenstaub':/level too low/.test(m)?'Dein Spielerlevel ist zu niedrig':/already/.test(m)?'Schon erledigt':niceErr(e) };
+/* campaign: every cleared level is queued and sent in order, so nothing gets lost when the connection drops */
+function econLevel(g,i,st,cb){
+  const x={g,i,st,id:Date.now()+Math.random()}; pendingLevels.push(x); save(PENDING_LVL,pendingLevels);
+  if(cb) lvlCb.set(x.id,cb);
+  if(!econReady()&&cb) cb({xp:0,dust:0,up:0,offline:true,pending:true});
+  econPump();
 }
+async function econPump(){
+  if(lvlBusy||!econReady()||!pendingLevels.length) return;
+  lvlBusy=true; const x=pendingLevels[0];
+  try{
+    const r=await rpc('gd_level_done',{p_gal:x.g,p_level:x.i,p_stars:x.st});
+    if(r&&r.wait){ lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,2200); return }
+    pendingLevels.shift(); save(PENDING_LVL,pendingLevels);
+    const cb=lvlCb.get(x.id); lvlCb.delete(x.id);
+    applyEcon(r.state); if(r.reward&&r.reward.up) Sfx.levelup();
+    if(cb) cb(r.reward||{xp:0,dust:0});
+  }catch(e){
+    const m=String(e&&e.message||'');
+    if(/bad level|level locked/.test(m)){ pendingLevels.shift(); save(PENDING_LVL,pendingLevels); lvlCb.delete(x.id); econRefresh().catch(()=>{}) } // the server does not accept it
+    else { lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,8000); return }
+  }
+  lvlBusy=false; if(pendingLevels.length) econPump();
+}
+const levelLine=rw=>rw&&rw.pending?'Wird gutgeschrieben, sobald du online bist':rewardLine(rw);
+async function econDuel(won,cb){
+  if(!econReady()){ cb({xp:0,dust:0,up:0,limited:false,offline:true}); $('overReward').textContent='Ohne Verbindung gibt es keine Belohnung'; return }
+  try{ const r=await rpc('gd_duel_done',{p_won:!!won}); applyEcon(r.state); if(r.reward.up) Sfx.levelup(); cb(r.reward) }
+  catch(e){ if(current==='over') $('overReward').textContent='Belohnung gerade nicht möglich' }
+}
+/* events during play (shots, targets, ...) only count for tasks; they are sent in small batches */
+function econEvent(ev,n){ evPending[ev]=(evPending[ev]||0)+n; clearTimeout(evTimer); evTimer=setTimeout(econFlushEvents,Math.max(1500,5200-(Date.now()-evLast))) }
+async function econFlushEvents(){
+  if(!Object.keys(evPending).length) return;
+  if(!econReady()){ clearTimeout(evTimer); evTimer=setTimeout(econFlushEvents,10000); return }
+  if(Date.now()-evLast<5000){ clearTimeout(evTimer); evTimer=setTimeout(econFlushEvents,5200-(Date.now()-evLast)); return }
+  const send=evPending; evPending={}; evLast=Date.now();
+  try{ applyEcon(await rpc('gd_events',{p_ev:send})) }catch(e){ for(const k in send) evPending[k]=(evPending[k]||0)+send[k] }
+}
+async function econFlush(){ try{ await econFlushEvents() }catch(e){} }
+async function econClaim(id,btn){
+  if(btn) btn.disabled=true;
+  try{
+    const r=await rpc('gd_quest_claim',{p_id:id}); applyEcon(r.state);
+    if(id==='weekly_bonus'){ crateFrom='quests'; openCrate(CRATES.find(c=>c.id==='nebula'),true,crateReward(r.reward)) } else Sfx.buy();
+  }catch(e){ econFail(e,btn); econRefresh().catch(()=>{}) }
+}
+async function econBuy(cat,id,btn){
+  if(btn) btn.disabled=true;
+  try{ applyEcon(await rpc('gd_buy',{p_cat:cat,p_id:id})); Sfx.buy(); netSyncProfile().catch(()=>{}) }catch(e){ econFail(e,btn) }
+}
+async function econEquip(cat,id,btn){
+  if(btn) btn.disabled=true;
+  try{ applyEcon(await rpc('gd_equip',{p_cat:cat,p_id:id})); Sfx.select(); netSyncProfile().catch(()=>{}) }catch(e){ econFail(e,btn) }
+}
+const crateReward=r=>r.kind==='dust'?{kind:'dust',amount:r.amount|0,rarity:'common'}:{kind:'item',cat:r.cat,item:shopItem(r.cat,r.id),rarity:r.rarity,dup:!!r.dup,refund:r.refund|0};
+let crateBusy=false;
+async function econCrate(id,start){
+  if(crateBusy) return; crateBusy=true;
+  try{ const r=await rpc('gd_open_crate',{p_id:id}); applyEcon(r.state); start(crateReward(r.reward)) }
+  catch(e){ econFail(e) } finally{ crateBusy=false }
+}
+/* online match: the server pays out when it settles the match; show what changed */
+async function econMatchReward(before){
+  try{
+    await econRefresh();
+    if(current!=='over'||!before) return;
+    const dx=profile.xp-before.xp, dd=profile.dust-before.dust;
+    $('overReward').textContent=dx>0?`+${dx} XP · +${dd} ✦`:'Keine Belohnung (zu kurzes Match oder Tageslimit gegen diesen Gegner)';
+    const lv=levelInfo(profile.xp).level, lv0=levelInfo(before.xp).level;
+    $('overLevelUp').hidden=lv<=lv0; $('overLevelUp').textContent=lv>lv0?`Aufstieg auf Spielerlevel ${lv}!`:'';
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') econFlush() });
 
 /* ---------- account: e-mail and password or Google, so the game state can move between devices ---------- */
 let acctMode='new';
@@ -3039,7 +3118,7 @@ function setAcctMode(m){
   $('acctTabs').hidden=m==='setpw'; $('acctEmail').hidden=m==='setpw'; $('acctGoogle').hidden=m==='setpw';
   $('acctTitle').textContent=m==='setpw'?'Passwort festlegen':'Konto';
   $('acctInfo').textContent=m==='new'?'Dein Spielstand wird mit dem Konto verbunden. Dann kannst du dich auf jedem Gerät anmelden.'
-    :m==='login'?'Melde dich mit deinem Konto an. Fortschritt von diesem Gerät wird übernommen.':'Deine E-Mail ist bestätigt. Leg jetzt dein Passwort fest.';
+    :m==='login'?'Melde dich mit deinem Konto an. Danach spielst du mit dem Spielstand dieses Kontos.':'Deine E-Mail ist bestätigt. Leg jetzt dein Passwort fest.';
   $('acctPw').autocomplete=m==='login'?'current-password':'new-password';
   $('acctGo').textContent=m==='new'?'Konto erstellen':m==='login'?'Anmelden':'Speichern';
   $('acctHint').textContent='';
@@ -3049,8 +3128,8 @@ async function accountButton(){
   if(!isAccount()) return openAccount('new');
   const btn=$('acctBtn');
   if(btn.dataset.sure!=='1'){ btn.dataset.sure='1'; btn.textContent='Sicher?'; return }
-  try{ await cloudPush(); await Net.backend.sb.auth.signOut() }catch(e){}
-  await switchedAccount('Abgemeldet. Dein Fortschritt bleibt auf diesem Gerät.');
+  try{ await econFlush(); await Net.backend.sb.auth.signOut() }catch(e){}
+  await switchedAccount('Abgemeldet. Du spielst jetzt als Gast.');
 }
 const authErr=e=>{ const m=String(e&&(e.message||e)||'');
   return /registered|already|exists/i.test(m)?'Diese E-Mail hat schon ein Konto. Wechsle zu „Anmelden“.'
@@ -3069,7 +3148,7 @@ async function accountSubmit(){
   $('acctGo').disabled=true; hint.textContent='Einen Moment …';
   try{
     if(acctMode==='login'){
-      await cloudPush();
+      await econFlush();
       const {error}=await sb.auth.signInWithPassword({email,password:pw}); if(error) throw error;
       return await switchedAccount('Angemeldet. Dein Spielstand ist synchronisiert.');
     }
@@ -3082,7 +3161,7 @@ async function accountSubmit(){
     const u=r.data.user;
     if(u&&u.email&&u.email.toLowerCase()===email.toLowerCase()){
       const r2=await sb.auth.updateUser({password:pw}); if(r2.error) throw r2.error;
-      Net.user=r2.data.user||u; await cloudPush(); toast('Konto erstellt. Dein Spielstand ist gesichert.'); renderAccountRow(); return show('settings');
+      Net.user=r2.data.user||u; toast('Konto erstellt. Dein Spielstand ist gesichert.'); renderAccountRow(); return show('settings');
     }
     save(PENDING_PW,email.toLowerCase());
     hint.textContent='Fast fertig: Öffne den Bestätigungslink in der E-Mail, die wir dir geschickt haben. Danach legst du hier dein Passwort fest.';
@@ -3094,7 +3173,7 @@ async function accountGoogle(){
   const redirectTo=/^https?:/.test(location.protocol)?location.origin+location.pathname:WEB_URL;
   hint.textContent='Weiter zu Google …';
   try{
-    await cloudPush();
+    await econFlush();
     const {error}=acctMode==='login'||isAccount()
       ?await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo}})
       :await sb.auth.linkIdentity({provider:'google',options:{redirectTo}});
@@ -3107,7 +3186,7 @@ async function switchedAccount(msg){
   let {data:{session}}=await sb.auth.getSession();
   if(!session){ const r=await sb.auth.signInAnonymously(); if(r.error){ Net.state='error'; Net.err=niceErr(r.error); renderOnline(); return } session=r.data.session }
   Net.backend.uid=session.user.id; Net.user=session.user; Net.friends=[];
-  try{ await cloudPull() }catch(e){ console.warn('cloud',e) }
+  try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
   try{ await netSyncProfile() }catch(e){}
   toast(msg); renderAccountRow(); renderHome(); show('settings');
 }
@@ -3306,7 +3385,8 @@ function onlineEnd(w,byTb,how){
   $('winner').style.color=players[w].color;
   const tt=won?titleName(profile.equip.title):''; $('tally').dataset.title=tt;
   $('tally').textContent=`${tt?tt+' · ':''}${o.ranked?'Wettkampf':'Freundschaftsduell'} · ${MODE_NAME[o.mode]} · gegen ${players[1-me].name}`;
-  const r=grant(won?25:12,won?15:5);
+  const r=SERVER_ECON?{line:'Belohnung wird gutgeschrieben …',up:null}:grant(won?25:12,won?15:5);
+  o.econBefore={xp:profile.xp,dust:profile.dust};
   $('overReward').textContent=r.line;
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
   $('overGrav').hidden=!o.ranked; $('overGrav').textContent='Gravitonen werden gewertet …';
@@ -3320,8 +3400,9 @@ async function netReport(id,winner,tries=0){
     const r=await rpc('gd_report',{p_id:id,p_winner:winner});
     if(typeof r.gravitons==='number'){ profile.trophies=r.gravitons; saveProfile() }
     const el=$('overGrav'); if(current!=='over'||!online||online.id!==id) return;
-    if(r.status==='done'){ const d=r.delta|0; el.innerHTML=r.ranked?`${d>0?'+':d<0?'−':'±'}${Math.abs(d)} <span class="gv" aria-hidden="true"></span>${CURRENCY} · jetzt ${r.gravitons}`:'' }
-    else if(r.status==='disputed') el.textContent='Ergebnis strittig: dieses Match wird nicht gewertet';
+    if(r.status==='done'){ const d=r.delta|0; el.innerHTML=r.ranked?`${d>0?'+':d<0?'−':'±'}${Math.abs(d)} <span class="gv" aria-hidden="true"></span>${CURRENCY} · jetzt ${r.gravitons}`:'';
+      if(SERVER_ECON) econMatchReward(online.econBefore) }
+    else if(r.status==='disputed'){ el.textContent='Ergebnis strittig: dieses Match wird nicht gewertet'; if(SERVER_ECON) $('overReward').textContent='Keine Belohnung für dieses Match' }
     else { el.textContent='Wird gewertet, sobald dein Gegner bestätigt'; if(tries<5) setTimeout(()=>netReport(id,winner,tries+1),[2500,5000,12000,30000,47000][tries]) }
   }catch(e){ if(tries<3) setTimeout(()=>netReport(id,winner,tries+1),5000); else if(current==='over') $('overGrav').textContent='Wertung gerade nicht möglich' }
 }
@@ -3538,10 +3619,10 @@ function renderShop(){
     el.innerHTML=`<canvas width="240" height="160" aria-hidden="true"></canvas><span class="iname">${it.name}</span><span class="rar" style="color:${rar.color}">${rar.name}</span>`;
     const b=document.createElement('button'); b.id=`buy-${shopTab}-${it.id}`;
     if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
-    else if(owned){ b.className='own'; b.textContent='Ausrüsten'; b.onclick=()=>{ profile.equip[shopTab]=it.id; saveProfile(); Sfx.select(); renderShop() } }
+    else if(owned){ b.className='own'; b.textContent='Ausrüsten'; b.onclick=()=>{ if(SERVER_ECON) return econEquip(shopTab,it.id,b); profile.equip[shopTab]=it.id; saveProfile(); Sfx.select(); renderShop() } }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
-      b.onclick=()=>{ if(profile.dust<it.price) return; profile.dust-=it.price; profile.owned[key]=1; profile.equip[shopTab]=it.id; saveProfile(); Sfx.buy(); renderShop() } }
+      b.onclick=()=>{ if(profile.dust<it.price) return; if(SERVER_ECON) return econBuy(shopTab,it.id,b); profile.dust-=it.price; profile.owned[key]=1; profile.equip[shopTab]=it.id; saveProfile(); Sfx.buy(); renderShop() } }
     el.appendChild(b); box.appendChild(el);
     shopPreviews.push({cv:el.querySelector('canvas'),skin,cat:shopTab,item:it,parts:[],fx:[],next:0});
   }
@@ -3576,7 +3657,7 @@ tap('toShop',goShop);
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
 tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ renderQuests(); show('quests') } else { renderShop(); show('shop') } });
-tap('toQuests',()=>{ renderQuests(); show('quests') });
+tap('toQuests',()=>{ renderQuests(); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
 tap('questsBack',()=>goHome());
 tap('toFriends',()=>openFriends(null));
 tap('friendsBack',()=>goHome());
@@ -3594,7 +3675,7 @@ tap('copyCode',()=>{
   try{ navigator.clipboard.writeText(code).then(done,fallback) }catch(e){ fallback() }
 });
 tap('crateAgain',()=>{ const c=crateAnim&&crateAnim.c; if(c&&profile.dust>=c.price) openCrate(c) });
-tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item'){ profile.equip[r.cat]=r.item.id; saveProfile(); Sfx.select(); $('crateEquip').hidden=true } });
+tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item'){ if(SERVER_ECON) econEquip(r.cat,r.item.id); else { profile.equip[r.cat]=r.item.id; saveProfile() } Sfx.select(); $('crateEquip').hidden=true } });
 $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.revealed) revealCrate() });
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
@@ -3651,6 +3732,7 @@ if(window.__GD_TEST__) window.__gd={
       PHYS.advance(bodies,visT,H); if(ok) return v }
     return null }, weapon:(w)=>{ players[meIdx()].weapon=w }, me:()=>meIdx(),
   clearMoons:()=>{ bodies=bodies.filter(b=>b.kind!=='moon'&&b.kind!=='portal') },
+  clearLevel:()=>levelCleared(), endDuel:w=>endMatch(w,false,''),
   setLives:(a,b)=>{ players[0].lives=a; players[1].lives=b },
   fire:(x,y)=>{ if(phase==='aim') fire({x,y}) },
   timeLayout:(n)=>{ const t0=performance.now(); for(let i=0;i<n;i++) layoutDuel(); return (performance.now()-t0)/n },
