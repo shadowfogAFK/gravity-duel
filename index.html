@@ -488,6 +488,23 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 #void.degen .label{color:#d9a0b0}
 @media (min-width:500px){#void .card{max-width:440px}}
 @media (prefers-reduced-motion:reduce){#void #voidPlay::after{animation:none}#void .vprize{animation:none}}
+/* v2: Plinko balls slider, crash cash-out, autospin */
+#void .vballs{display:grid;grid-template-columns:1fr 34px;gap:10px;align-items:center}
+#void .vballs b{font-family:var(--display);font-size:1.1rem;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
+#void .vballs input{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:0;--p:0%}
+#void .vballs input::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--p2) var(--p),rgba(255,255,255,.12) var(--p))}
+#void .vballs input::-moz-range-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--p2) var(--p),rgba(255,255,255,.12) var(--p))}
+#void .vballs input::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--p2) 45%,#0b5a6a);box-shadow:0 0 12px rgba(46,230,255,.7);border:0}
+#void .vballs input::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,var(--p2) 45%,#0b5a6a);box-shadow:0 0 12px rgba(46,230,255,.7);border:0}
+#void .vballs input[disabled]{opacity:.45}
+#void .vauto{justify-content:flex-start;flex-wrap:nowrap}
+#void .vauto button{padding:6px 8px;flex:1 1 0;min-width:0}
+#void .vauto button[aria-pressed="true"]{color:var(--gold);border-color:var(--gold)}
+#void #voidPlay.cash{background:linear-gradient(90deg,#3dffd0,#2ee6ff);color:#03201c;font-size:1.05rem;white-space:nowrap;padding:16px 10px;box-shadow:0 0 26px rgba(61,255,208,.6);animation:vcash .5s ease-in-out infinite alternate;font-variant-numeric:tabular-nums}
+#void #voidPlay.cash::after,#void #voidPlay.stop::after{animation:none;display:none}
+#void #voidPlay.stop{background:transparent;color:#ff8aa0;border:1px solid rgba(255,59,92,.75);box-shadow:0 0 16px rgba(255,59,92,.3)}
+@keyframes vcash{from{box-shadow:0 0 14px rgba(61,255,208,.45)}to{box-shadow:0 0 34px rgba(61,255,208,.9)}}
+@media (prefers-reduced-motion:reduce){#void #voidPlay.cash{animation:none}}
 </style>
 </head>
 <body>
@@ -6043,7 +6060,7 @@ function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return 
    takes the bet, draws the outcome and pays out in one call; this code only animates the answer it gets.
    VOID_T is a copy of gd_void_tables() so the board and the odds sheets can be drawn before the first call. */
 const VOID_T={
-  minBet:10,maxBet:2000,cooldown:1,consolation:5000,
+  minBet:10,maxBet:2000,cooldown:1,consolation:5000,plinkoBalls:10,
   coinflip:{mult:1.96},
   plinko:{
     low: {8:[5.5,1.8,1.2,1,.4,1,1.2,1.8,5.5],12:[10,3,1.5,1.2,1.1,1,.5,1,1.1,1.2,1.5,3,10],16:[16,9,2,1.4,1.3,1.2,1.1,1,.4,1,1.1,1.2,1.3,1.4,2,9,16]},
@@ -6051,7 +6068,7 @@ const VOID_T={
     high:{8:[28,3.8,1.6,.3,.1,.3,1.6,3.8,28],12:[150,24,8,2.1,.6,.2,.2,.2,.6,2.1,8,24,150],16:[250,100,26,9,4,2.1,.2,.2,.2,.2,.2,2.1,4,9,26,100,250]}},
   plinkoVoid:{rows:12,bet:500,mult:[50,20,6,2.5,.7,.3,.05,.3,.7,2.5,6,20,50],item:[1,.3,0,0,0,0,0,0,0,0,0,.3,1]},
   wheel:[0,1.5,0,2,0,1,0,1.5,0,3,0,1,2,0,1.5,0,1,0,5,0,2,0,1,0,1.5],
-  crash:{edge:.97,min:1.01,max:100},
+  crash:{edge:.97,min:1.01,max:100,k:.15},
   slot:{syms:['a','m','e','r','g','k','s','w','x'],wBase:[21,20,17,12,11,7,5,3,4],wFree:[20,19,16,12,11,7,5,6,4],
     pay:{a:[5,15,40],m:[6,20,50],e:[8,30,75],r:[15,50,150],g:[20,60,200],k:[30,100,400],s:[50,150,600],w:[80,300,1000]},
     scatter:{3:1,4:10,5:50},lines:[[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2],[0,0,1,2,2],[2,2,1,0,0],[1,0,0,0,1],[1,2,2,2,1],[1,0,1,2,1]],
@@ -6063,11 +6080,12 @@ const VOID_GAMES=[
   {id:'coinflip',  name:'Coinflip',        sub:'Planet oder Mond? Richtig getippt: 1,96×', tag:'98 %'},
   {id:'plinko',    name:'Plinko',          sub:'Ein Komet fällt durch ein Sternenfeld',   tag:'bis 250×'},
   {id:'slot',      name:'Space-Slot',      sub:'Schwarze Löcher, Wurmlöcher, Freispiele',  tag:'Freispiele'},
-  {id:'crash',     name:'Ereignis\u00adhorizont',sub:'Steig aus, bevor das Loch dich holt',      tag:'bis 100×'},
+  {id:'crash',     name:'Ereignis\u00adhorizont',sub:'Tippe „Aussteigen“, bevor das Loch dich holt',tag:'bis 100×'},
   {id:'wheel',     name:'Orbit-Rad',       sub:'Dein Planet, 25 Felder, ein Mond',         tag:'bis 5×'},
   {id:'plinkovoid',name:'Void-Modus',      sub:'Plinko am Abgrund · fester Einsatz ✦ 500 · die Ränder können ein Void-Item fallen lassen',tag:'Void-Item',degen:true}
 ];
 const VOID_SYM={a:'Asteroid',m:'Mond',e:'Eismond',r:'Ringplanet',g:'Gasriese',k:'Komet',s:'Supernova',w:'Schwarzes Loch',x:'Wurmloch'};
+const VOID_AUTO=[20,50,100,500,Infinity];
 const VOID_LADDER=[10,20,25,50,75,100,150,200,250,300,400,500,750,1000,1500,2000];
 const VOID_TARGETS=[1.01,1.1,1.2,1.3,1.5,1.75,2,2.5,3,4,5,7.5,10,15,20,25,50,75,100];
 const VOID_KEY='gravityDuel.void.v1';
@@ -6231,23 +6249,29 @@ const VPlinko={
   st:{ph:'idle'},
   isVoid(){ return VS.game==='plinkovoid' },
   rows(){ return this.isVoid()?VOID_T.plinkoVoid.rows:(vPrefs.rows|0)||12 },
+  balls(){ return this.isVoid()?1:vClamp(Math.round(+vPrefs.balls||1),1,VOID_T.plinkoBalls) },
   table(){ return this.isVoid()?VOID_T.plinkoVoid.mult:VOID_T.plinko[vPrefs.risk][this.rows()] },
-  reset(){ this.st={ph:'idle',flash:{},slotHit:-1} },
+  reset(){ this.st={ph:'idle',flash:{},hits:{},balls:[]} },
   opts(box){
     if(this.isVoid()){ box.innerHTML=''; return }
     box.innerHTML=`<div class="vrow"><span>Risiko</span><div class="vseg" role="radiogroup" aria-label="Risiko"><button role="radio" data-risk="low">Niedrig</button><button role="radio" data-risk="mid">Mittel</button><button role="radio" data-risk="high">Hoch</button></div></div>
-      <div class="vrow"><span>Reihen</span><div class="vseg" role="radiogroup" aria-label="Reihen"><button role="radio" data-rows="8">8</button><button role="radio" data-rows="12">12</button><button role="radio" data-rows="16">16</button></div></div>`;
+      <div class="vrow"><span>Reihen</span><div class="vseg" role="radiogroup" aria-label="Reihen"><button role="radio" data-rows="8">8</button><button role="radio" data-rows="12">12</button><button role="radio" data-rows="16">16</button></div></div>
+      <div class="vrow"><span>Bälle</span><div class="vballs"><input type="range" id="voidBalls" min="1" max="${VOID_T.plinkoBalls}" step="1" aria-label="Anzahl Bälle"><b id="voidBallsN"></b></div></div>`;
     for(const b of box.querySelectorAll('[data-risk]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.risk=b.dataset.risk; vSavePrefs(); this.sync() });
     for(const b of box.querySelectorAll('[data-rows]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.rows=+b.dataset.rows; vSavePrefs(); this.sync() });
+    const sl=$('voidBalls'); sl.value=this.balls();
+    sl.addEventListener('input',()=>{ if(VS.busy){ sl.value=this.balls(); return } vPrefs.balls=+sl.value; vSavePrefs(); Sfx.init(); Sfx.tick(+sl.value/10); this.sync(); vSyncBet() });
     this.sync();
   },
   sync(){
     if(!VOID_T.plinko[vPrefs.risk]) vPrefs.risk='mid'; if(![8,12,16].includes(vPrefs.rows|0)) vPrefs.rows=12;
     for(const b of document.querySelectorAll('#voidOpts [data-risk]')) b.setAttribute('aria-checked',String(b.dataset.risk===vPrefs.risk));
     for(const b of document.querySelectorAll('#voidOpts [data-rows]')) b.setAttribute('aria-checked',String(+b.dataset.rows===(vPrefs.rows|0)));
+    const n=$('voidBallsN'); if(n){ const k=this.balls(); n.textContent=k; $('voidBalls').style.setProperty('--p',`${(k-1)/(VOID_T.plinkoBalls-1)*100}%`) }
     if(VS.info) vRenderInfo();
   },
-  args(){ return this.isVoid()?{void:true}:{risk:vPrefs.risk,rows:this.rows()} },
+  stake(b){ return b*this.balls() },
+  args(){ return this.isVoid()?{void:true}:{risk:vPrefs.risk,rows:this.rows(),balls:this.balls()} },
   info(){
     const n=this.rows(), T=this.table(), pr=k=>{ let c=1; for(let i=0;i<k;i++) c=c*(n-i)/(i+1); return c/Math.pow(2,n) };
     const half=T.slice(0,Math.floor(n/2)+1);
@@ -6257,19 +6281,25 @@ const VPlinko={
       <p>Void-Item pro Drop insgesamt: <b>${vPct(VOID_T.rtp.plinkoVoidItem)}</b> (etwa 1 zu ${Math.round(1/VOID_T.rtp.plinkoVoidItem)}). Besitzt du schon alle Void-Items, gibt es stattdessen ✦ ${vNum(VOID_T.consolation)}.</p>
       <span class="rtp">Erwartete Rückgabe in ✦: ${vPct(VOID_T.rtp.plinkoVoid)} + Item-Chance</span>`;
     const name={low:'Niedrig',mid:'Mittel',high:'Hoch'}[vPrefs.risk];
-    return `<h3>Plinko · Risiko ${name} · ${n} Reihen</h3><p style="margin:0 0 6px">An jedem Stern springt der Komet mit 50 % nach links oder rechts.</p>
+    return `<h3>Plinko · Risiko ${name} · ${n} Reihen</h3><p style="margin:0 0 6px">An jedem Stern springt der Komet mit 50 % nach links oder rechts. Mit mehreren Bällen gilt der Einsatz je Ball (bis ${VOID_T.plinkoBalls} Bälle), jeder Ball fällt unabhängig.</p>
       <table><tr><th>Feld (je Seite)</th><th>Auszahlung</th><th>Chance</th></tr>${rows}</table>
-      <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.plinko[vPrefs.risk][n])}</span>`;
+      <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.plinko[vPrefs.risk][n])} je Ball</span>`;
   },
   geo(w,h){ const n=this.rows(), top=h*.1, bottom=h*.84, sy=(bottom-top)/n, sx=Math.min(w*.97/(n+1.4),sy*1.3), cx=w/2; return {n,top,sy,sx,cx,slotY:top+n*sy+sy*.15} },
-  charge(t){ this.st.ph='charge'; this.st.t0=t },
+  charge(t){ this.st.ph='charge'; this.st.t0=t; this.st.nb=this.balls() },
   abort(){ this.reset() },
-  land(r,t){ const s=this.st; s.ph='fall'; s.t0=t; s.path=r.result.path; s.slot=r.result.slot; s.item=!!r.item||!!r.result.consolation; s.trail=[]; s.hitRow=-1; s.flash={}; s.slotHit=-1; Sfx.launch(.3) },
-  pos(G,s,e){ // ball position after e seconds of fall
+  land(r,t){
+    const s=this.st, res=r.result, drops=Array.isArray(res.drops)&&res.drops.length?res.drops:[{path:res.path,slot:res.slot,mult:res.mult,pay:r.payout}];
+    const gap=drops.length>6?.12:drops.length>3?.15:.19;
+    s.ph='fall'; s.t0=t; s.flash={}; s.hits={}; s.item=!!r.item||!!res.consolation; s.left=drops.length;
+    s.balls=drops.map((d,i)=>({path:d.path,slot:d.slot,mult:d.mult,pay:d.pay|0,t0:t+i*gap,trail:[],hitRow:-1,done:false,hue:i}));
+    Sfx.launch(.3);
+  },
+  pos(G,b,e){ // ball position after e seconds of fall
     const step=this.isVoid()?.14:G.n>12?.105:.125, fall0=.22;
     if(e<fall0){ const p=e/fall0; return {x:G.cx,y:G.top-G.sy*1.2+p*p*(G.sy*1.2-G.sy*.42),row:-1,done:false} }
     let k=(e-fall0)/step, i=Math.floor(k), p=k-i;
-    const off=j=>{ let r=0; for(let q=0;q<j;q++) r+=s.path[q]; return r-j/2 };
+    const off=j=>{ let r=0; for(let q=0;q<j;q++) r+=b.path[q]; return r-j/2 };
     if(i>=G.n){ const q=Math.min(1,(e-fall0-G.n*step)/.14), y0=G.top+G.n*G.sy-G.sy*.42; return {x:G.cx+off(G.n)*G.sx,y:y0+q*q*(G.slotY+G.sy*.3-y0),row:G.n,done:q>=1} }
     const x0=G.cx+off(i)*G.sx, x1=G.cx+off(i+1)*G.sx, y0=G.top+i*G.sy-G.sy*.42, y1=y0+G.sy;
     return {x:vLerp(x0,x1,vOutCubic(p)),y:vLerp(y0,y1,p*p)-G.sy*.55*Math.sin(Math.PI*p)*(1-p*.4),row:i,done:false};
@@ -6285,7 +6315,7 @@ const VPlinko={
     // slots: gravity wells
     const sw=G.sx*.9, sh=Math.min(G.sy*.85,26);
     for(let k=0;k<=G.n;k++){
-      const m=T[k], x=G.cx+(k-G.n/2)*G.sx, hit=s.slotHit===k?Math.max(0,1-(t-s.slotAt)*1.2):0, y=G.slotY+hit*5;
+      const m=T[k], x=G.cx+(k-G.n/2)*G.sx, hit=s.hits&&s.hits[k]?Math.max(0,1-(t-s.hits[k])*1.2):0, y=G.slotY+hit*5;
       const voidSlot=vd&&VOID_T.plinkoVoid.item[k]>0, c=voidSlot?'#a24dff':vd?(m>=1?'#ff4f8b':'#5a1830'):vMultColor(m);
       g.fillStyle=rgba(c,.22+hit*.5); g.strokeStyle=rgba(c,.85); g.lineWidth=1.2;
       roundRect(g,x-sw/2,y,sw,sh,Math.min(5,sw*.25)); g.fill(); g.stroke();
@@ -6295,23 +6325,33 @@ const VPlinko={
       if(hit>0) radialHex(g,x,y+sh/2,sw*1.8,c,hit*.6);
     }
     if(vd){ vText(g,'VOID',G.cx-(G.n/2-.5)*G.sx,G.slotY+sh+10,8,'#d7a0ff'); vText(g,'VOID',G.cx+(G.n/2-.5)*G.sx,G.slotY+sh+10,8,'#d7a0ff') }
-    // ball: the player's own shot, with its trail
-    let P=null;
-    if(s.ph==='charge'){ const e=t-s.t0; P={x:G.cx+Math.sin(e*14)*2,y:G.top-G.sy*1.2} ; radialHex(g,P.x,P.y,22,col,.3+.2*Math.sin(e*18)) }
-    else if(s.ph==='fall'){
-      const e=t-s.t0; P=this.pos(G,s,e);
-      if(P.row>s.hitRow&&P.row<G.n&&P.row>=0){ s.hitRow=P.row; let off=0; for(let q=0;q<P.row;q++) off+=s.path[q]; s.flash[P.row*100+off+1]=t; Sfx.tick(.15+.8*P.row/G.n) }
-      s.trail.push([P.x,P.y]); if(s.trail.length>14) s.trail.shift();
-      if(P.done){ s.ph='land'; s.t0=t; s.slotHit=s.slot; s.slotAt=t; s.trail=[];
-        const m=T[s.slot], x=G.cx+(s.slot-G.n/2)*G.sx;
-        vFloat(vX(m),x,G.slotY-12,m>=1?'#ffd34f':'#a99cd6',m>=10?24:18);
-        if(s.item){ VS.flash={c:'#a24dff',a:1}; VS.shake=14; vBurst(x,G.slotY,70,['#a24dff','#ff3b5c','#ffffff','#ff6bd6'],260,'star') }
-        else if(m>=3){ vBurst(x,G.slotY,m>=10?50:24,['#ffd34f','#ff4f8b','#fff'],200); VS.shake=m>=10?9:4 }
-        voidReveal() }
-    } else if(s.ph==='land'){ if(t-s.t0>.45){ s.ph='idle'; voidDone() } }
-    if(s.trail&&s.trail.length>1) drawStyledTrail(g,s.trail,col,skin.trail,t,.85);
-    if(P){ g.save(); g.translate(P.x,P.y); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0 }
-    if(s.ph==='idle'&&!P){ g.globalAlpha=.55+.3*Math.sin(t*3); g.save(); g.translate(G.cx,G.top-G.sy*1.2); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0; g.globalAlpha=1 }
+    // balls: the player's own shot, with its trail
+    const heads=[];
+    if(s.ph==='charge'){ const e=t-s.t0, n=s.nb||1; for(let i=0;i<Math.min(n,5);i++){ const x=G.cx+(i-(Math.min(n,5)-1)/2)*10+Math.sin(e*14+i)*2, y=G.top-G.sy*1.2-(i%2)*3; radialHex(g,x,y,18,col,.25+.15*Math.sin(e*18+i)); heads.push({x,y,a:1}) } }
+    else if(s.ph==='fall'||s.ph==='land'){
+      let stagger=0;
+      for(const b of s.balls){
+        if(b.done) continue;
+        const e=t-b.t0; if(e<0){ if(stagger++<4) heads.push({x:G.cx+stagger*7-14,y:G.top-G.sy*1.25,a:.45}); continue }
+        const P=this.pos(G,b,e);
+        if(P.row>b.hitRow&&P.row<G.n&&P.row>=0){ b.hitRow=P.row; let off=0; for(let q=0;q<P.row;q++) off+=b.path[q]; s.flash[P.row*100+off+1]=t; if(s.balls.length<4||Math.random()<.5) Sfx.tick(.15+.8*P.row/G.n) }
+        b.trail.push([P.x,P.y]); if(b.trail.length>12) b.trail.shift();
+        if(b.trail.length>1) drawStyledTrail(g,b.trail,col,skin.trail,t,.8);
+        heads.push({x:P.x,y:P.y,a:1});
+        if(P.done){ b.done=true; s.hits[b.slot]=t; s.left--;
+          const m=b.mult, x=G.cx+(b.slot-G.n/2)*G.sx;
+          vFloat(s.balls.length>1&&b.pay?'+'+vNum(b.pay):vX(m),x,G.slotY-12-(b.hue%3)*9,m>=1?'#ffd34f':'#a99cd6',m>=10?24:s.balls.length>1?14:18);
+          if(VS.shownDust!=null){ VS.shownDust+=b.pay; vDust(b.pay>0) }
+          if(s.item){ VS.flash={c:'#a24dff',a:1}; VS.shake=14; vBurst(x,G.slotY,70,['#a24dff','#ff3b5c','#ffffff','#ff6bd6'],260,'star') }
+          else if(m>=3){ vBurst(x,G.slotY,m>=10?50:24,['#ffd34f','#ff4f8b','#fff'],200); VS.shake=Math.max(VS.shake,m>=10?9:4) }
+          else if(s.balls.length>1) Sfx.tick(.9);
+          if(s.left<=0){ s.ph='land'; s.tEnd=t; voidReveal() } }
+      }
+      if(s.ph==='land'&&t-s.tEnd>.45){ s.ph='idle'; voidDone() }
+    }
+    for(const P of heads){ g.globalAlpha=P.a; g.save(); g.translate(P.x,P.y); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0 }
+    g.globalAlpha=1;
+    if(s.ph==='idle'){ g.globalAlpha=.55+.3*Math.sin(t*3); g.save(); g.translate(G.cx,G.top-G.sy*1.2); g.scale(1.3,1.3); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0; g.globalAlpha=1 }
   }
 };
 
@@ -6323,7 +6363,11 @@ const VSlot={
     this.st={ph:'idle',grid:prev||[['m','r','a'],['k','w','e'],['s','x','g'],['e','a','m'],['g','r','k']],reels:[0,1,2,3,4].map(()=>({off:0,v:0,tape:{},mode:'stop'})),spins:null,idx:0,total:0,shown:0,hl:null,banner:null,orb:null,fsLeft:0,fsDone:0};
     this.st.reels.forEach((R,j)=>{ const gcol=this.st.grid[j]; R.tape[2]=gcol[0]; R.tape[1]=gcol[1]; R.tape[0]=gcol[2] });
   },
-  opts(box){ box.innerHTML='' },
+  opts(box){
+    box.innerHTML=`<div class="vrow"><span>Autospin</span><div class="vchips vauto" role="group" aria-label="Autospin">${VOID_AUTO.map(n=>`<button data-auto="${n}">${n===Infinity?'∞':n+'×'}</button>`).join('')}</div></div>`;
+    for(const b of box.querySelectorAll('[data-auto]')) b.addEventListener('click',()=>{ if(VS.busy||VS.auto) return; Sfx.init(); Sfx.select(); vAutoStart(+b.dataset.auto) });
+  },
+  sync(){ for(const b of document.querySelectorAll('#voidOpts [data-auto]')) b.setAttribute('aria-pressed',String(!!VS.auto&&VS.auto.n===+b.dataset.auto)) },
   args(){ return {} },
   info(){
     const P=VOID_T.slot.pay, rows=Object.keys(P).map(k=>`<tr><td>${VOID_SYM[k]}${k==='w'?' (Wild)':''}</td><td>${P[k][0]}</td><td>${P[k][1]}</td><td>${P[k][2]}</td></tr>`).join('');
@@ -6332,6 +6376,7 @@ const VSlot={
       <table><tr><th>Symbol</th><th>3×</th><th>4×</th><th>5×</th></tr>${rows}</table>
       <p><b>Schwarzes Loch</b> ersetzt jedes Symbol außer dem Wurmloch. <b>Wurmloch</b> zahlt überall: 3 = ${S.scatter[3]}×, 4 = ${S.scatter[4]}×, 5+ = ${S.scatter[5]}× Einsatz, und 3+ starten <b>${S.freeSpins} Freispiele</b> (Chance ${vPct(.0203)} je Dreh, ab 3 in den Freispielen +${S.retrigger}, höchstens ${S.maxSpins}).</p>
       <p>In Freispielen gibt es mehr Schwarze Löcher, und mit ${vPct(S.orbChance)} erscheint ein <b>Multiplikator-Orb</b>: ${orbs}. 5 Schwarze Löcher auf einer Linie in den Freispielen: Void-Item (etwa 1 zu 700.000).</p>
+      <p><b>Autospin</b> (20×, 50×, 100×, 500×, ∞) dreht Runde für Runde mit deinem Einsatz weiter und stoppt bei „Stopp“, wenn dein Sternenstaub nicht mehr reicht, bei einem Fehler oder wenn du das Spiel verlässt.</p>
       <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.slot)}</span>`;
   },
   tape(R,i){ if(!(i in R.tape)) R.tape[i]=vChoose(VOID_T.slot.syms.slice(0,7).concat(['a','m','e','w','x'])); return R.tape[i] },
@@ -6384,7 +6429,7 @@ const VSlot={
     const s=this.st, sp=s.spins[s.idx];
     s.hl=null;
     if(s.idx===0&&sp.scat>=3&&s.spins.length>1){ s.fsLeft=VOID_T.slot.freeSpins; s.free=true; Sfx.portal(); Sfx.levelup(); VS.flash={c:'#3dffd0',a:1}; vBurst(this.lastW/2,this.lastH/2,60,['#3dffd0','#ff6bd6','#fff'],240,'star');
-      s.planned=VOID_T.slot.freeSpins; s.ph='banner'; s.pt=0; s.banner={text:`${VOID_T.slot.freeSpins} FREISPIELE`,sub:'Mehr Schwarze Löcher · Multiplikator-Orbs',c:'#3dffd0',dur:1.9,t0:t,next:()=>{ s.idx++; VS.speed=Math.max(VS.speed,1.5); this.startSpin() }}; return }
+      s.planned=VOID_T.slot.freeSpins; s.ph='banner'; s.pt=0; s.banner={text:`${VOID_T.slot.freeSpins} FREISPIELE`,sub:'Mehr Schwarze Löcher · Multiplikator-Orbs',c:'#3dffd0',dur:1.9,t0:t,next:()=>{ s.idx++; VS.speed=Math.max(VS.speed,VS.auto?2:1.5); this.startSpin() }}; return }
     if(s.idx>0&&sp.add>0){ s.planned+=sp.add; Sfx.portal(); s.ph='banner'; s.pt=0; s.banner={text:`+${sp.add} FREISPIELE`,sub:'',c:'#3dffd0',dur:1.1,t0:t,next:()=>this.next(t)}; return }
     this.next(t);
   },
@@ -6412,9 +6457,10 @@ const VSlot={
         const y=gy+(2-i+off)*cs+cs/2; if(y<gy-cs||y>gy+cs*4) continue;
         const id=this.tape(R,i), row=Math.round((y-gy-cs/2)/cs);
         const hot=s.hl&&R.mode==='stop'&&row>=0&&row<3&&this.isHot(j,row,id);
-        g.globalAlpha=blur>.3?.75:1;
-        if(blur>.3){ g.save(); g.translate(cx,y); g.scale(1,1+blur*.35); vSym(g,id,0,0,cs,t,false); g.restore() } else vSym(g,id,cx,y,cs*(hot?1+.06*Math.sin(t*10):1),t,hot);
-        g.globalAlpha=1;
+        if(blur>.3){ // motion blur: the symbol keeps its shape, fading copies trail behind it
+          for(let q=3;q>=1;q--){ g.globalAlpha=.16*blur*(4-q)/3; vSym(g,id,cx,y-q*cs*.13*blur,cs,t,false) }
+          g.globalAlpha=1-.25*blur; vSym(g,id,cx,y,cs,t,false); g.globalAlpha=1 }
+        else vSym(g,id,cx,y,cs*(hot?1+.06*Math.sin(t*10):1),t,hot);
       }
       g.restore();
     }
@@ -6434,6 +6480,7 @@ const VSlot={
     g.fillStyle='rgba(8,3,24,.6)'; g.fillRect(0,0,w,head);
     if(s.free&&s.idx>0){ vText(g,`FREISPIEL ${s.idx} / ${s.planned}`,12,head/2,13,'#3dffd0','left') }
     else if(s.free) vText(g,'FREISPIELE',12,head/2,13,'#3dffd0','left');
+    else if(VS.auto) vText(g,VS.auto.left===Infinity?'AUTOSPIN ∞':`AUTOSPIN · noch ${VS.auto.left}`,12,head/2,12,'#ffd34f','left');
     else vText(g,s.total>0?'10 Linien':'10 Linien · Wild · Freispiele',12,head/2,11,'rgba(169,156,214,.9)','left',500);
     s.shown=s.shown<s.total?Math.min(s.total,s.shown+Math.max(1,(s.total-s.shown)*dt*6)):s.total;
     if(s.total>0||s.ph!=='idle') vText(g,`Gewinn ✦ ${vNum(s.shown)}`,w-12,head/2,14,s.total>0?'#ffd34f':'rgba(243,238,255,.6)','right');
@@ -6448,80 +6495,110 @@ const VSlot={
   tap(){ if(VS.busy&&this.st.spins&&this.st.spins.length>1) VS.speed=3 }
 };
 
-/* ---------- 4 · Ereignishorizont (crash) ---------- */
+/* ---------- 4 · Ereignishorizont (crash, manual cash-out) ----------
+   The server starts the round (gd_void_play) and keeps the time; the ship's factor is m(t)=e^(k·t) from that start.
+   gd_void_crash_peek (every ~280 ms) says when the hole has caught it, gd_void_cashout pays the factor at server time. */
 const VCrash={
-  st:{ph:'idle'}, K:.35,
-  mAt(e){ return Math.exp(this.K*Math.pow(Math.max(0,e),1.25)) },
-  tOf(m){ return Math.pow(Math.log(m)/this.K,.8) },
+  st:{ph:'idle'}, PEEK:.28,
+  k(){ return VOID_T.crash.k },
+  mAt(e){ return Math.min(VOID_T.crash.max,Math.floor(100*Math.exp(this.k()*Math.max(0,e)))/100) },
+  mRaw(e){ return Math.exp(this.k()*Math.max(0,e)) },
+  tOf(m){ return Math.log(Math.max(1,m))/this.k() },
   reset(){ this.st={ph:'idle'} },
   target(){ const v=+vPrefs.target; return VOID_TARGETS.includes(v)?v:2 },
+  flying(){ return this.st.ph==='fly' },
   opts(box){
-    box.innerHTML=`<div class="vrow"><span>Ausstieg</span><div class="vtarget"><button class="vbb" data-t="-1" aria-label="Ausstieg niedriger">−</button><b id="voidTarget"></b><button class="vbb" data-t="1" aria-label="Ausstieg höher">+</button></div></div>
-      <div class="vchips" role="radiogroup" aria-label="Schnellwahl">${[1.5,2,3,5,10,50].map(x=>`<button role="radio" data-q="${x}">${vX(x)}</button>`).join('')}</div>`;
+    box.innerHTML=`<div class="vrow"><span>Ausstieg</span><div class="vseg" role="radiogroup" aria-label="Ausstieg"><button role="radio" data-auto="0">Von Hand</button><button role="radio" data-auto="1">Automatisch</button></div></div>
+      <div class="vrow" id="voidAutoRow"><span>Bei</span><div class="vtarget"><button class="vbb" data-t="-1" aria-label="Ausstieg niedriger">−</button><b id="voidTarget"></b><button class="vbb" data-t="1" aria-label="Ausstieg höher">+</button></div></div>`;
+    for(const b of box.querySelectorAll('[data-auto]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.crashAuto=b.dataset.auto==='1'; vSavePrefs(); this.sync() });
     for(const b of box.querySelectorAll('[data-t]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); const i=VOID_TARGETS.indexOf(this.target()); vPrefs.target=VOID_TARGETS[vClamp(i+(+b.dataset.t),0,VOID_TARGETS.length-1)]; Sfx.tick(i/VOID_TARGETS.length); vSavePrefs(); this.sync() });
-    for(const b of box.querySelectorAll('[data-q]')) b.addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vPrefs.target=+b.dataset.q; vSavePrefs(); this.sync() });
     this.sync();
   },
-  sync(){ const m=this.target(), el=document.getElementById('voidTarget'); if(el) el.innerHTML=`${vX(m)}<small>Chance ${vPct(Math.min(1,VOID_T.crash.edge/m))}</small>`;
-    for(const b of document.querySelectorAll('#voidOpts [data-q]')) b.setAttribute('aria-checked',String(+b.dataset.q===m)); if(VS.info) vRenderInfo() },
-  args(){ return {target:this.target()} },
-  info(){ const ex=[1.5,2,3,5,10,25,100].map(m=>`<tr><td>${vX(m)}</td><td>${vPct(VOID_T.crash.edge/m)}</td><td>${vPct(1-VOID_T.crash.edge/m)}</td></tr>`).join('');
-    return `<h3>Ereignishorizont</h3><p style="margin:0 0 6px">Vor dem Start wählst du, bei welchem Faktor dein Schiff aussteigt. Der Server lost aus, wann das Schwarze Loch es zurückholt. Die Chance, Faktor m zu erreichen, ist 97 % ÷ m. In 3 % der Runden wird das Schiff sofort verschluckt.</p>
-      <table><tr><th>Ausstieg bei</th><th>Gewinnchance</th><th>Verschluckt</th></tr>${ex}</table><span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.crash)} bei jedem Ausstieg</span>` },
-  charge(t){ this.st={ph:'charge',t0:t,trail:[]}; Sfx.crateShake() },
+  sync(){ const m=this.target(), el=$('voidTarget'); if(el) el.innerHTML=`${vX(m)}<small>Chance ${vPct(Math.min(1,VOID_T.crash.edge/m))}</small>`;
+    for(const b of document.querySelectorAll('#voidOpts [data-auto]')) b.setAttribute('aria-checked',String((b.dataset.auto==='1')===!!vPrefs.crashAuto));
+    const row=$('voidAutoRow'); if(row) row.hidden=!vPrefs.crashAuto; if(VS.info) vRenderInfo() },
+  args(){ return {} },
+  info(){ const ex=[1.5,2,3,5,10,25,100].map(m=>`<tr><td>${vX(m)}</td><td>${(this.tOf(m)).toFixed(1).replace('.',',')} s</td><td>${vPct(VOID_T.crash.edge/m)}</td></tr>`).join('');
+    return `<h3>Ereignishorizont</h3><p style="margin:0 0 6px">Dein Schiff flieht aus einem Schwarzen Loch, der Faktor steigt mit der Zeit. Tippe auf <b>Aussteigen</b>, bevor das Loch es zurückholt: Du bekommst Einsatz × Faktor. Wann das Loch zuschlägt, lost der Server beim Start aus, und Faktor und Zeit zählt nur der Server. Die Chance, Faktor m zu erreichen, ist 97 % ÷ m; in 3 % der Runden wird das Schiff sofort verschluckt. Bei ${vX(VOID_T.crash.max)} steigt es automatisch aus.</p>
+      <table><tr><th>Faktor</th><th>erreicht nach</th><th>Chance</th></tr>${ex}</table>
+      <p>Optional steigt „Automatisch“ beim gewählten Faktor aus. Verlässt du eine laufende Runde, wird sofort ausgestiegen; ohne Verbindung gilt eine liegengebliebene Runde als verloren.</p>
+      <span class="rtp">Erwartete Rückgabe: ${vPct(VOID_T.rtp.crash)}, egal wann du aussteigst</span>` },
+  charge(t){ this.st={ph:'charge',t0:t}; Sfx.crateShake() },
   abort(){ this.reset() },
-  land(r,t){ const s=this.st, R=r.result; s.ph='fly'; s.t0=t; s.target=R.target; s.crash=R.crash; s.win=R.win; s.trail=[]; s.ticks=1; s.end=s.win?this.tOf(R.target):this.tOf(Math.max(1.0001,R.crash)); if(R.crash<=1){ s.end=0 } Sfx.boost() },
+  land(r,t,sent){ // sent/t: when the start call left and came back; the server's clock started about in between
+    const s=this.st; s.ph='fly'; s.t0=sent!=null?(sent+t)/2:t; s.ticks=1; s.peekAt=t+this.PEEK; s.peeking=false; s.cashing=false; s.bet=r.bet; s.end=null; Sfx.boost() },
+  /* the server's answer that ends the round: from peek or cash-out */
+  finish(a,t){
+    const s=this.st; if(s.ph!=='fly') return;
+    const R=VS.round; if(R) R.r={...R.r,result:a.result,payout:a.payout|0,state:a.state,item:null};
+    s.crash=a.result.crash; s.out=a.result.cashout;
+    if(a.result.win){ s.ph='out'; s.end=this.tOf(s.out); s.t0b=t; Sfx.target(); VS.flash={c:'#3dffd0',a:.9}; vFloat(a.capped?'Höchstfaktor!':'Ausgestiegen!',(VS.w||300)/2,(VS.h||300)*.38,'#3dffd0',22,1.4); s.burst=true; voidReveal() }
+    else { s.ph='boom'; s.end=Math.min(t-s.t0,this.tOf(s.crash)); s.t0b=t; s.swallowed=false }
+  },
+  async peek(){
+    const s=this.st; s.peeking=true;
+    try{ const a=await rpc('gd_void_crash_peek',{}); if(s!==this.st||s.ph!=='fly') return;
+      if(a&&a.result&&(a.crashed||a.capped)) this.finish(a,performance.now()/1000) }
+    catch(e){ /* try again with the next beat */ }
+    finally{ s.peeking=false; s.peekAt=performance.now()/1000+this.PEEK }
+  },
+  async cashout(){
+    const s=this.st; if(s.ph!=='fly'||s.cashing) return; s.cashing=true; vSyncBet();
+    try{ const a=await rpc('gd_void_cashout',{}); if(s!==this.st||s.ph!=='fly') return; this.finish(a,performance.now()/1000) }
+    catch(e){ s.cashing=false; vSyncBet(); if(!/no round/.test(String(e&&e.message||e))) toast(voidErr(e)) } // "no round": a peek has just settled it
+  },
+  label(){ const s=this.st, m=this.mAt(performance.now()/1000-s.t0); return s.cashing?`Steige aus … ${vX2(m)}`:`Aussteigen ${vX2(m)} · ✦ ${vNum(Math.floor(s.bet*m))}` },
   draw(g,w,h,t,dt){
     const s=this.st, skin=mySkin(), col=skinColor(skin,t), bh={x:w*.13,y:h*.84}, bhr=Math.min(w,h)*.06;
-    // the black hole
     drawBody(g,{kind:'moon',type:'b',x:bh.x,y:bh.y,r:bhr,m0:bhr*bhr*10},t,0);
-    // a warped grid: lines bend toward the hole
     g.strokeStyle='rgba(167,123,255,.13)'; g.lineWidth=1;
     for(let k=1;k<7;k++){ g.beginPath(); for(let x=0;x<=w;x+=8){ const y=h*.84-k*h*.12, d=Math.hypot(x-bh.x,y-bh.y), pull=1800/(d+40); x?g.lineTo(x,y+pull*.5):g.moveTo(x,y+pull*.5) } g.stroke() }
-    let e=0, m=1, view={tx:6,lm:Math.log(Math.max(2,this.target()*1.25))};
-    if(s.ph==='fly'||s.ph==='ghost'||s.ph==='boom'||s.ph==='out'){ e=Math.min(t-s.t0,s.ph==='fly'?s.end:s.end); m=this.mAt(e);
-      view={tx:Math.max(6,e*1.18),lm:Math.max(Math.log(Math.max(2,s.target*1.15)),Math.log(m)*1.12)} }
+    let e=0, m=1;
+    if(s.ph==='fly'){ e=t-s.t0; m=this.mAt(e);
+      if(m>=VOID_T.crash.max&&!s.cashing) this.cashout();                                  // the cap: the server pays 100× anyway
+      else if(vPrefs.crashAuto&&m>=this.target()&&!s.cashing) this.cashout();
+      if(!s.peeking&&!s.cashing&&t>=s.peekAt) this.peek();
+      if(!s.lbl||t-s.lbl>.1){ s.lbl=t; vSyncBet() } }
+    else if(s.ph==='out'||s.ph==='boom'){ e=s.end; m=s.ph==='out'?s.out:Math.min(this.mAt(s.end),s.crash) }
+    const view={tx:Math.max(6,e*1.18),lm:Math.max(Math.log(2),Math.log(Math.max(1.01,m))*1.15,vPrefs.crashAuto&&s.ph!=='boom'&&s.ph!=='out'?Math.log(this.target())*1.12:0)};
     const X=tt=>bh.x+bhr*1.8+(w*.92-bh.x-bhr*1.8)*Math.min(1,tt/view.tx), Y=mm=>bh.y-bhr*1.2-(h*.72)*Math.min(1.1,Math.log(mm)/view.lm);
-    // target line
-    const tg=s.ph==='idle'||s.ph==='charge'?this.target():s.target, ty=Y(tg);
-    g.setLineDash([5,6]); g.strokeStyle='rgba(61,255,208,.6)'; g.beginPath(); g.moveTo(bh.x+bhr*2,ty); g.lineTo(w-8,ty); g.stroke(); g.setLineDash([]);
-    vText(g,'Ausstieg '+vX(tg),w-10,ty-10,11,'#3dffd0','right',600);
-    // flight
+    if(vPrefs.crashAuto&&s.ph!=='out'&&s.ph!=='boom'){ const ty=Y(this.target()); g.setLineDash([5,6]); g.strokeStyle='rgba(61,255,208,.6)'; g.beginPath(); g.moveTo(bh.x+bhr*2,ty); g.lineTo(w-8,ty); g.stroke(); g.setLineDash([]);
+      vText(g,'Auto '+vX(this.target()),w-10,ty-10,11,'#3dffd0','right',600) }
+    const curve=(upto,c,a)=>{ const pts=[]; for(let q=0;q<=40;q++){ const tt=upto*q/40; pts.push([X(tt),Y(this.mRaw(tt))]) } drawStyledTrail(g,pts,c,skin.trail,t,a) };
     let P={x:X(0),y:Y(1)};
     if(s.ph==='charge'){ const k=t-s.t0; P={x:X(0)+Math.sin(k*45)*1.5,y:Y(1)+Math.cos(k*38)*1.5}; radialHex(g,P.x,P.y,26,col,.25+.2*Math.sin(k*20)) }
     if(s.ph==='fly'){
-      const pts=[]; for(let q=0;q<=40;q++){ const tt=e*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,col,skin.trail,t,.9);
-      P={x:X(e),y:Y(m)};
-      while(s.ticks<20&&m>=[1.25,1.5,2,3,5,7.5,10,15,20,30,50,75,100][s.ticks-1]){ Sfx.tick(Math.min(1,s.ticks/10)); s.ticks++ }
+      curve(e,col,.9); P={x:X(e),y:Y(this.mRaw(e))};
+      while(s.ticks<14&&m>=[1.25,1.5,2,3,5,7.5,10,15,20,30,50,75,100][s.ticks-1]){ Sfx.tick(Math.min(1,s.ticks/10)); s.ticks++ }
       if(Math.random()<.6) VS.parts.push({x:P.x,y:P.y,vx:-60-Math.random()*40,vy:30+Math.random()*30,life:.4,max:.4,c:col,r:1.3,k:'dot'});
-      if(t-s.t0>=s.end){
-        if(s.win){ s.ph='out'; s.t0b=t; Sfx.target(); VS.flash={c:'#3dffd0',a:.9}; vBurst(P.x,P.y,40,['#3dffd0','#ffffff',col],220,'star'); vFloat('Entkommen!',w/2,h*.38,'#3dffd0',22,1.4); voidReveal() }
-        else { s.ph='boom'; s.t0b=t; s.from={...P} }
-      }
+      radialHex(g,P.x,P.y,30,'#3dffd0',.12+.08*Math.sin(t*12));
     }
     if(s.ph==='out'||s.ph==='ghost'){
-      const pts=[]; for(let q=0;q<=40;q++){ const tt=s.end*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,col,skin.trail,t,.55);
-      const k=t-s.t0b; P={x:X(s.end)+k*k*300,y:Y(s.target)-k*k*160}; // warp away
-      // ghost: where the hole would have caught it
-      if(s.crash>s.target){ const ge=Math.min(this.tOf(Math.max(1.0001,s.crash)),s.end+k*3), gm=this.mAt(ge);
-        if(ge>s.end){ g.setLineDash([2,5]); g.strokeStyle='rgba(255,79,139,.5)'; g.beginPath(); g.moveTo(X(s.end),Y(s.target)); for(let q=1;q<=20;q++){ const tt=s.end+(ge-s.end)*q/20; g.lineTo(X(tt),Y(Math.min(this.mAt(tt),Math.exp(view.lm*1.1)))) } g.stroke(); g.setLineDash([]) }
-        if(ge>=this.tOf(Math.max(1.0001,s.crash))) vText(g,'Loch bei '+vX2(s.crash),w*.66,h*.7+34,12,'#ff8aa0',undefined,600) }
+      curve(s.end,col,.55);
+      const k=t-s.t0b; P={x:X(s.end)+k*k*300,y:Y(s.out)-k*k*160};
+      if(s.burst){ s.burst=false; vBurst(X(s.end),Y(s.out),40,['#3dffd0','#ffffff',col],220,'star') }
+      if(s.crash>s.out){ const tc=this.tOf(s.crash), ge=Math.min(tc,s.end+k*3);
+        if(ge>s.end){ g.setLineDash([2,5]); g.strokeStyle='rgba(255,79,139,.5)'; g.beginPath(); g.moveTo(X(s.end),Y(s.out)); for(let q=1;q<=20;q++){ const tt=s.end+(ge-s.end)*q/20; g.lineTo(X(tt),Y(Math.min(this.mRaw(tt),Math.exp(view.lm*1.1)))) } g.stroke(); g.setLineDash([]) }
+        if(ge>=tc) vText(g,'Loch bei '+vX2(s.crash),w*.66,h*.7+34,12,'#ff8aa0',undefined,600) }
       if(k>1.6&&s.ph==='out'){ s.ph='ghost'; voidDone() }
     }
     if(s.ph==='boom'){
+      if(!s.from) s.from={x:X(s.end),y:Y(Math.min(this.mRaw(s.end),s.crash))};
       const k=Math.min(1,(t-s.t0b)/.9), a0=Math.atan2(s.from.y-bh.y,s.from.x-bh.x), d0=Math.hypot(s.from.x-bh.x,s.from.y-bh.y), a=a0+k*k*4, d=d0*(1-vInOut(k));
-      P={x:bh.x+Math.cos(a)*d,y:bh.y+Math.sin(a)*d};
-      const pts=[]; for(let q=0;q<=40;q++){ const tt=s.end*q/40; pts.push([X(tt),Y(this.mAt(tt))]) } drawStyledTrail(g,pts,'#ff4f8b',skin.trail,t,.4*(1-k));
+      P={x:bh.x+Math.cos(a)*d,y:bh.y+Math.sin(a)*d}; curve(s.end,'#ff4f8b',.4*(1-k));
       if(k>=1&&!s.swallowed){ s.swallowed=true; Sfx.swallow(); VS.shake=12; VS.flash={c:'#ff3b5c',a:1}; vBurst(bh.x,bh.y,40,['#ffb15c','#ff4f8b','#fff'],200); vFloat('Verschluckt',w/2,h*.38,'#ff8aa0',22,1.4); voidReveal() }
-      if(k>=1&&t-s.t0b>1.5){ s.ph='done'; voidDone() }
+      if(k>=1&&t-s.t0b>1.5){ s.ph='done'; s.from=null; voidDone() }
     }
     if(s.ph!=='boom'||!s.swallowed){ g.save(); g.translate(P.x,P.y); g.rotate(-.6); g.scale(1.6,1.6); drawShotHead(g,skin.shot,col,t); g.restore(); g.shadowBlur=0 }
-    // big multiplier
     let big=1, bc='#f3eeff';
-    if(s.ph==='fly') big=m; else if(s.ph==='out'||s.ph==='ghost'){ big=s.target; bc='#3dffd0' } else if(s.ph==='boom'||s.ph==='done'){ big=s.crash; bc='#ff8aa0' }
-    if(s.ph==='fly'&&m>=s.target*.85&&s.win) bc='#3dffd0';
+    if(s.ph==='fly'){ big=m; bc=m>=2?'#ffd34f':'#f3eeff' } else if(s.ph==='out'||s.ph==='ghost'){ big=s.out; bc='#3dffd0' } else if(s.ph==='boom'||s.ph==='done'){ big=s.crash; bc='#ff8aa0' }
     g.save(); const pulse=s.ph==='fly'?1+.03*Math.sin(t*20):1; g.translate(w*.66,h*.7); g.scale(pulse,pulse); vText(g,vX2(big),0,0,Math.min(44,w*.12),bc); g.restore();
-    if(s.ph==='idle'||s.ph==='charge') vText(g,s.ph==='charge'?'Zündung …':'Wähle deinen Ausstieg',w*.66,h*.7+30,12,'rgba(169,156,214,.9)',undefined,500);
+    if(s.ph==='fly') vText(g,`✦ ${vNum(Math.floor(s.bet*m))}`,w*.66,h*.7+30,14,'#ffd34f');
+    if(s.ph==='idle'||s.ph==='charge') vText(g,s.ph==='charge'?'Zündung …':vPrefs.crashAuto?'Automatischer Ausstieg bei '+vX(this.target()):'Starte und steig rechtzeitig aus',w*.66,h*.7+30,12,'rgba(169,156,214,.9)',undefined,500);
+  },
+  leave(){ // leaving mid-flight: get out right away (best effort; the server decides)
+    const s=this.st; if(s.ph!=='fly') return; s.ph='left';
+    rpc('gd_void_cashout',{}).then(a=>{ applyEcon(a.state); if(a.payout>0) toast(`Ausgestiegen bei ${vX2(a.result.cashout)}: ✦ ${vNum(a.payout)}`); else toast(`Verschluckt bei ${vX2(a.result.crash)}`) }).catch(()=>econRefresh().catch(()=>{}));
   }
 };
 
@@ -6586,66 +6663,91 @@ function vRenderPicker(){
   vDust();
 }
 function vOpenGame(id){
-  const G=VOID_GAMES.find(x=>x.id===id), M=VGAME[id]; VS.game=id; VS.parts=[]; VS.floats=[]; VS.prize=null; VS.info=false;
+  vAutoStop(); const G=VOID_GAMES.find(x=>x.id===id), M=VGAME[id]; VS.game=id; VS.parts=[]; VS.floats=[]; VS.prize=null; VS.info=false;
   $('void').classList.toggle('degen',!!G.degen); $('void').dataset.game=id;
   $('voidPicker').hidden=true; $('voidStage').hidden=false; $('voidPrize').hidden=true; $('voidInfo').hidden=true; $('voidInfoBtn').setAttribute('aria-expanded','false');
   $('voidGameName').textContent=G.name; $('voidTitle').textContent=G.degen?'Void-Modus':'Void'; $('voidLabel').textContent=G.degen?'Achtung · hohes Risiko':'Shop · Spielecke';
   $('voidWarn').hidden=!G.degen; $('voidBetRow').hidden=false;
   M.reset(); M.opts($('voidOpts')); vMsg(G.degen?'Fester Einsatz ✦ 500':'',''); vSyncBet();
 }
+function vRenderInfo(){ const M=VGAME[VS.game]; if(!M) return; $('voidInfo').innerHTML=M.info()+`<p>Void ist reines Spielgeld: Sternenstaub ✦ verdienst du im Spiel, er ist nicht käuflich und nicht auszahlbar. Jedes Ergebnis lost der Server aus. Einsatz ✦ ${VOID_T.minBet}–${vNum(VOID_T.maxBet)}.</p>` }
+
+function vStake(){ const M=VGAME[VS.game], b=vBet(); return M&&M.stake?M.stake(b):b }
 function vSyncBet(){
-  const b=vBet(), dg=VS.game==='plinkovoid';
+  const b=vBet(), dg=VS.game==='plinkovoid', st=vStake(), P=$('voidPlay'), fly=VS.game==='crash'&&VCrash.flying();
   $('voidBet').textContent=`✦ ${vNum(b)}`;
-  for(const id of ['voidBetHalf','voidBetMinus','voidBetPlus','voidBetDouble']) $(id).disabled=VS.busy||dg;
+  const lock=VS.busy||!!VS.auto;
+  for(const id of ['voidBetHalf','voidBetMinus','voidBetPlus','voidBetDouble']) $(id).disabled=lock||dg;
   if(!dg){ $('voidBetMinus').disabled||=b<=VOID_LADDER[0]; $('voidBetHalf').disabled||=b<=VOID_LADDER[0]; $('voidBetPlus').disabled||=b>=VOID_LADDER.at(-1); $('voidBetDouble').disabled||=b>=VOID_LADDER.at(-1) }
-  $('voidPlay').disabled=VS.busy;
-  $('voidPlay').textContent=VS.busy?'Läuft …':VS.game==='plinkovoid'?'In den Abgrund · ✦ 500':VS.game==='slot'?`Drehen · ✦ ${vNum(b)}`:VS.game==='plinko'?`Fallen lassen · ✦ ${vNum(b)}`:VS.game==='crash'?`Starten · ✦ ${vNum(b)}`:VS.game==='wheel'?`Mond schicken · ✦ ${vNum(b)}`:`Werfen · ✦ ${vNum(b)}`;
+  P.classList.toggle('cash',fly); P.classList.toggle('stop',!!VS.auto);
+  if(VS.auto){ P.disabled=false; P.textContent=VS.auto.left===Infinity?'Stopp · Autospin ∞':`Stopp · noch ${VS.auto.left}` }
+  else if(fly){ P.disabled=VCrash.st.cashing; P.textContent=VCrash.label() }
+  else { P.disabled=VS.busy;
+    const nb=VS.game==='plinko'?VPlinko.balls():1;
+    P.textContent=VS.busy?'Läuft …':VS.game==='plinkovoid'?'In den Abgrund · ✦ 500':VS.game==='slot'?`Drehen · ✦ ${vNum(b)}`:VS.game==='plinko'?(nb>1?`${nb} Bälle · ✦ ${vNum(st)}`:`Fallen lassen · ✦ ${vNum(b)}`):VS.game==='crash'?`Starten · ✦ ${vNum(b)}`:VS.game==='wheel'?`Mond schicken · ✦ ${vNum(b)}`:`Werfen · ✦ ${vNum(b)}` }
   $('voidToPicker').disabled=VS.busy;
-  for(const el of document.querySelectorAll('#voidOpts button')) el.disabled=VS.busy;
+  for(const el of document.querySelectorAll('#voidOpts button,#voidOpts input')) el.disabled=lock;
+  const M=VGAME[VS.game]; if(M&&M===VSlot) VSlot.sync();
 }
-function vSetBet(b){ if(VS.busy||VS.game==='plinkovoid') return; const L=VOID_LADDER; let best=L[0]; for(const x of L) if(x<=b) best=x; vPrefs.bet[VS.game]=best; vSavePrefs(); Sfx.tick(L.indexOf(best)/L.length); vSyncBet() }
+function vSetBet(b){ if(VS.busy||VS.auto||VS.game==='plinkovoid') return; const L=VOID_LADDER; let best=L[0]; for(const x of L) if(x<=b) best=x; vPrefs.bet[VS.game]=best; vSavePrefs(); Sfx.tick(L.indexOf(best)/L.length); vSyncBet() }
 function vStepBet(d){ const L=VOID_LADDER, i=L.indexOf(vBet()); vSetBet(L[vClamp(i+d,0,L.length-1)]) }
 function vMsg(text,cls){ const el=$('voidMsg'); el.textContent=text; el.className='vmsg'+(cls?' '+cls:'') }
-function vRenderInfo(){ const M=VGAME[VS.game]; if(!M) return; $('voidInfo').innerHTML=M.info()+`<p>Void ist reines Spielgeld: Sternenstaub ✦ verdienst du im Spiel, er ist nicht käuflich und nicht auszahlbar. Jedes Ergebnis lost der Server aus. Einsatz ✦ ${VOID_T.minBet}–${vNum(VOID_T.maxBet)}.</p>` }
+
+/* ---------- autospin (slot): rounds back to back until "Stopp", no stardust, an error or leaving ---------- */
+function vAutoStart(n){ if(VS.game!=='slot'||VS.busy) return; VS.auto={n,left:n,timer:0}; vSyncBet(); voidPlay() }
+function vAutoStop(why){ if(!VS.auto) return; clearTimeout(VS.auto.timer); VS.auto=null; if(why) toast(why); if(VS.game) vSyncBet() }
+function vAutoNext(){
+  const A=VS.auto; if(!A) return;
+  if(current!=='void'||VS.game!=='slot') return vAutoStop();
+  if(A.left<=0) return vAutoStop();
+  if(profile.dust<vBet()) return vAutoStop('Autospin gestoppt: nicht genug Sternenstaub');
+  const R=VS.round, big=R&&(R.r.payout|0)>=R.bet*20;
+  A.timer=setTimeout(()=>{ if(VS.auto===A&&!VS.busy) voidPlay() },big?1600:250);
+}
 
 /* ---------- one round: bet → server → animation → reveal ---------- */
 async function voidPlay(){
   if(VS.busy||!VS.game) return;
-  const M=VGAME[VS.game], bet=vBet();
-  if(!SERVER_ECON){ toast('Void braucht eine Verbindung zum Server'); return }
-  if(!econReady()){ toast('Keine Verbindung zum Server'); return }
-  if(profile.dust<bet){ toast('Nicht genug Sternenstaub'); Sfx.miss(); return }
-  VS.busy=true; VS.speed=1; VS.round=null; $('voidPrize').hidden=true; VS.prize=null; vSyncBet(); vMsg('','');
-  VS.shownDust=profile.dust-bet; vDust(true);
+  const M=VGAME[VS.game], bet=vBet(), stake=vStake();
+  if(!SERVER_ECON){ vAutoStop(); toast('Void braucht eine Verbindung zum Server'); return }
+  if(!econReady()){ vAutoStop(); toast('Keine Verbindung zum Server'); return }
+  if(profile.dust<stake){ vAutoStop(); toast('Nicht genug Sternenstaub'); Sfx.miss(); return }
+  if(VS.auto&&VS.auto.left!==Infinity) VS.auto.left--;
+  VS.busy=true; VS.speed=VS.auto?1.3:1; VS.round=null; $('voidPrize').hidden=true; VS.prize=null; vSyncBet(); vMsg('','');
+  VS.shownDust=profile.dust-stake; vDust(true);
   const t0=performance.now()/1000; M.charge(t0);
   const wait=VOID_T.cooldown*1000+80-(Date.now()-VS.lastAt); // the server allows one round per second
-  const minCharge=vSleep(VS.game==='slot'||VS.game==='wheel'?120:300);
+  const minCharge=vSleep(VS.game==='slot'||VS.game==='wheel'||VS.game==='crash'?120:300);
   if(wait>0) await vSleep(wait);
-  let r;
-  try{ VS.lastAt=Date.now(); r=await rpc('gd_void_play',{p_game:VS.game==='plinkovoid'?'plinko':VS.game,p_bet:bet,p_opts:M.args()}); await minCharge }
-  catch(e){ M.abort(); VS.busy=false; VS.shownDust=null; vDust(); vSyncBet(); toast(voidErr(e)); econRefresh().catch(()=>{}); return }
-  if(current!=='void'||!VS.game||VGAME[VS.game]!==M){ applyEcon(r.state); VS.busy=false; VS.shownDust=null; return } // left while waiting
-  VS.round={r,bet:r.bet||bet,game:VS.game,revealed:false};
-  M.land(r,performance.now()/1000);
+  let r, sent;
+  try{ VS.lastAt=Date.now(); sent=performance.now()/1000; r=await rpc('gd_void_play',{p_game:VS.game==='plinkovoid'?'plinko':VS.game,p_bet:bet,p_opts:M.args()}); }
+  catch(e){ M.abort(); VS.busy=false; VS.shownDust=null; vDust(); vAutoStop(); vSyncBet(); toast(voidErr(e)); econRefresh().catch(()=>{}); return }
+  const back=performance.now()/1000;
+  if(VS.game!=='crash') await minCharge;
+  if(current!=='void'||!VS.game||VGAME[VS.game]!==M){ applyEcon(r.state); VS.busy=false; VS.shownDust=null; if(M===VCrash){ VCrash.st={ph:'fly'}; VCrash.leave() } return } // left while waiting
+  VS.round={r,bet:r.bet||bet,stake:r.stake||stake,game:VS.game,revealed:false};
+  M.land(r,M===VCrash?back:performance.now()/1000,sent);
+  if(M===VCrash) vSyncBet();
 }
 function voidReveal(){
   const R=VS.round; if(!R||R.revealed) return; R.revealed=true;
   applyEcon(R.r.state); VS.shownDust=null; vDust(true);
-  const pay=R.r.payout|0, bet=R.bet, ratio=pay/bet, res=R.r.result||{};
+  const pay=R.r.payout|0, bet=R.stake||R.bet, ratio=pay/bet, res=R.r.result||{}, nb=res.balls|0;
   if(R.game==='coinflip') VS.hist.push(res.side);
   if(res.consolation){ vFloat(`+${vNum(res.consolation)} ✦`,(VS.w||300)/2,(VS.h||300)*.4,'#d7a0ff',24,2); toast(`Alle Void-Items gesammelt: Trostpreis ✦ ${vNum(res.consolation)}`) }
-  if(pay>bet) vMsg(`Gewinn ${R.game==='slot'?'':vX(ratio)+' · '}✦ ${vNum(pay)}`,'win'+(ratio>=10?' big':''));
-  else if(pay>0) vMsg(`${R.game==='slot'?'':vX(ratio)+' · '}✦ ${vNum(pay)} zurück`,'');
+  const pre=R.game==='slot'?'':nb>1?`${nb} Bälle · `:R.game==='crash'?vX2(res.cashout||ratio)+' · ':vX(ratio)+' · ';
+  if(pay>bet) vMsg(`Gewinn ${pre}✦ ${vNum(pay)}`,'win'+(ratio>=10?' big':''));
+  else if(pay>0) vMsg(`${pre}✦ ${vNum(pay)} zurück`,'');
   else vMsg(R.game==='crash'?`Verschluckt bei ${vX2(res.crash)}`:'Diesmal nichts','lose');
   if(R.r.item) vShowPrize(R.r.item);
-  else if(R.game==='slot'){ if(pay===0) Sfx.miss() } // the slot already played its own win sounds
+  else if(R.game==='slot'){ if(pay===0&&!VS.auto) Sfx.miss() } // the slot already played its own win sounds
   else if(ratio>=10){ Sfx.crateOpen('legendary'); vibrate([30,40,90]) }
   else if(ratio>=2) Sfx.win();
   else if(ratio>1) Sfx.buy();
   else if(pay>0) Sfx.select();
   else Sfx.miss();
 }
-function voidDone(){ VS.busy=false; VS.speed=1; vSyncBet() }
+function voidDone(){ VS.busy=false; VS.speed=1; vSyncBet(); if(VS.auto) vAutoNext() }
 function vShowPrize(it){
   const list=SHOP[it.cat], item=list&&list.find(x=>x.id===it.id);
   const skin=mySkin(); if(item){ if(it.cat==='color'){ skin.color=item.color; skin.c2=item.c2; skin.anim=item.anim } else skin[it.cat]=it.id }
@@ -6654,8 +6756,11 @@ function vShowPrize(it){
   $('voidPrizeName').textContent=(item?item.name:it.name||it.id); $('voidPrizeRar').textContent=`${RARITY.void.name} · ${cat}`; $('voidPrizeRar').style.color=RARITY.void.color;
   $('voidPrize').hidden=false; Sfx.crateOpen('mythic'); vibrate([40,40,40,40,160]);
   vMsg(`Void-Fund: ${item?item.name:it.name||it.id}!`,'win big');
+  if(VS.auto) vAutoStop();
 }
-function vLeave(){ // finish a running round at once (the server has already paid)
+function vLeave(){ // finish a running round at once (the server has already paid; a crash flight gets out now)
+  vAutoStop();
+  if(VS.game==='crash') VCrash.leave();
   const R=VS.round; if(R&&!R.revealed){ R.revealed=true; applyEcon(R.r.state); if(R.r.item) toast(`Void-Fund: ${(SHOP[R.r.item.cat]||[]).find(x=>x.id===R.r.item.id)?.name||R.r.item.name||R.r.item.id}`) }
   if(VS.game) VGAME[VS.game].reset(); VS.busy=false; VS.shownDust=null; VS.round=null; VS.parts=[]; VS.floats=[];
 }
@@ -6700,7 +6805,7 @@ function vTile(T,t){
 /* ---------- buttons of the Void screen ---------- */
 $('voidBack').addEventListener('click',()=>{ Sfx.init(); vLeave(); renderShop(); show('shop') });
 $('voidToPicker').addEventListener('click',()=>{ if(VS.busy) return; Sfx.init(); Sfx.select(); vLeave(); vRenderPicker() });
-$('voidPlay').addEventListener('click',()=>{ Sfx.init(); voidPlay() });
+$('voidPlay').addEventListener('click',()=>{ Sfx.init(); if(VS.auto) return vAutoStop(); if(VS.game==='crash'&&VCrash.flying()) return VCrash.cashout(); voidPlay() });
 $('voidBetHalf').addEventListener('click',()=>{ Sfx.init(); vSetBet(Math.floor(vBet()/2)) });
 $('voidBetDouble').addEventListener('click',()=>{ Sfx.init(); vSetBet(vBet()*2) });
 $('voidBetMinus').addEventListener('click',()=>{ Sfx.init(); vStepBet(-1) });
@@ -6710,8 +6815,8 @@ $('voidCv').addEventListener('click',()=>{ const M=VGAME[VS.game]; if(M&&M.tap) 
 $('voidPrizeOk').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); $('voidPrize').hidden=true; VS.prize=null });
 $('voidPrizeInv').addEventListener('click',()=>{ Sfx.init(); const P=VS.prize; $('voidPrize').hidden=true; VS.prize=null; vLeave(); openInventory(P&&P.cat) });
 if($('tab-void')) $('tab-void').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); openVoid() });
-document.addEventListener('keydown',e=>{ if(current!=='void'||!VS.game||e.repeat) return; if(e.key===' '||e.key==='Enter'){ if(document.activeElement&&/^(BUTTON|INPUT|SUMMARY)$/.test(document.activeElement.tagName)) return; e.preventDefault(); voidPlay() } });
-if(window.__GD_TEST__) window.__void={state:()=>({game:VS.game,busy:VS.busy,dust:profile.dust,msg:$('voidMsg').textContent,prize:!$('voidPrize').hidden,slot:VSlot.st&&{ph:VSlot.st.ph,idx:VSlot.st.idx,n:VSlot.st.spins&&VSlot.st.spins.length}}),open:openVoid,game:vOpenGame,refresh:()=>econRefresh()};
+document.addEventListener('keydown',e=>{ if(current!=='void'||!VS.game||e.repeat) return; if(e.key===' '||e.key==='Enter'){ if(document.activeElement&&/^(BUTTON|INPUT|SUMMARY)$/.test(document.activeElement.tagName)) return; e.preventDefault(); if(VS.auto) vAutoStop(); else if(VS.game==='crash'&&VCrash.flying()) VCrash.cashout(); else voidPlay() } });
+if(window.__GD_TEST__) window.__void={state:()=>({game:VS.game,busy:VS.busy,dust:profile.dust,msg:$('voidMsg').textContent,prize:!$('voidPrize').hidden,slot:VSlot.st&&{ph:VSlot.st.ph,idx:VSlot.st.idx,n:VSlot.st.spins&&VSlot.st.spins.length},auto:VS.auto&&VS.auto.left,crash:VCrash.st.ph,play:$('voidPlay').textContent}),open:openVoid,game:vOpenGame,refresh:()=>econRefresh()};
 
 /* ---------- buttons ---------- */
 const tap=(id,fn)=>$(id).addEventListener('click',()=>{Sfx.init();fn()});
