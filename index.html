@@ -62,6 +62,12 @@ button:active{transform:translateY(1px)}
 #emotes button{font-size:.8rem;padding:8px 10px;text-align:left;white-space:nowrap;background:rgba(255,255,255,.05);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
 #emotes button.mute{grid-column:1/-1;color:var(--muted);text-align:center;font-size:.72rem;white-space:normal}
 #emotes button.emo{padding:2px;width:64px;height:64px;border-radius:14px}#emotes button.emo canvas{width:100%;height:100%;display:block}#emotes button.emo.myth{border-color:rgba(255,59,59,.6)}
+.shoptabs #tab-crate{color:var(--gold);border-color:rgba(255,211,79,.55);background:rgba(255,211,79,.07)}.shoptabs #tab-crate[aria-selected="true"]{background:rgba(255,211,79,.2);box-shadow:inset 0 0 0 1px rgba(255,211,79,.7)}
+.item button.src{background:transparent;color:var(--muted);border:1px dashed rgba(167,123,255,.45);box-shadow:none;font-size:.7rem;opacity:1}
+.item button.src.void{color:#c99bff;border-color:rgba(162,77,255,.6)}
+.item.r-cosmic,.ii.r-cosmic{border-color:transparent;background:linear-gradient(rgba(22,10,52,.92),rgba(22,10,52,.92)) padding-box,linear-gradient(120deg,#fff6c9,#8af3ff,#d9a8ff,#ffb3d9,#fff6c9) border-box;background-size:100% 100%,300% 300%;animation:cosmicb 6s linear infinite}
+@keyframes cosmicb{to{background-position:0 0,300% 0}}
+.item.r-void,.ii.r-void{border-color:rgba(162,77,255,.7);background:radial-gradient(circle at 50% 30%,rgba(162,77,255,.18),rgba(5,0,15,.85) 70%);box-shadow:0 0 18px rgba(120,40,220,.35),inset 0 0 22px rgba(0,0,0,.6)}
 .tabs.shoptabs{grid-template-columns:repeat(5,1fr)}.shoptabs .tab{font-size:.74rem;padding:8px 2px}
 .reward{font-family:var(--display);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .levelup{font-family:var(--display);font-weight:700;color:var(--p2);text-shadow:0 0 12px rgba(46,230,255,.6)}
@@ -4862,7 +4868,7 @@ function renderShop(){
     const skin=mySkin();
     if(shopTab==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else skin[shopTab]=it.id;
     const rar=RARITY[it.rarity];
-    const el=document.createElement('div'); el.className='item'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
+    const el=document.createElement('div'); el.className='item'+(on?' on':'')+(it.rarity==='mythic'?' myth':'')+' r-'+it.rarity;
     el.innerHTML=`<canvas width="240" height="160" aria-hidden="true"></canvas><span class="iname">${it.name}</span><span class="rar" style="color:${rar.color}">${rar.name}</span>`;
     const b=document.createElement('button'); b.id=`buy-${shopTab}-${it.id}`;
     if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
@@ -4899,7 +4905,7 @@ function renderInv(){
     if(invTab==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else if(!emo) skin[invTab]=it.id;
     const rar=RARITY[it.rarity];
     const b=document.createElement('button'); b.id=`inv-${invTab}-${it.id}`;
-    b.className='ii'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
+    b.className='ii'+(on?' on':'')+(it.rarity==='mythic'?' myth':'')+' r-'+it.rarity;
     b.setAttribute('aria-pressed',String(on)); b.setAttribute('aria-label',`${it.name}, ${rar.name}${on?', ausgerüstet':', ausrüsten'}`);
     b.innerHTML=`<canvas width="${invTab==='title'?240:192}" height="${invTab==='title'?110:192}" aria-hidden="true"></canvas><span class="iname">${it.name}</span><i class="rar" style="background:${rar.color}"></i>`;
     if(emo){ b.dataset.n=on?mine.indexOf(it.id)+1:''; b.setAttribute('aria-label',`${it.name}, ${rar.name}${on?', ausgewählt':''}`); b.onclick=()=>toggleEmoteSlot(it.id,b) }
