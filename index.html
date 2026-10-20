@@ -226,7 +226,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .me .dust{font-size:.9rem}
 .xpline{position:absolute;left:44px;right:12px;bottom:4px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
 .xpline i{display:block;height:100%;background:linear-gradient(90deg,var(--p1),var(--gold))}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .tile{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:5px;height:32px;min-width:0;padding:0 4px;
   border-radius:11px;background:rgba(22,10,52,.72);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:.7rem;letter-spacing:.01em}
 .tile svg{flex:none;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -256,6 +256,8 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .item td{padding:4px 2px;border-top:1px solid rgba(167,123,255,.18)}
 .item td:last-child{text-align:right;white-space:nowrap;color:var(--ink)}
 .fine{font-size:.75rem;margin-top:6px}
+.invhero{width:100%;height:auto;aspect-ratio:12/5;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);margin-top:8px}
+.invempty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.85rem;padding:18px 8px}
 .phead{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
 .pwho{flex:1;min-width:0}.pwho h2{margin:0;overflow-wrap:anywhere}.pwho .fine{margin:2px 0 0;display:block}
 .pbadge{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:2px solid var(--c,var(--line));background:rgba(255,255,255,.05);box-shadow:0 0 14px var(--c,transparent)}
@@ -330,6 +332,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <nav class="tiles" aria-label="Menü">
         <button class="tile" id="toQuests" aria-label="Aufgaben"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg><span>Aufgaben</span><b class="badge" id="questBadge" hidden>0</b></button>
         <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span></button>
+        <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span></button>
         <button class="tile shop" id="toShop" aria-label="Shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Shop</span></button>
         <button class="tile" id="toSettings" aria-label="Optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg><span>Optionen</span></button>
       </nav>
@@ -606,6 +609,20 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         <button id="crateAgain" class="alt">Nochmal öffnen</button>
         <button id="crateBack" class="ghost">Zurück zum Shop</button>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="inventory" hidden>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">
+        <div><span class="label">Dein Look</span><h2>Inventar</h2></div>
+        <button class="ghost mini" id="invToShop">Zum Shop</button>
+      </div>
+      <canvas id="invHero" class="invhero" width="480" height="200" aria-hidden="true"></canvas>
+      <p class="fine" id="invCount"></p>
+      <div class="tabs" role="tablist" id="invTabs"></div>
+      <div class="items" id="invItems"></div>
+      <button class="ghost" id="invBack">Zurück</button>
     </div>
   </div>
 
@@ -3468,7 +3485,7 @@ function applyEcon(st){
     if(done){ toast(`Aufgabe erledigt: ${done.d.text(done.d.goal)}`); Sfx.select() }
   }
   renderMe(); updateQuestBadge();
-  if(current==='home') renderHome(); else if(current==='shop') renderShop(); else if(current==='quests') renderQuests(); else if(current==='levels') goLevels();
+  if(current==='home') renderHome(); else if(current==='shop') renderShop(); else if(current==='inventory') renderInv(); else if(current==='quests') renderQuests(); else if(current==='levels') goLevels();
 }
 async function econRefresh(){ if(!Net.backend) return; applyEcon(await rpc('gd_econ')); loadAch() }
 function econFail(e,btn){ if(btn) btn.disabled=false; toast(econReady()?econErr(e):'Keine Verbindung zum Server') }
@@ -3926,7 +3943,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile'];
+const screens=['settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory'];
 let current='home';
 function show(name){
   current=name;
@@ -4127,7 +4144,7 @@ function renderShop(){
     el.innerHTML=`<canvas width="240" height="160" aria-hidden="true"></canvas><span class="iname">${it.name}</span><span class="rar" style="color:${rar.color}">${rar.name}</span>`;
     const b=document.createElement('button'); b.id=`buy-${shopTab}-${it.id}`;
     if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
-    else if(owned){ b.className='own'; b.textContent='Ausrüsten'; b.onclick=()=>{ if(SERVER_ECON) return econEquip(shopTab,it.id,b); profile.equip[shopTab]=it.id; saveProfile(); Sfx.select(); renderShop() } }
+    else if(owned){ b.className='own'; b.textContent='Im Inventar'; b.onclick=()=>openInventory(shopTab) }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
       b.onclick=()=>{ if(profile.dust<it.price) return; if(SERVER_ECON) return econBuy(shopTab,it.id,b); profile.dust-=it.price; profile.owned[key]=1; profile.equip[shopTab]=it.id; saveProfile(); Sfx.buy(); renderShop() } }
@@ -4136,6 +4153,44 @@ function renderShop(){
   }
 }
 function goShop(){ shopFrom=current; renderShop(); show('shop') }
+/* ---------- inventory: everything you own, sorted by category; equip here ---------- */
+let invTab='color', invPreviews=[], invFrom='home', invHero=null;
+function openInventory(tab){ if(current!=='inventory') invFrom=current; if(tab&&SHOP[tab]) invTab=tab; renderInv(); show('inventory') }
+function renderInv(){
+  const tabs=$('invTabs'); tabs.innerHTML='';
+  for(const [t,label] of SHOP_TABS){ if(t==='crate') continue;
+    const n=SHOP[t].filter(it=>profile.owned[t+':'+it.id]).length;
+    const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(t===invTab)); b.textContent=`${label} ${n}`;
+    b.onclick=()=>{ invTab=t; Sfx.select(); renderInv() }; tabs.appendChild(b) }
+  const all=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].length,0), have=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].filter(it=>profile.owned[c+':'+it.id]).length,0);
+  $('invCount').textContent=`${have} von ${all} Items gesammelt`;
+  const box=$('invItems'); box.innerHTML=''; invPreviews=[];
+  const list=SHOP[invTab].filter(it=>profile.owned[invTab+':'+it.id]);
+  for(const it of list){
+    const on=profile.equip[invTab]===it.id, skin=mySkin();
+    if(invTab==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else skin[invTab]=it.id;
+    const rar=RARITY[it.rarity];
+    const el=document.createElement('div'); el.className='item'+(on?' on':'')+(it.rarity==='mythic'?' myth':'');
+    el.innerHTML=`<canvas width="240" height="160" aria-hidden="true"></canvas><span class="iname">${it.name}</span><span class="rar" style="color:${rar.color}">${rar.name}</span>`;
+    const b=document.createElement('button'); b.id=`inv-${invTab}-${it.id}`;
+    if(on){ b.className='eq'; b.textContent='Ausgerüstet'; b.disabled=true }
+    else { b.className='own'; b.textContent='Ausrüsten'; b.onclick=()=>{ if(SERVER_ECON) return econEquip(invTab,it.id,b); profile.equip[invTab]=it.id; saveProfile(); Sfx.select(); renderInv() } }
+    el.appendChild(b); box.appendChild(el);
+    invPreviews.push({cv:el.querySelector('canvas'),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
+  }
+  if(list.length<=1){ const e=document.createElement('div'); e.className='invempty'; e.textContent='Mehr gibt es im Shop, in Kisten und als Belohnung für Aufgaben.'; box.appendChild(e) }
+  invHero={cv:$('invHero'),parts:[],fx:[],next:0};
+}
+function invTick(t){
+  if(current!=='inventory') return;
+  for(const p of invPreviews) drawSkinPreview(p.cv,p.skin,t,p);
+  if(invHero){ const cv=invHero.cv, g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return; g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+    const skin=mySkin(), tr=[]; for(let i=0;i<=50;i++){ const k=i/50; tr.push([w*.3+k*w*.55,h*.62-Math.sin(k*Math.PI)*h*.42+k*h*.1]) }
+    drawStyledTrail(g,tr,skinColor(skin,t),skin.trail,t,.9);
+    const e=tr[50], q=tr[49]; g.save(); g.translate(e[0],e[1]); g.rotate(Math.atan2(e[1]-q[1],e[0]-q[0])); g.scale(1.5,1.5); drawShotHead(g,skin.shot,skinColor(skin,t),t); g.restore();
+    drawSkinnedPlanet(g,w*.22,h*.6,Math.min(34,h*.2),skin,t,false);
+    const tt=titleName(profile.equip.title); if(tt){ g.font='700 13px "Chakra Petch", ui-monospace, monospace'; g.textAlign='center'; g.fillStyle=COL.gold; g.fillText(tt,w*.22,h*.93) } }
+}
 function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return crateCardsTick(t); for(const p of shopPreviews) drawSkinPreview(p.cv,p.skin,t,p) }
 
 /* ---------- buttons ---------- */
@@ -4167,6 +4222,9 @@ function renderModes(){ for(const m of ['classic','blitz']) $('mode-'+m).setAttr
 for(const m of ['classic','blitz']) tap('mode-'+m,()=>{ duelMode=m; save('gravityDuel.duelMode.v1',m); Sfx.select(); renderModes() });
 tap('coverGo',coverReady);
 tap('toShop',goShop);
+tap('toInv',()=>openInventory());
+tap('invBack',()=>{ if(invFrom==='shop'){ renderShop(); show('shop') } else if(invFrom==='profile') openProfile(); else goHome() });
+tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
 tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ renderQuests(); show('quests') } else { renderShop(); show('shop') } });
@@ -4234,7 +4292,7 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); crateTick(t);
+  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); invTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); requestAnimationFrame(loop); netInit();
