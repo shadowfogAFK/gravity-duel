@@ -2134,7 +2134,7 @@ let layoutWhy='';
 function rearrange(why,given){
   layoutDuel(given); appearT=.9; Sfx.portal(); missRounds=0;
   for(const b of bodies) if(b.kind!=='planet') explode(b.x,b.y,(BODY_LOOK[b.type]||BODY_LOOK.n).edge,10);
-  layoutWhy=why||'Neue Anordnung der Himmelskörper'; toast(layoutWhy);
+  layoutWhy=why||'neu'; // no banner: the bodies just fade in at their new places
 }
 function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,opp:{name,skin}}
   DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):pickDuelAmmo();
