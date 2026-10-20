@@ -254,6 +254,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .fine{font-size:.75rem;margin-top:6px}
 .arenaprog{display:flex;flex-direction:column;gap:6px}
 #shareLink{grid-column:1/-1;margin-top:4px}
+#searchAi{margin-bottom:8px}
 #acctForm .text{font-family:var(--body);font-size:1rem}
 .hint{text-align:center;font-size:.85rem;color:var(--muted);margin:0}
 .rules{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.9rem;line-height:1.4}
@@ -335,7 +336,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
         <div class="road" id="road"></div>
-        <p class="hint">Sieg <b>+30</b> · Niederlage <b>−20</b> Gravitonen</p>
+        <p class="hint">Sieg <b>+10 bis +50</b> · Niederlage <b>−5 bis −35</b> Gravitonen, je nach Gegner</p>
         <button class="ghost" id="toBoard" disabled>Bestenliste</button>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
@@ -496,6 +497,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <div class="radar" aria-hidden="true"><i></i><i></i></div>
       <h2 id="searchTitle" aria-live="polite">Suche Gegner …</h2>
       <p id="searchText"></p>
+      <button class="alt" id="searchAi" hidden>Gegen KI spielen</button>
       <button class="ghost" id="searchCancel">Abbrechen</button>
     </div>
   </div>
@@ -1830,7 +1832,7 @@ function launchFrom(vec,o=turn){
 /* ---------- weapon bar ---------- */
 function renderWeapons(){
   const bar=$('weapons'), pl=players[turn];
-  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&turn!==meIdx());
+  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&turn!==meIdx())&&!(ai&&turn===1);
   bar.hidden=!showBar; if(!showBar) return;
   bar.classList.toggle('flip',mode==='duel'&&!online&&turn===1);
   const c=skinColor(pl.skin,performance.now()/1000);
@@ -1860,7 +1862,7 @@ const otherOf=o=>1-o;
 /* the guest of an online match plays from the top planet and sees the field turned around */
 const meIdx=()=>online&&!online.host?1:0;
 const viewRot=()=>!!(online&&!online.host);
-const flipFor=o=>mode==='duel'&&(online?viewRot():o===1);
+const flipFor=o=>mode==='duel'&&(online?viewRot():!ai&&o===1);
 
 const TURN_TIME=10; // seconds per shot in duels, against stalling
 let turnLeft=TURN_TIME, lastTick=0;
@@ -1872,11 +1874,13 @@ function startTurn(){
     const enemyDown=players[otherOf(turn)].lives<=0||pl.lives<=0;
     if(tiebreak) banner={text:'Entscheidungsschuss',sub:`Neue Anordnung · so nah wie möglich an die Planetenmitte`,t:2.4,player:turn};
     else if(roundShot===1&&enemyDown) banner={text:'Letzte Chance!',sub:`${pl.name} darf noch ausgleichen`,t:2.2,player:turn};
-    else if(online&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Ihr zielt gleichzeitig · Ziehen und loslassen',t:1.8,player:meIdx()};
-    else if(online&&turn===meIdx()) banner={text:'Du bist dran',sub:`Runde ${round} · Ziehen und loslassen`,t:1.6,player:turn};
+    else if((online||ai)&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Ihr zielt gleichzeitig · Ziehen und loslassen',t:1.8,player:meIdx()};
+    else if((online||ai)&&turn===meIdx()) banner={text:'Du bist dran',sub:`Runde ${round} · Ziehen und loslassen`,t:1.6,player:turn};
+    else if(ai) banner={text:pl.name+' zielt …',sub:`Runde ${round}`,t:1.6,player:0};
     else banner={text:pl.name+' ist dran',sub:`Runde ${round}${online?' · warte auf den Schuss':' · Ziehen und loslassen'}`,t:1.6,player:turn};
   }
   if(online){ online.k++; online.myBlitz=null; if(online.host) onlineSendState('turn') }
+  if(ai&&turn===1&&!(duelMode==='blitz'||tiebreak)){ ai.v=aiShot(); ai.at=performance.now()+rand(900,2200) }
   Sfx.turn(); renderWeapons();
 }
 function startDuel(){
@@ -1898,6 +1902,7 @@ function startTiebreak(){
 function startBlitzRound(){
   blitzQueue=[null,null]; blitzOrder=[starter,otherOf(starter)];
   if(online){ show(null); turn=meIdx(); return startTurn() } // online both aim at the same time on their own phones
+  if(ai){ show(null); blitzQueue[1]=aiShot()||'skip'; turn=0; return startTurn() } // the AI has aimed already, no hand-over screen
   coverFor(blitzOrder[0]);
 }
 function coverFor(o){
@@ -1989,6 +1994,57 @@ function fire(v){
     return launch(blitzOrder.filter(o=>blitzQueue[o]!=='skip').map(o=>makeShot(o,blitzQueue[o])));
   }
   launch(v?[makeShot(turn,v)]:[]);
+}
+
+/* ---------- AI opponent: steps in for the Wettkampf when nobody else is searching ----------
+   It plays player 2 of a local duel. It tries a few hundred shots in the same physics the game uses,
+   keeps the ones that would hit and fires one of them; how often it uses a hit (instead of a near miss)
+   grows with the arena. AI matches give XP and stardust like a local duel, never Gravitonen. */
+let ai=null; // {arena, skill, prevMode, v, at}
+const AI_NAMES=['Nova','Quasar','Orion','Vega','Lyra','Atlas','Kepler','Rigel','Sirius','Altair','Deneb','Polaris'];
+function aiSkin(arena){
+  const pick=(cat,max)=>{ const l=SHOP[cat].filter(i=>i.price<=max); return l[Math.floor(Math.random()*l.length)].id };
+  const max=150+arena*450;
+  return skinFromEquip({color:pick('color',max),aura:pick('aura',max),trail:pick('trail',max),shot:pick('shot',max),pattern:pick('pattern',max),impact:'basic',title:'none'});
+}
+function startAiDuel(arena,dmode){
+  const prevMode=ai?ai.prevMode:duelMode;
+  ai={arena,skill:.32+.45*arena/(ARENAS.length-1),prevMode,v:null,at:0};
+  duelMode=dmode; mode='duel';
+  newDuelMap({arena,seed:Math.floor(Math.random()*1e5),opp:{name:`KI-Pilot ${AI_NAMES[Math.floor(Math.random()*AI_NAMES.length)]}`,skin:aiSkin(arena)}});
+  starter=nextStarter; nextStarter=otherOf(starter);
+  roundShot=0; round=1; tiebreak=false; tbMarks=[];
+  matchLeft=MATCH_TIME; timeUp=false; missRounds=0; roundHit=false;
+  show(null); $('back').textContent='Menü'; toast(`Arena ${arena+1}: ${ARENAS[arena].name} · gegen ${players[1].name}`);
+  if(duelMode==='blitz') startBlitzRound(); else { turn=starter; startTurn() }
+}
+function endAi(){ if(!ai) return; duelMode=ai.prevMode; ai=null }
+/* one simulated flight of player o's shot: did it hit the enemy, and how close did it get to the enemy's center */
+function simShot(v,o){
+  const en=players[otherOf(o)].planet, L=launchFrom(v,o), q={x:L.x,y:L.y,vx:L.vx,vy:L.vy}; let t=0, best=Infinity;
+  for(let k=0;k<5/DT;k++){
+    t+=DT; PHYS.advance(bodies,t,H); PHYS.integrate(q,bodies,t,DT);
+    const d=Math.hypot(q.x-en.x,q.y-en.y); if(d<best) best=d;
+    const h=PHYS.collide(bodies,q.x,q.y,null);
+    if(h) return {hit:h===en?'enemy':h.kind==='planet'?'self':'body',d:best};
+    if(Math.abs(q.x-W/2)>900||Math.abs(q.y-H/2)>1500) break;
+  }
+  return {hit:null,d:best};
+}
+function aiShot(){
+  const me=players[1].planet, en=players[0].planet, base=Math.atan2(en.y-me.y,en.x-me.x);
+  const hits=[]; let near=null, nearD=Infinity;
+  for(let i=0;i<260&&hits.length<4;i++){
+    const a=i<90?base+rand(-1.3,1.3):rand(0,6.283), l=rand(35,MAX_DRAG), v={x:Math.cos(a)*l,y:Math.sin(a)*l};
+    const r=simShot(v,1);
+    if(r.hit==='enemy') hits.push({v,d:r.d});
+    else if(r.hit!=='self'&&r.d<nearD){ nearD=r.d; near=v }
+  }
+  PHYS.advance(bodies,visT,H);
+  if(hits.length&&Math.random()<ai.skill) return (tiebreak?hits.sort((a,b)=>a.d-b.d)[0]:hits[Math.floor(Math.random()*hits.length)]).v;
+  const src=hits.length?hits[0].v:near||{x:Math.cos(base)*80,y:Math.sin(base)*80};
+  const a=Math.atan2(src.y,src.x)+(Math.random()<.5?-1:1)*rand(.05,.15), l=Math.min(MAX_DRAG,Math.max(30,Math.hypot(src.x,src.y)*rand(.88,1.1)));
+  return {x:Math.cos(a)*l,y:Math.sin(a)*l}; // a believable near miss
 }
 
 /* tap during flight: splitter fans out, booster gets a push (in blitz, each player taps their own half) */
@@ -2155,7 +2211,8 @@ function endMatch(w,byTiebreak,how){
   if(SERVER_ECON) econDuel(w===0,rw=>{ if(current!=='over') return; $('overReward').textContent=rw.limited?'Keine Belohnung: höchstens alle 15 s und 25 Duelle pro Tag':rewardLine(rw)+(w===0?'':' (für Spieler 1)'); $('overLevelUp').hidden=!rw.up; $('overLevelUp').textContent=upLine(rw) });
   $('overReward').textContent=r.line+(w===0||SERVER_ECON?'':' (für Spieler 1)');
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
-  $('again').textContent=`Revanche · ${players[nextStarter].name} beginnt`;
+  $('again').textContent=ai?`Revanche gegen ${players[1].name}`:`Revanche · ${players[nextStarter].name} beginnt`;
+  if(ai){ $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ohne Gravitonen`; $('winner').textContent=w===0?'Du gewinnst':players[1].name+' gewinnt' }
   show('over');
 }
 
@@ -2226,6 +2283,7 @@ function step(dt){
   if(banner.t>0) banner.t-=dt;
   if(appearT>0) appearT=Math.max(0,appearT-dt);
   // the match clock runs while someone aims or a shot is flying, not on the hand-over screen
+  if(ai&&mode==='duel'&&phase==='aim'&&turn===1&&ai.at&&performance.now()>=ai.at){ ai.at=0; fire(ai.v) }
   if(mode==='duel'&&phase==='aim'){
     turnLeft-=dt;
     const sec=Math.ceil(turnLeft);
@@ -2259,8 +2317,8 @@ function toWorld(e){ const r=cv.getBoundingClientRect(), x=(e.clientX-r.left)/sc
 cv.addEventListener('pointerdown',e=>{
   Sfx.init();
   if(phase==='fly'&&online){ onlineTap(); return }
-  if(phase==='fly'){ const p=toWorld(e); trigger(mode==='duel'&&(duelMode==='blitz'||tiebreak)?(p.y>H/2?0:1):undefined); return }
-  if(phase!=='aim'||(online&&turn!==meIdx())) return;
+  if(phase==='fly'){ const p=toWorld(e); trigger(ai?0:mode==='duel'&&(duelMode==='blitz'||tiebreak)?(p.y>H/2?0:1):undefined); return }
+  if(phase!=='aim'||(online&&turn!==meIdx())||(ai&&turn===1)) return;
   cv.setPointerCapture(e.pointerId);
   const p=toWorld(e); aim={sx:p.x,sy:p.y,x:p.x,y:p.y,id:e.pointerId,step:0};
 });
@@ -2791,6 +2849,11 @@ async function supabaseBackend(){
   };
 }
 const rpc=(n,a)=>Net.backend.rpc(n,a);
+/* Gravitonen depend on the opponent: beating a stronger one is worth more, losing to a weaker one costs more (same rule as gd_settle) */
+function gravStakes(mine,theirs){
+  const ew=1/(1+Math.pow(10,((theirs|0)-(mine|0))/800));
+  return {win:Math.min(50,Math.max(10,Math.round(60*(1-ew)))),loss:Math.min(mine|0,Math.min(35,Math.max(5,Math.round(40*ew))))};
+}
 const niceErr=e=>{ const m=String(e&&(e.message||e)||'Fehler'); return /fetch|network|load/i.test(m)?'keine Verbindung zum Server':/anonymous/i.test(m)?'anonyme Anmeldung ist im Supabase-Projekt noch nicht erlaubt':m.slice(0,80) };
 
 async function netInit(){
@@ -2831,10 +2894,16 @@ async function netPing(){
     const r=await rpc('gd_ping');
     if(typeof r.gravitons==='number'&&r.gravitons!==profile.trophies&&!online){ profile.trophies=r.gravitons; saveProfile(); if(current==='home') renderHome() }
     const inv=(r.invites||[]).find(i=>!Net.declined.has(i.id));
-    if(inv&&!online&&!search&&phase==='menu'&&['home','friends','quests','shop','settings','board'].includes(current)) showInvite(inv);
+    const s=search;
+    if(inv&&s&&s.kind==='challenge'&&s.friend&&inv.from.id===s.friend.id&&Net.backend.uid<inv.from.id){ // both asked at once: take theirs
+      search=null; clearInterval(s.poll); if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{});
+      invite=inv; invite.back='home'; answerInvite(true);
+    }
+    else if(inv&&!online&&!search&&phase==='menu'&&['home','friends','quests','shop','settings','board'].includes(current)) showInvite(inv);
+    else if(inv&&!search&&current==='over'&&online&&online.over&&!online.ranked&&inv.from.id===online.opp.id) showInvite(inv,true);
     if(current==='friends') loadFriends(true);
   }catch(e){}
-  schedulePing(current==='friends'||current==='invite'?4000:9000);
+  schedulePing(current==='friends'||current==='invite'||current==='search'||(current==='over'&&online&&!online.ranked)?3000:9000);
 }
 
 /* ---------- status on the Wettkampf page ---------- */
@@ -2852,7 +2921,7 @@ function setOnlineMode(m){ onlineMode=m; save('gravityDuel.onlineMode.v1',m); Sf
 
 /* ---------- searching and challenges ---------- */
 let search=null; // {kind:'ranked'|'challenge', mode, matchId, t0, poll, friend}
-function showSearch(label,title,text){ $('searchLabel').textContent=label; $('searchTitle').textContent=title; $('searchText').textContent=text||''; show('search') }
+function showSearch(label,title,text){ $('searchAi').hidden=true; $('searchLabel').textContent=label; $('searchTitle').textContent=title; $('searchText').textContent=text||''; show('search') }
 async function findMatch(){
   if(Net.state!=='ready'||search||online) return;
   const mode=onlineMode;
@@ -2869,11 +2938,11 @@ async function queueSearch(){
   if(m.status==='active') return beginOnline(m);
   clearInterval(s.poll); s.poll=setInterval(pollSearch,1500);
 }
-async function challengeFriend(f){
+async function challengeFriend(f,rm){
   if(Net.state!=='ready'||search||online) return;
-  const mode=friendCtx?duelMode:onlineMode;
-  search={kind:'challenge',mode,t0:performance.now(),friend:f,arena:friendCtx?duelArenaPick:-1};
-  showSearch(`Herausforderung · ${MODE_NAME[mode]}`,`Warte auf ${f.name} …`,'Freundschaftsduell · ohne Gravitonen');
+  const mode=rm?rm.mode:friendCtx?duelMode:onlineMode;
+  search={kind:'challenge',mode,t0:performance.now(),friend:f,arena:rm?rm.arena:friendCtx?duelArenaPick:-1,rematch:!!(rm&&rm.rematch)};
+  showSearch(`${rm&&rm.rematch?'Revanche':'Herausforderung'} · ${MODE_NAME[mode]}`,`Warte auf ${cleanName(f.name)} …`,'Freundschaftsduell · ohne Gravitonen');
   try{
     await netSyncProfile();
     const m=await rpc('gd_challenge',{p_friend:f.id,p_mode:mode});
@@ -2889,33 +2958,43 @@ async function pollSearch(){
     const secs=Math.round((performance.now()-s.t0)/1000);
     if(m.status==='active'){ clearInterval(s.poll); search=s; return beginOnline(m) }
     if(m.status==='cancelled'){
-      if(s.kind==='challenge'){ clearInterval(s.poll); search=null; $('searchTitle').textContent=`${s.friend.name} hat abgelehnt`; $('searchText').textContent='Oder die Einladung ist abgelaufen.'; $('searchCancel').textContent='Zurück'; return }
+      if(s.kind==='challenge'){ clearInterval(s.poll); search=null; $('searchTitle').textContent=`${cleanName(s.friend.name)} hat abgelehnt`; $('searchText').textContent='Oder die Einladung ist abgelaufen.'; $('searchCancel').textContent='Zurück'; return }
       return queueSearch();
     }
     if(s.kind==='ranked'){
-      $('searchText').textContent=`Seit ${secs} s`;
+      $('searchText').textContent=secs>=10?`Seit ${secs} s · ab 30 s spielst du gegen die KI`:`Seit ${secs} s`;
+      $('searchAi').hidden=secs<10;
+      if(secs>=30) return playAi();
       if(performance.now()-s.queued>75000) await queueSearch(); // keep the search fresh on the server
     } else if(secs>170){ cancelSearch(); toast('Die Einladung ist abgelaufen') }
   }catch(e){} finally{ s.busy=false }
 }
 function searchFailed(e){ const s=search; if(s) clearInterval(s.poll); search=null; $('searchTitle').textContent='Das hat nicht geklappt'; $('searchText').textContent=niceErr(e); $('searchCancel').textContent='Zurück' }
+/* nobody else is searching: an AI match in your own arena (no Gravitonen) */
+function playAi(){
+  const s=search; if(!s||s.kind!=='ranked') return;
+  search=null; clearInterval(s.poll); $('searchAi').hidden=true;
+  if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{});
+  startAiDuel(arenaIndex(profile.trophies),s.mode);
+}
 function cancelSearch(){
-  const s=search; search=null; $('searchCancel').textContent='Abbrechen';
+  const s=search; search=null; $('searchCancel').textContent='Abbrechen'; $('searchAi').hidden=true;
   if(s){ clearInterval(s.poll); if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{}) }
-  if(s&&s.kind==='challenge') openFriends(); else goHome(1);
+  if(s&&s.kind==='challenge'&&!s.rematch) openFriends(); else goHome(s&&s.rematch&&friendCtx?2:1);
 }
 
 /* incoming challenge */
 let invite=null;
-function showInvite(inv){
+function showInvite(inv,rematch){
   invite=inv;
-  $('inviteTitle').textContent=`${cleanName(inv.from.name)} fordert dich heraus`;
+  $('inviteTitle').textContent=rematch?`${cleanName(inv.from.name)} will eine Revanche`:`${cleanName(inv.from.name)} fordert dich heraus`;
   $('inviteText').textContent=`${MODE_NAME[inv.mode]||'Duell'} · ohne Gravitonen`;
   invite.back=current; show('invite');
 }
 async function answerInvite(yes){
   const inv=invite; invite=null; if(!inv) return;
-  if(!yes){ Net.declined.add(inv.id); rpc('gd_cancel',{p_id:inv.id}).catch(()=>{}); return inv.back==='friends'?openFriends():goHome() }
+  if(!yes){ Net.declined.add(inv.id); rpc('gd_cancel',{p_id:inv.id}).catch(()=>{}); return inv.back==='friends'?openFriends():inv.back==='over'?show('over'):goHome() }
+  if(online) onlineCleanup(); // accepting a rematch from the result screen
   showSearch('Herausforderung','Verbinde …','');
   try{
     await netSyncProfile();
@@ -3208,7 +3287,7 @@ async function beginOnline(m){
   search=null;
   const opp=m.opponent||{}, meP=m.me||Net.me||{};
   showSearch(m.ranked?`Wettkampf · ${MODE_NAME[m.mode]}`:`Freundschaftsduell · ${MODE_NAME[m.mode]}`,`Gegner: ${cleanName(opp.name)}`,
-    m.ranked?`${opp.gravitons|0} ${CURRENCY} · Verbinde …`:'Verbinde …');
+    m.ranked?(()=>{ const st=gravStakes(meP.gravitons,opp.gravitons); return `${opp.gravitons|0} ${CURRENCY} · Sieg +${st.win} · Niederlage −${st.loss}` })():'Verbinde …');
   const ch=Net.backend.channel('gd-match-'+m.id);
   online={id:m.id,host:m.role==='host',ranked:!!m.ranked,mode:m.mode,opp,meId:meP.id||Net.backend.uid,ch,
     seq:0,out:[],inSeq:0,buf:{},queue:[],k:0,lastHeard:performance.now(),lastHb:0,started:false,over:false,
@@ -3225,7 +3304,7 @@ async function beginOnline(m){
 function hostStart(){
   const o=online;
   const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):o.arenaPick>=0&&ARENAS[o.arenaPick]?o.arenaPick:Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
-  newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
+  o.arena=arena; newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
   starter=Math.random()<.5?0:1;
   onlineSend('start',{arena,seed,specs:duelSpecs,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
   o.sentLayout=layoutId; o.started=true;
@@ -3280,7 +3359,7 @@ function onlineHandle(t,d){
   if(o.over) return;
   if(t==='start'){
     if(o.started||o.host) return;
-    newDuelMap({arena:d.arena|0,seed:d.seed|0,specs:d.specs,opp:{name:cleanName(d.name),skin:skinFromEquip(d.skin)}});
+    o.arena=d.arena|0; newDuelMap({arena:d.arena|0,seed:d.seed|0,specs:d.specs,opp:{name:cleanName(d.name),skin:skinFromEquip(d.skin)}});
     starter=d.starter?1:0; o.started=true; beginOnlineRounds(); return;
   }
   if(!o.started) return 'wait';
@@ -3390,7 +3469,7 @@ function onlineEnd(w,byTb,how){
   $('overReward').textContent=r.line;
   $('overLevelUp').hidden=!r.up; $('overLevelUp').textContent=r.up||'';
   $('overGrav').hidden=!o.ranked; $('overGrav').textContent='Gravitonen werden gewertet …';
-  $('again').textContent=o.ranked?`Nochmal suchen · ${MODE_NAME[o.mode]}`:'Zurück zu den Freunden';
+  $('again').textContent=o.ranked?`Nochmal suchen · ${MODE_NAME[o.mode]}`:`Revanche gegen ${cleanName(o.opp.name)}`;
   $('back').textContent='Menü';
   show('over');
   netReport(o.id,won?o.meId:o.opp.id);
@@ -3502,6 +3581,7 @@ document.addEventListener('keydown',e=>{
 });
 function goHome(p){
   if(online) onlineCleanup();
+  endAi();
   phase='menu'; bodies=[]; players=[]; proj=[];
   if(p!==undefined) page=p;
   renderHome(); show('home');
@@ -3679,8 +3759,8 @@ tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item
 $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.revealed) revealCrate() });
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
-tap('again',()=>{ if(!online) return startDuel(); const ranked=online.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; openFriends() } });
-tap('overBack',()=>goHome(online&&!online.fromDuel?1:2));
+tap('again',()=>{ if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
+tap('overBack',()=>goHome(ai||online&&!online.fromDuel?1:2));
 tap('next',()=>{
   const g=curGalaxy();
   if(levelIdx<g.levels.length-1) startLevel(levelIdx+1);
@@ -3690,7 +3770,7 @@ tap('next',()=>{
 tap('retry',()=>startLevel(levelIdx));
 tap('clearBack',()=>goLevels());
 tap('introOk',nextIntro);
-tap('back',()=>{ if(online&&!online.over) return onlineForfeit(); if(online) return goHome(1); mode==='campaign'?goLevels():goHome(2) });
+tap('back',()=>{ if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); mode==='campaign'?goLevels():goHome(2) });
 function toggleMute(){ Sfx.init(); const m=Sfx.toggle(); $('mute').textContent=m?'Ton aus':'Ton an'; $('mute').setAttribute('aria-pressed',String(m)); $('setSound').setAttribute('aria-checked',String(!m)) }
 $('mute').addEventListener('click',toggleMute);
 function syncMusicLabels(){ const on=Sfx.musicOn; $('music').textContent=on?'Musik an':'Musik aus'; $('music').setAttribute('aria-pressed',String(!on)); $('setMusic').setAttribute('aria-checked',String(on)) }
@@ -3732,7 +3812,7 @@ if(window.__GD_TEST__) window.__gd={
       PHYS.advance(bodies,visT,H); if(ok) return v }
     return null }, weapon:(w)=>{ players[meIdx()].weapon=w }, me:()=>meIdx(),
   clearMoons:()=>{ bodies=bodies.filter(b=>b.kind!=='moon'&&b.kind!=='portal') },
-  clearLevel:()=>levelCleared(), endDuel:w=>endMatch(w,false,''),
+  clearLevel:()=>levelCleared(), endDuel:w=>endMatch(w,false,''), ai:()=>ai&&{arena:ai.arena,skill:ai.skill}, aiTest:(n)=>{ let hit=0; const t0=performance.now(); for(let i=0;i<n;i++){ const v=aiShot(); if(simShot(v,1).hit==='enemy') hit++ } PHYS.advance(bodies,visT,H); return {hit,n,ms:(performance.now()-t0)/n} },
   setLives:(a,b)=>{ players[0].lives=a; players[1].lives=b },
   fire:(x,y)=>{ if(phase==='aim') fire({x,y}) },
   timeLayout:(n)=>{ const t0=performance.now(); for(let i=0;i<n;i++) layoutDuel(); return (performance.now()-t0)/n },
