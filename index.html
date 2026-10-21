@@ -278,6 +278,26 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .legal{font-size:.72rem;color:var(--muted);text-align:center;margin:10px 0 2px}.legal a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
 button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .dangerbtn{background:linear-gradient(90deg,#ff3b5c,#c4163a);color:#fff}.dangerbtn[disabled]{opacity:.45}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dailybtn{position:relative;color:var(--gold);border-color:rgba(255,211,79,.5)}.dailybtn .medot{position:absolute;top:-4px;right:-4px}
+.dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.dres{text-align:center;font-family:var(--display);color:var(--gold);margin:4px 0 10px}
+.dhead{font-size:.95rem;margin:16px 0 6px}
+.dboard{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:4px}
+.dboard li{display:grid;grid-template-columns:30px 14px 1fr auto;gap:8px;align-items:center;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.2);font-size:.85rem}
+.dboard li.me{border-color:var(--gold);background:rgba(255,211,79,.08)}
+.dboard li .r{font-family:var(--display);color:var(--muted)}.dboard li:nth-child(1) .r{color:var(--gold)}.dboard li:nth-child(2) .r{color:#c8d4e6}.dboard li:nth-child(3) .r{color:#d08a4f}
+.dboard li i{width:12px;height:12px;border-radius:50%}.dboard li b{font-family:var(--display)}
+.dboard .empty{display:block;text-align:center;color:var(--muted)}
+.lcal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0}
+.lcal div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);font-size:.72rem;color:var(--muted)}
+.lcal div b{font-family:var(--display);font-size:.85rem;text-align:center;overflow-wrap:anywhere;color:var(--ink)}.lcal div .ic{font-size:1.2rem;line-height:1.2}
+.lcal div.done{opacity:.55}.lcal div.done b::after{content:' ✓';color:#3dffa8}
+.lcal div.today{border-color:var(--gold);background:rgba(255,211,79,.1);box-shadow:0 0 14px rgba(255,211,79,.25)}
+.lcal div.big{grid-column:span 2;border-color:rgba(196,107,255,.6)}
+.evcard{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,rgba(196,107,255,.16),rgba(46,230,255,.08));border:1px solid rgba(196,107,255,.45);margin:6px 0}
+.evcard .evic{font-size:1.5rem}.evcard>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.evcard b{font-family:var(--display);font-size:.88rem}
+.evcard span{font-size:.72rem;color:var(--muted)}.evcard .bar{height:5px;margin-top:3px}.evcard button{flex:none}
 .linkbtn{display:block;margin:6px 0 0 auto;padding:4px 2px;background:none;border:0;box-shadow:none;color:var(--p2);font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
 .invtabs{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 10px;padding:2px 4px 4px;scrollbar-width:none}
 .invtabs::-webkit-scrollbar{display:none}
@@ -549,7 +569,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         <div class="seg diffseg" role="radiogroup" aria-label="Schwierigkeit" data-diffseg></div>
         <div class="btns">
           <button id="campPlay">Weiter: Level 1</button>
-          <button class="ghost" id="campAll">Alle Galaxien</button>
+          <div class="duo"><button class="ghost" id="campAll">Alle Galaxien</button><button class="ghost dailybtn" id="toDaily">☀ Tageslevel<i class="medot" id="dailyDot" hidden></i></button></div>
         </div>
       </section>
       <section class="page" id="page-ranked" aria-label="Wettkampf">
@@ -557,6 +577,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
           <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div>
           <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
         <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
+        <div class="evcard" id="evCard" hidden><span class="evic" id="evIcon">🎪</span><div><b id="evName">Wochen-Event</b><span id="evText"></span><div class="bar" aria-hidden="true"><i id="evBar"></i></div></div><button class="mini" id="evClaim" hidden>Abholen</button></div>
         <p class="netstate" id="netState" hidden>Verbinde …</p>
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
@@ -844,6 +865,35 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       </div>
 
       <button class="ghost" id="voidBack">Zurück zum Shop</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="daily" hidden>
+    <div class="card">
+      <span class="label" id="dailyLabel">Tageslevel</span>
+      <h2 id="dailyTitle">Tageslevel</h2>
+      <p class="fine" id="dailyInfo"></p>
+      <div class="dstats">
+        <div class="stat"><b id="dailyBest">–</b><span>Dein Bestwert</span></div>
+        <div class="stat"><b id="dailyRank">–</b><span>Platz</span></div>
+        <div class="stat"><b id="dailyStreak">0</b><span>Serie</span></div>
+      </div>
+      <p class="dres" id="dailyResult" hidden></p>
+      <div class="btns"><button id="dailyPlay">Spielen</button></div>
+      <h3 class="dhead">Bestenliste heute</h3>
+      <ol class="dboard" id="dailyBoard"></ol>
+      <button class="ghost" id="dailyBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="login" hidden>
+    <div class="card center">
+      <span class="label">Täglicher Bonus</span>
+      <h2 id="loginTitle">Tag 1 von 7</h2>
+      <p class="fine">Komm jeden Tag vorbei: Die Belohnung wird größer, an Tag 7 wartet eine Kiste. Lässt du einen Tag aus, beginnt es wieder bei Tag 1.</p>
+      <div class="lcal" id="loginCal"></div>
+      <p class="reward" id="loginReward"></p>
+      <div class="btns"><button id="loginClaim">Abholen</button><button class="ghost" id="loginBack">Später</button></div>
     </div>
   </div>
 
@@ -2654,7 +2704,7 @@ const DIFFS=[null,{name:'Kadett',short:'Freies Feuer',info:'Unbegrenzt viele Sch
   {name:'Legende',short:'Kein Fehlschuss',info:'Nur so viele Schüsse wie die beste Lösung braucht.'}];
 let campDiff=Math.min(3,Math.max(1,load('gravityDuel.campDiff.v1',1)|0));
 const pkey=(g,d=campDiff)=>d===1?g.id:g.id+'@'+d;
-const shotLimit=L=>campDiff===2?L.par+4:campDiff===3?L.par:0;
+const shotLimit=L=>dailyMode?0:campDiff===2?L.par+4:campDiff===3?L.par:0;
 for(const g of GALAXIES) for(const d of [1,2,3]) if(!Array.isArray(progress[pkey(g,d)])) progress[pkey(g,d)]=[];
 let seen=load(KEYS.seen,{});
 
@@ -2808,10 +2858,22 @@ function duelHittable(specs){
   return false;
 }
 let duelSpecs=[], layoutId=0;
+function eventSpecs(specs){
+  if(!curEvent) return specs;
+  if(curEvent.id==='hole'&&specs[0]&&specs[0].t!=='d'){ specs[0]={x:W/2,fy:.5,r:Math.round(sizeOf('b')),t:'b'} }
+  if(curEvent.id==='rain') for(let k=0,tries=0;k<3&&tries<300;tries++){
+    const spec={x:Math.round(rand(40,360)),fy:+rand(.24,.46).toFixed(3),r:Math.round(rand(9,14)),t:'n'}, ext=PHYS.footprint(spec), m={...spec,x:W-spec.x,fy:+(1-spec.fy).toFixed(4)};
+    if(spec.x-ext<20||spec.x+ext>W-20||spec.fy*H-ext<PHYS.PLANET_GAP+60) continue;
+    if(Math.hypot(m.x-spec.x,(m.fy-spec.fy)*H)<2*ext+24) continue;
+    if(specs.some(o=>Math.hypot(o.x-spec.x,(o.fy-spec.fy)*H)<ext+PHYS.footprint(o)+18)) continue;
+    specs.push(spec,m); k++;
+  }
+  return specs;
+}
 function layoutDuel(given){
   bodies=bodies.filter(b=>b.kind==='planet');
   let specs=given||null;
-  if(!specs) for(let i=0;i<10;i++){ const c=genDuelSpecs(duelArena); if(duelHittable(c)){ specs=c; break } if(i===9) specs=c }
+  if(!specs) for(let i=0;i<10;i++){ const c=eventSpecs(genDuelSpecs(duelArena)); if(duelHittable(c)){ specs=c; break } if(i===9) specs=c }
   duelSpecs=specs; layoutId++;
   for(const spec of specs) bodies.push(withCraters(PHYS.makeBody(spec,H)));
   PHYS.linkPortals(bodies);
@@ -2828,8 +2890,9 @@ function rearrange(why,given){
   for(const b of bodies) if(b.kind!=='planet') explode(b.x,b.y,(BODY_LOOK[b.type]||BODY_LOOK.n).edge,10);
   layoutWhy=why||'neu'; // no banner: the bodies just fade in at their new places
 }
-function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,opp:{name,skin}}
-  DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):pickDuelAmmo();
+function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,opp:{name,skin}}
+  curEvent=o&&o.ev!=null?WEEK_EVENTS[o.ev|0]||null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:null;
+  DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):curEvent&&curEvent.ammo?{...curEvent.ammo}:pickDuelAmmo();
   duelArena=o?o.arena:duelArenaPick>=0&&duelArenaPick<ARENAS.length?duelArenaPick:Math.floor(Math.random()*ARENAS.length);
   scene=makeScene(ARENAS[duelArena].theme,o?o.seed:Math.floor(Math.random()*1e5)); bodies=[];
   const p1=mkPlanet(0), p2=mkPlanet(1);
@@ -2841,7 +2904,8 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,opp:{
   layoutDuel(o&&o.specs);
 }
 let levelDiff=1; // the difficulty the running level was started with
-const curGalaxy=()=>GALAXIES[galIdx];
+let dailyMode=false, dailyGal=null, dailyData=null;
+const curGalaxy=()=>dailyMode&&dailyGal?dailyGal:GALAXIES[galIdx];
 const curLevel=()=>curGalaxy().levels[levelIdx];
 function newLevelMap(){
   const L=curLevel(); scene=makeScene(curGalaxy().id,galIdx*100+levelIdx+1); bodies=[];
@@ -2897,9 +2961,22 @@ const viewRot=()=>!!(online&&!online.host);
 const flipFor=o=>mode==='duel'&&(online?viewRot():!ai&&o===1);
 
 const TURN_TIME=10; // seconds per shot in duels, against stalling
+/* ---------- weekly PvP events: a special rule for every Wettkampf match of the week (wins counted by gd_event) ---------- */
+const WEEK_EVENTS=[
+  {id:'hole', name:'Schwarzes Loch', icon:'🕳️', desc:'In der Mitte jeder Karte lauert ein Schwarzes Loch.'},
+  {id:'boomer',name:'Bumerang-Woche',icon:'🪃', desc:'Nur Bumerangs und Magnete als Spezialgeschosse.', ammo:{boomerang:4,magnet:2}},
+  {id:'ghost', name:'Unsichtbare Monde',icon:'👻',desc:'Die Himmelskörper verblassen beim Zielen. Merk dir, wo sie sind!'},
+  {id:'rain',  name:'Mondregen',     icon:'🌑', desc:'Viel mehr kleine Monde auf jeder Karte.'},
+  {id:'bombs', name:'Bombenstimmung',icon:'💣', desc:'Schwerkraftbomben und Splitter für alle.', ammo:{gbomb:3,split:2}},
+  {id:'blitz', name:'Schnellfeuer',  icon:'⚡', desc:'Nur 6 Sekunden pro Schuss.'}
+];
+const EVENT_START=Date.parse('2026-10-19T00:00:00+02:00');
+let curEvent=null, eventData=null, aimStart=0;
+const eventIdx=()=>eventData&&Number.isFinite(eventData.idx)?eventData.idx%WEEK_EVENTS.length:Math.floor((Date.now()-EVENT_START)/604800000)%WEEK_EVENTS.length;
+const turnTime=()=>curEvent&&curEvent.id==='blitz'?6:TURN_TIME;
 let turnLeft=TURN_TIME, lastTick=0;
 function startTurn(){
-  phase='aim'; turnLeft=TURN_TIME; lastTick=0;
+  phase='aim'; turnLeft=turnTime(); lastTick=0; aimStart=performance.now();
   const pl=players[turn];
   if(pl.weapon!=='std'&&!(pl.ammo[pl.weapon]>0)) pl.weapon='std';
   if(mode==='duel'){
@@ -2950,9 +3027,9 @@ function coverFor(o){
 function coverReady(){ show(null); startTurn() }
 function startLevel(i){
   mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
-  levelDiff=campDiff; if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
+  levelDiff=campDiff; if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
   const L=curLevel();
-  banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:`Level ${i+1}`,sub:L.name,t:1.8,player:0};
+  banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:dailyMode?'Tageslevel':`Level ${i+1}`,sub:L.name,t:1.8,player:0};
   // explain new weapons and new kinds of bodies the first time they show up
   introQueue=[];
   for(const k of Object.keys(L.ammo||{})) if(!seen[k]){ seen[k]=true; introQueue.push({label:'Neues Geschoss',title:WEAPONS[k].name,text:WEAPONS[k].info}); players[0].weapon=k }
@@ -3962,7 +4039,7 @@ function startAiDuel(arena,dmode,rk){
   roundShot=0; round=1; tiebreak=false; tbMarks=[];
   matchLeft=MATCH_TIME; timeUp=false; missRounds=0; roundHit=false;
   show(null); $('back').textContent='Menü';
-  toast(`Arena ${arena+1}: ${ARENAS[arena].name} · gegen ${players[1].name}`+(ai.ranked?` · Sieg +${rk.win}, Niederlage −${rk.loss}`:rk&&rk.reason==='daily'?' · heute ohne Gravitonen (Tageslimit)':''));
+  toast((curEvent?`${curEvent.icon} ${curEvent.name} · `:'')+`Arena ${arena+1}: ${ARENAS[arena].name} · gegen ${players[1].name}`+(ai.ranked?` · Sieg +${rk.win}, Niederlage −${rk.loss}`:rk&&rk.reason==='daily'?' · heute ohne Gravitonen (Tageslimit)':''));
   if(duelMode==='blitz') startBlitzRound(); else { turn=starter; startTurn() }
 }
 function endAi(){ if(!ai) return; duelMode=ai.prevMode; ai=null }
@@ -4201,7 +4278,7 @@ function endMatch(w,byTiebreak,how){
   if(ai) aiEmote('gg',400);
   if(ai){ $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ${ai.ranked?'wird gewertet …':'ohne Gravitonen'}`; $('winner').textContent=w===0?'Du gewinnst':players[1].name+' gewinnt'
     if(ai.ranked){ ai.ranked=false; // the rematch is a friendly game
-      rpc('gd_ai_finish',{p_won:w===0}).then(r=>{ if(typeof r.gravitons==='number'){ profile.trophies=r.gravitons; saveProfile() }
+      rpc('gd_ai_finish',{p_won:w===0}).then(r=>{ setTimeout(loadEvent,500); if(typeof r.gravitons==='number'){ profile.trophies=r.gravitons; saveProfile() }
         if(current==='over'&&r.ranked) $('tally').textContent=`${tt?tt+' · ':''}KI-Duell · ${MODE_NAME[duelMode]} · ${r.delta>=0?'+':'−'}${Math.abs(r.delta)} ${CURRENCY}` }).catch(()=>{}) } }
   show('over');
 }
@@ -4218,6 +4295,7 @@ function levelFailed(){
   show('clear');
 }
 function levelCleared(){
+  if(dailyMode) return dailyCleared();
   phase='over';
   const g=curGalaxy(), L=curLevel(), prog=progress[pkey(g)]||(progress[pkey(g)]=[]);
   const st=campDiff===3?3:starsFor(shotCount,L.par), prev=prog[levelIdx]||0;
@@ -4393,7 +4471,7 @@ function drawPlanet(b,t){
     }
     // shot clock: a ring that runs down, plus the seconds in the last moments
     if(b.owner===turn&&phase==='aim'){
-      const k=Math.max(0,turnLeft/TURN_TIME), low=turnLeft<=3;
+      const k=Math.max(0,turnLeft/turnTime()), low=turnLeft<=3;
       ctx.strokeStyle=low?'#ff4f6b':rgba(c,.8);ctx.lineWidth=2.5;
       ctx.beginPath();ctx.arc(b.x,b.y,b.r+15,-Math.PI/2,-Math.PI/2+k*Math.PI*2);ctx.stroke();
       if(turnLeft<=5) textAt(String(Math.max(1,Math.ceil(turnLeft))),b.x,b.y,flipFor(b.owner),low?'#ffffff':'rgba(255,255,255,.85)',18);
@@ -4535,6 +4613,7 @@ function draw(t){
   const pl=players[turn], col=pl.color;
   if(phase==='aim'||phase==='fly') drawStyledTrail(ctx,lastTrail[turn],col,'dash',t,.3);
   for(const b of bodies){
+    if(b.kind!=='target'&&b.kind!=='planet'&&curEvent&&curEvent.id==='ghost'&&mode==='duel'&&phase==='aim'&&appearT<=0){ ctx.save(); ctx.globalAlpha=Math.max(.06,1-(performance.now()-aimStart)/1800); drawBody(ctx,b,t,visT); ctx.restore(); continue }
     if(b.kind==='target') drawTarget(b,t); else if(b.kind==='planet') drawPlanet(b,t); else if(appearT>0){ ctx.save(); const k=1-appearT/.9; ctx.globalAlpha=k; ctx.translate(b.x,b.y); ctx.scale(.6+.4*k,.6+.4*k); ctx.translate(-b.x,-b.y); drawBody(ctx,b,t,visT); ctx.restore() } else drawBody(ctx,b,t,visT);
   }
   for(const s of proj){ const q=players[s.o]; drawStyledTrail(ctx,s.trail,q.color,q.skin.trail,t,.85); drawProjectile(s,q.color,t,q.skin) }
@@ -4976,7 +5055,7 @@ async function netInit(){
     if(current==='setup') goHome();
     try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
     await netSyncProfile();
-    Net.state='ready'; schedulePing(1500); econPump();
+    Net.state='ready'; schedulePing(1500); econPump(); refreshDailyDot(); loadEvent(); setTimeout(checkLogin,1200);
     afterReady();
   }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e); if(NEED_ACCOUNT&&current==='setup') openSetup('wait',`Keine Verbindung: ${Net.err}`) }
   renderOnline();
@@ -5409,7 +5488,7 @@ async function switchedAccount(msg){
 /* ---------- achievements and badges: counted and paid by the server (gd_achievements) ---------- */
 const ACH_FAM={shooter:['🎯','Treffsicher','Ziele zerstört'],stars:['⭐','Sternensammler','Sterne in der Kampagne'],explorer:['🧭','Entdecker','Galaxien abgeschlossen'],
   boss:['👑','Bossjäger','Wächter besiegt'],duelist:['⚔️','Duellant','Duelle gespielt'],champion:['🏆','Champion','Wettkampf-Siege'],perfect:['✨','Perfektionist','Level mit 3 Sternen'],
-  longshot:['☄️','Weitflieger','Treffer nach über 3 s Flug'],portal:['🌀','Wurmlochreisender','Flüge durch Wurmlöcher'],special:['💥','Spezialist','Spezialgeschosse eingesetzt'],
+  longshot:['☄️','Weitflieger','Treffer nach über 3 s Flug'],eventer:['🎪','Eventjäger','Wochen-Events geschafft'],daily:['☀️','Tagesheld','Tageslevel geschafft'],portal:['🌀','Wurmlochreisender','Flüge durch Wurmlöcher'],special:['💥','Spezialist','Spezialgeschosse eingesetzt'],
   collector:['💎','Sammler','Items im Besitz'],climber:['📈','Aufsteiger','Spielerlevel'],crates:['🎁','Kistenöffner','Kisten geöffnet']};
 const TIER_COL=['#d08a4f','#c8d4e6','#ffd34f'], TIER_NAME=['I','II','III'];
 let achData=null, achAt=-1e9;
@@ -5580,7 +5659,8 @@ function hostStart(){
   const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):o.arenaPick>=0&&ARENAS[o.arenaPick]?o.arenaPick:Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
   o.arena=arena; newDuelMap({arena,seed,ammo:pickDuelAmmo(),opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
   starter=Math.random()<.5?0:1;
-  onlineSend('start',{arena,seed,specs:duelSpecs,ammo:DUEL_AMMO,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
+  onlineSend('start',{arena,seed,specs:duelSpecs,ammo:DUEL_AMMO,ev:curEvent?WEEK_EVENTS.indexOf(curEvent):null,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
+  if(curEvent) setTimeout(()=>toast(`${curEvent.icon} Wochen-Event: ${curEvent.name}`),1600);
   o.sentLayout=layoutId; o.started=true;
   beginOnlineRounds();
 }
@@ -5634,7 +5714,8 @@ function onlineHandle(t,d){
   if(o.over) return;
   if(t==='start'){
     if(o.started||o.host) return;
-    o.arena=d.arena|0; newDuelMap({arena:d.arena|0,seed:d.seed|0,specs:d.specs,ammo:d.ammo,opp:{name:cleanName(d.name),skin:skinFromEquip(d.skin)}});
+    o.arena=d.arena|0; newDuelMap({arena:d.arena|0,seed:d.seed|0,specs:d.specs,ammo:d.ammo,ev:d.ev==null?null:d.ev|0,opp:{name:cleanName(d.name),skin:skinFromEquip(d.skin)}});
+    if(curEvent) setTimeout(()=>toast(`${curEvent.icon} Wochen-Event: ${curEvent.name}`),1600);
     starter=d.starter?1:0; o.started=true; beginOnlineRounds(); return;
   }
   if(!o.started) return 'wait';
@@ -5774,7 +5855,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['setup','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
+const screens=['setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
 let current='home';
 function show(name){
   current=name;
@@ -5856,6 +5937,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'&&page>0) $('nav-'+(page-1)).click();
 });
 function goHome(p){
+  dailyMode=false; if(p===1) setTimeout(loadEvent,300);
   if(online) onlineCleanup();
   endAi();
   phase='menu'; bodies=[]; players=[]; proj=[];
@@ -5917,6 +5999,103 @@ function homeTick(t){
     drawSkinnedPlanet(g,w*.8,h*.14,20,rival,t,false);
     showcaseBody(g,'n',w*.52,h*.3,t);
   });
+}
+
+/* ---------- daily level: one level for everyone, fewest shots wins (gd_daily / gd_daily_submit) ---------- */
+async function openDaily(result){
+  dailyMode=false; phase='menu'; bodies=[]; players=[]; proj=[];
+  if(!result) $('dailyResult').hidden=true;
+  show('daily'); renderDaily();
+  if(!SERVER_ECON||!econReady()){ $('dailyInfo').textContent='Das Tageslevel braucht eine Verbindung zum Server.'; return }
+  try{ dailyData=await rpc('gd_daily'); renderDaily() }catch(e){ $('dailyInfo').textContent='Konnte das Tageslevel nicht laden: '+niceErr(e) }
+}
+function renderDaily(){
+  const d=dailyData, box=$('dailyBoard'); box.innerHTML='';
+  $('dailyDot').hidden=!(d&&d.active&&!d.playedToday);
+  if(!d){ $('dailyTitle').textContent='Tageslevel'; $('dailyInfo').textContent='Lade …'; $('dailyPlay').disabled=true; return }
+  if(!d.active){ $('dailyInfo').textContent='Heute gibt es kein Tageslevel.'; $('dailyPlay').disabled=true; return }
+  const date=new Date(d.day+'T12:00:00'), hrs=Math.max(0,Math.ceil((new Date(d.ends)-new Date())/3600000));
+  $('dailyLabel').textContent=`Tageslevel · ${date.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}`;
+  $('dailyTitle').textContent=d.level.name;
+  $('dailyInfo').textContent=`Für alle gleich: Wer die wenigsten Schüsse braucht, gewinnt. Die beste bekannte Lösung braucht ${d.level.par} ${d.level.par===1?'Schuss':'Schüsse'}. Neues Level in ${hrs} ${hrs===1?'Stunde':'Stunden'}. Jeden Tag spielen verlängert deine Serie: bis zu +70 ✦ extra.`;
+  $('dailyBest').textContent=d.best?`${d.best} ${d.best===1?'Schuss':'Schüsse'}`:'–';
+  $('dailyRank').textContent=d.rank?`${d.rank} / ${d.players}`:'–';
+  $('dailyStreak').textContent=`${d.streak} 🔥`;
+  $('dailyPlay').disabled=false; $('dailyPlay').textContent=d.playedToday?'Nochmal versuchen':'Spielen';
+  if(!d.top.length){ const li=document.createElement('li'); li.className='empty'; li.textContent='Noch niemand hat es heute geschafft. Sei die oder der Erste!'; box.appendChild(li) }
+  for(const t of d.top){ const li=document.createElement('li'); li.className=t.me?'me':'';
+    li.innerHTML=`<span class="r">${t.r}.</span><i style="background:${skinFromEquip(t.skin).color}"></i><span>${badgeHtml(t.badge)}${esc(cleanName(t.name))}</span><b>${t.shots}</b>`; box.appendChild(li) }
+  if(d.rank&&d.rank>20){ const li=document.createElement('li'); li.className='me'; li.innerHTML=`<span class="r">${d.rank}.</span><i style="background:${mySkin().color}"></i><span>${esc(playerName())}</span><b>${d.best}</b>`; box.appendChild(li) }
+}
+function playDaily(){
+  const d=dailyData; if(!d||!d.active) return;
+  const base=GALAXIES.find(g=>g.id===d.gal)||GALAXIES[0];
+  dailyGal={id:base.id,name:'Tageslevel',levels:[d.level]}; dailyMode=true;
+  galIdx=Math.max(0,GALAXIES.indexOf(base));
+  startLevel(0);
+}
+async function dailyCleared(){
+  phase='over'; const n=shotCount;
+  [0,1,2].forEach(i=>setTimeout(()=>Sfx.star(i),150+i*180));
+  let line=`Geschafft mit ${n} ${n===1?'Schuss':'Schüssen'}!`;
+  $('dailyResult').hidden=false; $('dailyResult').textContent=line+' Wird gewertet …';
+  openDaily(true);
+  if(!SERVER_ECON||!econReady()){ $('dailyResult').textContent=line+' (ohne Verbindung nicht gewertet)'; return }
+  try{
+    const r=await rpc('gd_daily_submit',{p_shots:n});
+    applyEcon(r.state); dailyData=r.daily; renderDaily();
+    if(r.reward){ line+=` ${rewardLine(r.reward)} · Serie ${r.reward.streak} 🔥`+(r.reward.streakBonus?` (+${r.reward.streakBonus} ✦ Bonus)`:''); if(r.reward.up) Sfx.levelup() }
+    else if(r.improved) line+=' Neuer Bestwert!';
+    else line+=` Dein Bestwert bleibt ${dailyData.best}.`;
+    if(dailyData.rank) line+=` · Platz ${dailyData.rank}`;
+    $('dailyResult').textContent=line;
+  }catch(e){ $('dailyResult').textContent=line+' '+(/not started/.test(String(e&&e.message))?'Nicht gewertet: Starte das Level bitte neu.':niceErr(e)) }
+}
+async function refreshDailyDot(){ if(!SERVER_ECON||!econReady()) return; try{ dailyData=await rpc('gd_daily'); $('dailyDot').hidden=!(dailyData.active&&!dailyData.playedToday) }catch(e){} }
+
+/* ---------- login calendar (gd_login_status / gd_login_claim) ---------- */
+let loginData=null;
+async function checkLogin(){
+  if(!SERVER_ECON||!econReady()) return;
+  try{ loginData=await rpc('gd_login_status') }catch(e){ return }
+  if(!loginData.claimedToday&&current==='home') openLogin();
+}
+function loginLabel(r){ return r.kind==='dust'?{ic:'✦',t:`${r.amount} ✦`}:r.kind==='xp'?{ic:'⬆',t:`${r.amount} XP`}:{ic:'🎁',t:CRATE_NAME(r.value)} }
+function openLogin(){
+  const d=loginData; if(!d) return; const cal=$('loginCal'); cal.innerHTML='';
+  d.rewards.forEach((r,i)=>{ const day=i+1, L=loginLabel(r), el=document.createElement('div');
+    el.className=(day<d.day||(day===d.day&&d.claimedToday)?'done':day===d.day?'today':'')+(day===7?' big':'');
+    el.innerHTML=`<span>Tag ${day}</span><span class="ic">${L.ic}</span><b>${esc(L.t)}</b>`; cal.appendChild(el) });
+  $('loginTitle').textContent=`Tag ${d.day} von 7`; $('loginReward').textContent='';
+  $('loginClaim').hidden=d.claimedToday; $('loginBack').textContent=d.claimedToday?'Weiter':'Später';
+  show('login');
+}
+async function claimLogin(){
+  const b=$('loginClaim'); b.disabled=true;
+  try{
+    const r=await rpc('gd_login_claim'); applyEcon(r.state); loginData.claimedToday=true; loginData.day=r.day;
+    if(r.reward.crate){ crateFrom='home'; return openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)) }
+    Sfx.buy(); $('loginReward').textContent=r.reward.kind==='xp'?`+${r.reward.amount} XP`:`+${r.reward.amount} ✦`;
+    openLogin(); $('loginReward').textContent=r.reward.kind==='xp'?`+${r.reward.amount} XP`:`+${r.reward.amount} ✦`;
+  }catch(e){ b.disabled=false; toast(econErr(e)) }
+}
+
+/* ---------- weekly event card (gd_event / gd_event_claim) ---------- */
+async function loadEvent(){ if(!SERVER_ECON||!econReady()) return; try{ eventData=await rpc('gd_event'); renderEvent() }catch(e){} }
+function renderEvent(){
+  const d=eventData, ev=WEEK_EVENTS[eventIdx()]; $('evCard').hidden=!d;
+  if(!d) return;
+  const days=Math.max(0,Math.ceil((new Date(d.ends)-new Date())/86400000));
+  $('evIcon').textContent=ev.icon; $('evName').textContent=`Wochen-Event: ${ev.name}`;
+  $('evText').textContent=d.claimed?`${ev.desc} · Belohnung abgeholt ✓`:`${ev.desc} · ${Math.min(d.wins,d.goal)}/${d.goal} Siege im Wettkampf · noch ${days} ${days===1?'Tag':'Tage'}`;
+  $('evBar').style.width=`${Math.round(100*Math.min(1,d.wins/d.goal))}%`;
+  $('evClaim').hidden=d.claimed||d.wins<d.goal;
+}
+async function claimEvent(){
+  const b=$('evClaim'); b.disabled=true;
+  try{ const r=await rpc('gd_event_claim'); applyEcon(r.state); eventData=r.event; renderEvent(); achAt=-1e9; loadAch();
+    crateFrom='home'; openCrate(CRATES.find(c=>c.id==='nebula'),true,crateReward(r.reward)); toast('Event geschafft: +100 XP · +300 ✦ und eine Nebelkiste') }
+  catch(e){ toast(econErr(e)) } finally{ b.disabled=false }
 }
 
 /* ---------- galaxies and levels ---------- */
@@ -6875,6 +7054,11 @@ if(window.__GD_TEST__) window.__void={state:()=>({game:VS.game,busy:VS.busy,dust
 const tap=(id,fn)=>$(id).addEventListener('click',()=>{Sfx.init();fn()});
 tap('campPlay',()=>{ const gi=activeGalaxy(), g=GALAXIES[gi], n=nextLevelIn(g); galIdx=gi; n===null?goLevels(gi):startLevel(n) });
 tap('campAll',goGalaxies);
+tap('toDaily',()=>openDaily());
+tap('evClaim',claimEvent);
+tap('loginClaim',claimLogin); tap('loginBack',()=>goHome());
+tap('dailyPlay',playDaily);
+tap('dailyBack',()=>goHome(0));
 tap('duelPlay',startDuel);
 tap('duelRules',()=>show('rules'));
 tap('duelFriend',()=>openFriends({fromDuel:true}));
@@ -6905,7 +7089,7 @@ tap('invBack',()=>{ if(invFrom==='shop'){ renderShop(); show('shop') } else if(i
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
-tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else { renderShop(); show('shop') } });
+tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else { renderShop(); show('shop') } });
 tap('qtab-tasks',()=>setQTab('tasks'));
 tap('qtab-season',()=>setQTab('season'));
 tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
@@ -6961,7 +7145,7 @@ tap('next',()=>{
 tap('retry',()=>startLevel(levelIdx));
 tap('clearBack',()=>goLevels());
 tap('introOk',nextIntro);
-tap('back',()=>{ if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); mode==='campaign'?goLevels():goHome(2) });
+tap('back',()=>{ if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
 function toggleMute(){ Sfx.init(); const m=Sfx.toggle(); $('mute').textContent=m?'Ton aus':'Ton an'; $('mute').setAttribute('aria-pressed',String(m)); $('setSound').setAttribute('aria-checked',String(!m)) }
 $('mute').addEventListener('click',toggleMute);
 function syncMusicLabels(){ const on=Sfx.musicOn; $('music').textContent=on?'Musik an':'Musik aus'; $('music').setAttribute('aria-pressed',String(!on)); $('setMusic').setAttribute('aria-checked',String(on)) }
