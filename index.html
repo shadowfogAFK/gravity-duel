@@ -1657,6 +1657,7 @@ const SHOP={
     {id:'inferno',name:'Höllenglut',     color:'#ff4a1f',c2:'#5a0500',anim:'fire',price:11250,rarity:'mythic',minLevel:11},
     {id:'blood', name:'Blutmond',        color:'#ff1f3d',c2:'#1a0006',anim:'beat',price:15000,rarity:'mythic',minLevel:13},
     {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1},
+    {id:'polar',   name:'Polarnacht',      color:'#9fe9ff',c2:'#6a4dff',anim:'shift',price:0,rarity:'season',season:2},
     {id:'urlicht',     name:'Urlicht',          color:'#fff1c4',c2:'#9a5a12',anim:'dawn', price:60000,rarity:'cosmic',minLevel:200},
     {id:'milchstrasse',name:'Milchstraße',      color:'#8a6bff',c2:'#090225',anim:'milky',price:55000,rarity:'cosmic',minLevel:200},
     {id:'abyss',       name:'Abgrund',   color:'#7a2cff',c2:'#000000',anim:'abyss',price:0,rarity:'void',src:'void'}
@@ -1709,6 +1710,7 @@ const SHOP={
     {id:'rainbow', name:'Regenbogen',    price:8750, rarity:'mythic',   minLevel:8},
     {id:'dragon',  name:'Drachenschweif',price:12500, rarity:'mythic',   minLevel:12},
     {id:'pioneer', name:'Pionierspur',   price:0,    rarity:'season',   season:1},
+    {id:'frost',   name:'Frostspur',     price:0,    rarity:'season',   season:2},
     {id:'goldfaden',  name:'Goldfaden',        price:45000, rarity:'cosmic',   minLevel:200},
     {id:'spektral',   name:'Spektralschleier', price:40000, rarity:'cosmic',   minLevel:200},
     {id:'nichts',     name:'Spur des Nichts',  price:0,     rarity:'void',     src:'void'},
@@ -1907,6 +1909,13 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'thin': line(()=>0,1,c); break;
       case 'pioneer': line(i=>4.5*Math.sin(i*.32-t*7),2,'#3dffd0'); line(i=>-4.5*Math.sin(i*.32-t*7),2,'#ff4f8b'); line(()=>0,1,'#ffffff');
         for(let i=n-1;i>0;i-=7){ const a=.4+.6*Math.abs(Math.sin(t*4+i)); ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect(seg[i][0]-1,seg[i][1]-1,2,2) } break;
+      case 'frost': { line(()=>0,2.6,'#bfefff'); line(i=>2.2*Math.sin(i*.6-t*6),1,'rgba(255,255,255,.8)');
+        ctx.strokeStyle='#e8fbff'; ctx.lineWidth=1.1; ctx.shadowColor='#7fdcff';
+        for(let i=n-1, k=0;i>0;i-=9, k++){ const p=seg[i], q=nrm(i), drift=((t*14+k*7)%22), sz=3.2+1.6*Math.abs(Math.sin(k*1.7));
+          const x=p[0]+q[0]*(k%2?drift:-drift)*.5, y=p[1]+q[1]*(k%2?drift:-drift)*.5+drift*.25, rot=t*1.5+k;
+          ctx.globalAlpha=alpha*Math.max(0,1-drift/22);
+          for(let a=0;a<3;a++){ const an=rot+a*Math.PI/3, dx=Math.cos(an)*sz, dy=Math.sin(an)*sz; ctx.beginPath(); ctx.moveTo(x-dx,y-dy); ctx.lineTo(x+dx,y+dy); ctx.stroke() } }
+        ctx.globalAlpha=alpha; break }
       case 'wave': line(i=>5*Math.sin(i*.35-t*10),1.8,c); break;
       case 'chain': line(()=>0,.8,rgba(c,.5)); ctx.strokeStyle=c; ctx.lineWidth=1.4; for(let i=0;i<n;i+=5){ ctx.beginPath();ctx.arc(seg[i][0],seg[i][1],3,0,7);ctx.stroke() } break;
       case 'ghost': for(const [o,a] of [[7,.22],[-7,.22],[3.5,.42],[-3.5,.42]]) line(i=>o*Math.sin(i*.12+t*3),1.2,rgba(c,a)); line(()=>0,2,'#ffffff'); break;
@@ -2458,6 +2467,7 @@ SHOP.title=[
   {id:'legend',   name:'Legende der Galaxis',     price:10000, rarity:'mythic',   minLevel:10},
   {id:'redcomet', name:'Der Rote Komet',          price:15000, rarity:'mythic',   minLevel:13},
   {id:'pioneer',  name:'Pionier · Saison 1',      price:0,    rarity:'season',   season:1},
+  {id:'winter',   name:'Frostherz · Saison 2',    price:0,    rarity:'season',   season:2},
   {id:'schoepfer',  name:'Weltenschöpfer',   price:25000, rarity:'cosmic',   minLevel:200},
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
   {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'}
@@ -3080,7 +3090,8 @@ const EMOTE_LIST=[
   {id:'wormhole',name:'Wurmloch-Kuckuck',price:11500,rarity:'mythic',minLevel:13},
   {id:'maestro',name:'Sphären-Dirigent',price:38000,rarity:'cosmic',minLevel:200},
   {id:'bigbang',name:'Urknall',      price:45000,rarity:'cosmic',minLevel:200},
-  {id:'darkmatter',name:'Dunkle Materie',price:0,    rarity:'void',src:'void'}
+  {id:'darkmatter',name:'Dunkle Materie',price:0,    rarity:'void',src:'void'},
+  {id:'snowball',name:'Schneeballschlacht',price:0,  rarity:'season',season:2}
 ];
 SHOP.emote=EMOTE_LIST;
 const EMOTE_BY=Object.fromEntries(EMOTE_LIST.map(e=>[e.id,e]));
@@ -3844,6 +3855,27 @@ function drawEmoteArt(g,id,t,c){
       g.fillStyle='rgba(162,77,255,.5)'; g.fillRect(-36,((seed*11)%40)-16,72,2);
       eText(g,seed%3?'HEHE':'ERR0R',((seed*5)%9)-4,-34,10,seed%2?'#a24dff':'#ff2a6a');
     }
+    break; }
+  case 'snowball': {
+    // snow falls, Gravi in a bobble hat and scarf winds up and throws a snowball
+    for(let i=0;i<14;i++){ const p=(t*.35+i*.173)%1; g.globalAlpha=.85; g.fillStyle='#fff'; eCircle(g,-46+((i*41)%92)+Math.sin(p*7+i)*4,-50+p*100,1.1+(i%3)*.5); g.fill() }
+    g.globalAlpha=1;
+    const p=t%2.2, wind=Math.min(1,p/.7), thrown=p>.7, k=Math.min(1,(p-.7)/.8);
+    eArm(g,c,-20,20,-28,27);
+    eBody(g,c); eBlush(g,.6);
+    eEyes(g,thrown?'happy':sd=>sd<0?'open':'happy',{lx:.5,ly:-.3}); eMouth(g,thrown?'grin':'smirk',{w:7,d:10});
+    g.fillStyle='#ff4f6b'; g.strokeStyle=DARK; g.lineWidth=1.2;
+    g.beginPath(); g.ellipse(0,26,20,5,0,0,7); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(10,27); g.lineTo(16,42+Math.sin(t*6)*2); g.lineTo(9,41+Math.sin(t*6)*2); g.lineTo(5,28); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle='#fff'; for(const x of [-12,-4,4,12]) g.fillRect(x,24,2.5,4);
+    g.fillStyle='#3d7bff'; g.beginPath(); g.moveTo(-22,-12); g.quadraticCurveTo(-18,-36,2,-36); g.quadraticCurveTo(20,-34,22,-12); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle='#fff'; g.beginPath(); g.roundRect?g.roundRect(-24,-15,48,8,4):g.rect(-24,-15,48,8); g.fill(); g.stroke();
+    eCircle(g,4,-38,6); g.fill(); g.stroke();
+    const ax=thrown?34:22-wind*4, ay=thrown?-4:4-wind*22;
+    eArm(g,c,20,10,ax,ay);
+    if(!thrown){ eCircle(g,ax+1,ay-6,5.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
+    else if(k<1){ const bx=34+k*40, by=-10-Math.sin(k*Math.PI)*26; eCircle(g,bx,by,5-k*1.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
+    else { g.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<6;i++){ const a=i*1.05; eCircle(g,44+Math.cos(a)*6,-8+Math.sin(a)*6,1.6); g.fill() } }
     break; }
   default:
     eBody(g,c); eEyes(g,'open'); eMouth(g,'smile');
@@ -5457,7 +5489,7 @@ function renderSeason(){
   if(!seasonData.active){ box.innerHTML='<p class="fine">Gerade läuft keine Saison. Die nächste startet bald.</p>'; return }
   const lvl=seasonLevel(), max=seasonData.tiers.length, into=seasonData.sp-lvl*seasonData.tierSp, days=Math.max(0,Math.ceil((new Date(seasonData.ends)-new Date())/86400000));
   const head=document.createElement('div'); head.className='shead';
-  head.innerHTML=`<h2>Saison ${seasonData.id}: ${esc(seasonData.name)}</h2><p class="fine">Noch ${days} ${days===1?'Tag':'Tage'} · Jedes XP zählt als Saisonpunkt · exklusive Items auf Stufe 10, 20 und 30</p>
+  head.innerHTML=`<h2>Saison ${seasonData.id}: ${esc(seasonData.name)}</h2><p class="fine">Noch ${days} ${days===1?'Tag':'Tage'} · Jedes XP zählt als Saisonpunkt · exklusive Items auf Stufe ${seasonData.tiers.filter(x=>x.kind==='item').map(x=>x.tier).join(', ').replace(/, (\d+)$/,' und $1')}</p>
     <div class="slvl"><span>Stufe ${lvl} von ${max}</span><span>${lvl<max?`${into} / ${seasonData.tierSp} Punkte`:'Alles geschafft!'}</span></div>
     <div class="bar" aria-hidden="true"><i style="width:${lvl<max?Math.round(100*into/seasonData.tierSp):100}%"></i></div>`;
   box.appendChild(head);
