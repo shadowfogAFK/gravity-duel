@@ -13,9 +13,11 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Figtree:wght@400;600&display=swap">
 <style>
+/* fonts are served from gravityduel.com itself (no Google Fonts request) */
+@font-face{font-family:"Chakra Petch";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/chakra-500.woff) format("woff")}
+@font-face{font-family:"Chakra Petch";font-weight:700 900;font-style:normal;font-display:swap;src:url(fonts/chakra-700.woff) format("woff")}
+@font-face{font-family:"Figtree";font-weight:300 900;font-style:normal;font-display:swap;src:url(fonts/figtree.woff) format("woff")}
 /* Layout: one full-screen canvas; a swipeable home with three pages; overlays for menus. Single dark neon look by design. */
 :root{
   --space:#0d0626; --ink:#f3eeff; --muted:#a99cd6; --p1:#ff4f8b; --p2:#2ee6ff; --gold:#ffd34f; --panel:rgba(22,10,52,.94); --line:rgba(167,123,255,.35);
@@ -273,6 +275,9 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .setuplogo{position:relative;width:74px;height:74px;margin:2px auto 8px}.setuplogo i{position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb3cf,#ff4f8b 55%,#7a1640);box-shadow:0 0 24px rgba(255,79,139,.5)}
 .setuplogo b{position:absolute;inset:0;border-radius:50%;border:2px dashed rgba(46,230,255,.6);animation:spin 9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.legal{font-size:.72rem;color:var(--muted);text-align:center;margin:10px 0 2px}.legal a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
+.dangerbtn{background:linear-gradient(90deg,#ff3b5c,#c4163a);color:#fff}.dangerbtn[disabled]{opacity:.45}
 .linkbtn{display:block;margin:6px 0 0 auto;padding:4px 2px;background:none;border:0;box-shadow:none;color:var(--p2);font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
 .invtabs{display:flex;gap:6px;overflow-x:auto;margin:12px -4px 10px;padding:2px 4px 4px;scrollbar-width:none}
 .invtabs::-webkit-scrollbar{display:none}
@@ -679,7 +684,20 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         <div class="btns"><button id="setupConfirmed">Ich habe bestätigt</button><button class="alt" id="setupResend">E-Mail erneut senden</button><button class="ghost" data-goto="create">Andere E-Mail</button></div>
       </section>
       <p class="fine" id="setupHint" aria-live="polite"></p>
+      <p class="legal">Mit deinem Konto gilt unsere <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a>. <a href="impressum.html" target="_blank" rel="noopener">Impressum</a></p>
     </div>
+  </div>
+
+  <div class="overlay" id="delAcct" hidden>
+    <form class="card" id="delForm">
+      <span class="label">Konto</span>
+      <h2>Konto löschen?</h2>
+      <p>Dein Konto wird <b>endgültig</b> gelöscht: Spielstand, Sternenstaub, Items, Gravitonen, Freunde und Duell-Verlauf. Das lässt sich nicht rückgängig machen.</p>
+      <p class="fine">Tippe zur Bestätigung <b>LÖSCHEN</b> ein.</p>
+      <input id="delInput" class="text" autocomplete="off" spellcheck="false" aria-label="LÖSCHEN eintippen">
+      <p class="fine" id="delHint" aria-live="polite"></p>
+      <div class="btns"><button type="submit" class="dangerbtn" id="delGo" disabled>Endgültig löschen</button><button type="button" class="ghost" id="delBack">Abbrechen</button></div>
+    </form>
   </div>
 
   <div class="overlay" id="nameEdit" hidden>
@@ -701,6 +719,8 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <div class="setting"><div><b>Soundeffekte</b><span>Schüsse, Treffer, Hinweise</span></div><button class="switch" id="setSound" role="switch" aria-checked="true" aria-label="Soundeffekte"><i></i></button></div>
       <div class="setting"><div><b>Spielername</b><span id="setNameNow">Pilot</span></div><button class="ghost" id="setName">Ändern</button></div>
       <div class="setting" id="acctRow" hidden><div><b>Konto</b><span id="acctNow">Nur auf diesem Gerät</span></div><button class="ghost" id="acctBtn">Anmelden</button></div>
+      <div class="setting" id="delRow" hidden><div><b>Konto löschen</b><span>Spielstand, Items und Daten endgültig entfernen</span></div><button class="ghost danger" id="delOpen">Löschen</button></div>
+      <p class="legal"><a href="impressum.html" target="_blank" rel="noopener">Impressum</a> · <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutz</a></p>
       <button class="ghost" id="settingsBack">Zurück</button>
     </div>
   </div>
@@ -5257,6 +5277,7 @@ function renderAccountRow(){
   const u=Net.user, btn=$('acctBtn'); btn.dataset.sure='';
   $('acctNow').textContent=isAccount()?`Angemeldet: ${u.email||'Google-Konto'}`:'Nur auf diesem Gerät gespeichert';
   btn.textContent=isAccount()?'Abmelden':'Anmelden';
+  $('delRow').hidden=!isAccount();
 }
 function setAcctMode(m){
   acctMode=m;
@@ -5721,7 +5742,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['setup','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
+const screens=['setup','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
 let current='home';
 function show(name){
   current=name;
@@ -6866,6 +6887,19 @@ tap('acct-new',()=>setAcctMode('new'));
 tap('acct-login',()=>setAcctMode('login'));
 tap('acctGoogle',accountGoogle);
 tap('acctForgot',accountForgot);
+/* deleting the account: everything on the server goes (gd_delete_account), then this device forgets the game too */
+tap('delOpen',()=>{ $('delInput').value=''; $('delGo').disabled=true; $('delHint').textContent=''; show('delAcct'); setTimeout(()=>$('delInput').focus(),50) });
+tap('delBack',()=>show('settings'));
+$('delInput').addEventListener('input',()=>{ $('delGo').disabled=$('delInput').value.trim().toUpperCase()!=='LÖSCHEN' });
+$('delForm').addEventListener('submit',async e=>{ e.preventDefault(); if($('delGo').disabled) return;
+  $('delGo').disabled=true; $('delHint').textContent='Wird gelöscht …';
+  try{
+    await rpc('gd_delete_account',{p_confirm:'LÖSCHEN'});
+    try{ await Net.backend.sb.auth.signOut({scope:'local'}) }catch(_){}
+    try{ for(const k of Object.keys(localStorage)) if(k.startsWith('gravityDuel.')) localStorage.removeItem(k) }catch(_){}
+    $('delHint').textContent='Dein Konto wurde gelöscht.'; setTimeout(()=>location.replace(location.pathname),1200);
+  }catch(err){ $('delGo').disabled=false; $('delHint').textContent=/function|does not exist|schema cache/i.test(String(err&&err.message))?'Löschen ist gerade nicht möglich. Bitte schreib uns (siehe Impressum).':niceErr(err) }
+});
 tap('setupNew',()=>openSetup('create')); tap('setupHave',()=>openSetup('login')); tap('setupGoogle',setupGoogle); tap('setupGoogle2',setupGoogle);
 tap('setupConfirmed',setupCheck); tap('setupResend',setupResend); tap('setupRetry',()=>{ openSetup('wait'); netInit() });
 tap('setupForgot',()=>{ $('acctEmail').value=$('setupLEmail').value; accountForgot().then(()=>$('setupHint').textContent=$('acctHint').textContent) });
