@@ -304,6 +304,22 @@ button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .invtabs .tab{flex:none;padding:7px 12px;border-radius:99px;font-size:.8rem;white-space:nowrap}
 .invtabs .tab small{margin-left:5px;font-size:.68rem;opacity:.7}
 .invtabs .tab[aria-selected="true"] small{opacity:1}
+.albbar{height:10px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden;margin:8px 0 10px}.albbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c46bff,#ffd34f);border-radius:6px;transition:width .5s}
+.albsteps{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.albsteps button{flex:0 0 auto;min-width:74px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 6px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);box-shadow:none;color:var(--muted);font:inherit;font-size:.68rem;cursor:default}
+.albsteps button b{font-family:var(--display);font-size:.9rem;color:var(--ink)}.albsteps button span{white-space:nowrap}
+.albsteps button.ready{border-color:var(--gold);background:rgba(255,211,79,.12);box-shadow:0 0 14px rgba(255,211,79,.3);color:var(--gold);cursor:pointer;animation:albpulse 1.6s ease-in-out infinite}
+.albsteps button.done{opacity:.5}.albsteps button.done b::after{content:' ✓';color:#3dffa8}
+@keyframes albpulse{50%{box-shadow:0 0 22px rgba(255,211,79,.55)}}
+.albgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.albgrid.wide{grid-template-columns:repeat(2,1fr)}
+.ai{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:6px 4px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22)}
+.ai canvas{width:100%;max-width:96px;aspect-ratio:1}.albgrid.wide .ai canvas{max-width:none;aspect-ratio:24/11}
+.ai .iname{font-size:.72rem;text-align:center;overflow-wrap:anywhere;color:var(--ink)}.ai small{font-size:.6rem;color:var(--muted);text-align:center;line-height:1.2}
+.ai .rar{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%}
+.ai.miss canvas{filter:grayscale(1) brightness(.3) contrast(1.2)}.ai.miss .iname{color:var(--muted)}
+.ai.miss::after{content:'?';position:absolute;top:28%;left:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:1.6rem;color:rgba(255,255,255,.35)}
+.albgrid.wide .ai.miss::after{display:none}
+.invhead{display:flex;gap:6px}.invhead .ghost{position:relative}
 .invgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .ii{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;padding:6px 4px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);box-shadow:none;color:var(--ink);font:inherit;cursor:pointer}
 .ii:active{transform:scale(.97)}
@@ -552,7 +568,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <nav class="tiles" aria-label="Menü">
         <button class="tile" id="toQuests" aria-label="Aufgaben"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg><span>Aufgaben</span><b class="badge dot" id="questBadge" hidden></b></button>
         <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span></button>
-        <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span></button>
+        <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span><b class="badge dot" id="invBadge" hidden></b></button>
         <button class="tile shop" id="toShop" aria-label="Shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Shop</span></button>
       </nav>
     </div>
@@ -977,13 +993,25 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">
         <div><span class="label" id="invCount">Dein Look</span><h2>Inventar</h2></div>
-        <button class="ghost mini" id="invToShop">Zum Shop</button>
+        <div class="invhead"><button class="ghost mini" id="invToAlbum">Album<i class="medot" id="albumDot" hidden></i></button><button class="ghost mini" id="invToShop">Zum Shop</button></div>
       </div>
       <canvas id="invHero" class="invhero" width="480" height="230" aria-hidden="true"></canvas>
       <div class="invtabs" role="tablist" id="invTabs"></div>
       <p class="invnote" id="invNote" hidden></p>
       <div class="invgrid" id="invItems"></div>
       <button class="ghost" id="invBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="album" hidden>
+    <div class="card">
+      <span class="label" id="albCount">Sammelalbum</span><h2>Sammelalbum</h2>
+      <div class="albbar" aria-hidden="true"><i id="albFill"></i></div>
+      <p class="invnote" style="margin:0 0 4px">Jedes Item zählt. Bei jedem Meilenstein gibt es eine Belohnung.</p>
+      <div class="albsteps" id="albSteps"></div>
+      <div class="invtabs" role="tablist" id="albTabs"></div>
+      <div class="albgrid" id="albItems"></div>
+      <button class="ghost" id="albBack">Zurück zum Inventar</button>
     </div>
   </div>
 
@@ -2520,7 +2548,10 @@ SHOP.title=[
   {id:'winter',   name:'Frostherz · Saison 2',    price:0,    rarity:'season',   season:2},
   {id:'schoepfer',  name:'Weltenschöpfer',   price:25000, rarity:'cosmic',   minLevel:200},
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
-  {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'}
+  {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'},
+  {id:'sammler',    name:'Sammler',          price:0,     rarity:'epic',     src:'album'},
+  {id:'kurator',    name:'Kurator',          price:0,     rarity:'legendary',src:'album'},
+  {id:'archivar',   name:'Archivar des Alls',price:0,     rarity:'mythic',   src:'album'}
 ];
 const SHOP_TABS=[['color','Farbe'],['aura','Aura'],['trail','Spur'],['shot','Geschoss'],['pattern','Muster'],['impact','Treffer'],['title','Titel'],['emote','Emotes'],['crate','Kisten']];
 const COSMETIC_CATS=['color','aura','trail','shot','pattern','impact','title','emote'];
@@ -5055,7 +5086,7 @@ async function netInit(){
     if(current==='setup') goHome();
     try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
     await netSyncProfile();
-    Net.state='ready'; schedulePing(1500); econPump(); refreshDailyDot(); loadEvent(); setTimeout(checkLogin,1200);
+    Net.state='ready'; schedulePing(1500); econPump(); refreshDailyDot(); loadEvent(); loadAlbum(); setTimeout(checkLogin,1200);
     afterReady();
   }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e); if(NEED_ACCOUNT&&current==='setup') openSetup('wait',`Keine Verbindung: ${Net.err}`) }
   renderOnline();
@@ -5855,7 +5886,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','arenas','void'];
+const screens=['setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   current=name;
@@ -5896,7 +5927,7 @@ function renderMe(){
     <span class="xpline" aria-hidden="true"><i style="width:${Math.round(100*li.into/li.need)}%"></i></span>`;
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function renderHome(){
+function renderHome(){ refreshAlbumDot();
   renderMe(); updateQuestBadge();
   const gi=activeGalaxy(), g=GALAXIES[gi], th=THEMES[g.id];
   const done=galDone(g), nxt=nextLevelIn(g);
@@ -6226,6 +6257,72 @@ function toggleEmoteSlot(id,b){
   else { if(l.length>=6) return toast('Schon 6 ausgewählt: Tippe zuerst eins davon an, um Platz zu machen'); l.push(id) }
   if(SERVER_ECON){ b.disabled=true; rpc('gd_set_emotes',{p_ids:l}).then(st=>{ applyEcon(st); Sfx.select(); netSyncProfile().catch(()=>{}) }).catch(e=>econFail(e,b)); return }
   profile.equip.emotes=l; saveProfile(); Sfx.select(); renderInv();
+}
+/* ---------- collection album: every item in the game, milestones by how many you own ---------- */
+const ALBUM_STEPS=[{need:20,dust:300},{need:40,dust:600,crate:'star'},{need:60,dust:800,item:'title:sammler'},{need:90,dust:1500,crate:'nebula'},{need:120,dust:2500,item:'title:kurator'},{need:160,dust:5000,crate:'nova'},{need:200,dust:8000,item:'title:archivar'}];
+var albTab='color', albPreviews=[], albumData=null;
+function albumAll(){ const out=[]; for(const c of COSMETIC_CATS) for(const it of SHOP[c]) out.push([c,it]); return out }
+function albumHave(){ return albumAll().filter(([c,it])=>profile.owned[c+':'+it.id]).length }
+function albumClaimed(){ return albumData&&Array.isArray(albumData.claimed)?albumData.claimed:[] }
+function albumReady(){ const h=albumHave(), cl=albumClaimed(); return ALBUM_STEPS.some((s,i)=>h>=s.need&&!cl.includes(i)) }
+function refreshAlbumDot(){ const on=!!albumData&&albumReady(); const d=$('albumDot'); if(d) d.hidden=!on; const b=$('invBadge'); if(b) b.hidden=!on }
+async function loadAlbum(){ if(!SERVER_ECON||!econReady()) return; try{ albumData=await rpc('gd_album'); refreshAlbumDot(); if(current==='album') renderAlbum() }catch(e){} }
+function itemSource(cat,it){
+  if(it.src==='void'||it.rarity==='void') return 'Void-Spiele';
+  if(it.season) return `Saisonpass ${it.season}`;
+  if(it.src==='campaign'){ const g=GALAXIES.find(x=>x.id===it.gal); return `Kampagne · ${g?g.name:it.gal} · ${DIFFS[it.diff||1].name}` }
+  if(it.src==='album') return 'Sammelalbum';
+  if(!it.price) return 'Startausrüstung';
+  return `Shop · Kisten${it.minLevel?` · ab Stufe ${it.minLevel}`:''}`;
+}
+function albumStepLabel(s){
+  if(s.item){ const [c,id]=s.item.split(':'), it=shopItem(c,id); return it?`„${it.name}“`:'Titel' }
+  if(s.crate){ const c=CRATES.find(x=>x.id===s.crate); return c?c.name:'Kiste' }
+  return `✦ ${s.dust}`;
+}
+function openAlbum(){ renderAlbum(); show('album'); loadAlbum() }
+function renderAlbum(){
+  const all=albumAll(), have=albumHave(), cl=albumClaimed();
+  $('albCount').textContent=`${have} von ${all.length} gesammelt`;
+  $('albFill').style.width=(100*have/Math.max(1,all.length)).toFixed(1)+'%';
+  const st=$('albSteps'); st.innerHTML='';
+  ALBUM_STEPS.forEach((s,i)=>{ const done=cl.includes(i), ready=!done&&have>=s.need&&!!albumData;
+    const b=document.createElement('button'); b.type='button'; b.className=done?'done':ready?'ready':'';
+    b.innerHTML=`<b>${s.need}</b><span>${albumStepLabel(s)}</span>${s.item||s.crate?`<span>+ ✦ ${s.dust}</span>`:''}`;
+    b.setAttribute('aria-label',`${s.need} Items: ${albumStepLabel(s)}${done?', abgeholt':ready?', abholen':''}`);
+    if(ready) b.onclick=()=>claimAlbum(i,b); else b.disabled=!done&&!ready;
+    st.appendChild(b) });
+  const tabs=$('albTabs'); tabs.innerHTML='';
+  for(const [t,label] of SHOP_TABS){ if(!COSMETIC_CATS.includes(t)) continue;
+    const n=SHOP[t].filter(it=>profile.owned[t+':'+it.id]).length, m=SHOP[t].length;
+    const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(t===albTab));
+    b.innerHTML=`${label}<small>${n===m?'✓':n+'/'+m}</small>`; b.onclick=()=>{ albTab=t; Sfx.select(); renderAlbum() }; tabs.appendChild(b) }
+  const box=$('albItems'); box.innerHTML=''; albPreviews=[]; box.classList.toggle('wide',albTab==='title');
+  const order=Object.keys(RARITY);
+  const list=[...SHOP[albTab]].sort((a,b)=>(!profile.owned[albTab+':'+a.id])-(!profile.owned[albTab+':'+b.id])||order.indexOf(a.rarity)-order.indexOf(b.rarity));
+  for(const it of list){
+    const own=!!profile.owned[albTab+':'+it.id], rar=RARITY[it.rarity]||RARITY.common, skin=mySkin();
+    if(albTab==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else if(albTab!=='emote') skin[albTab]=it.id;
+    const d=document.createElement('div'); d.className='ai'+(own?'':' miss');
+    d.setAttribute('aria-label',`${it.name}, ${rar.name}, ${own?'gesammelt':'fehlt · '+itemSource(albTab,it)}`);
+    d.innerHTML=`<canvas width="${albTab==='title'?240:192}" height="${albTab==='title'?110:192}" aria-hidden="true"></canvas><span class="iname">${esc(it.name)}</span><small>${own?rar.name:esc(itemSource(albTab,it))}</small><i class="rar" style="background:${rar.color}"></i>`;
+    box.appendChild(d);
+    albPreviews.push({cv:d.querySelector('canvas'),skin,cat:albTab,item:it,parts:[],fx:[],next:0,still:!own,drawn:false});
+  }
+}
+async function claimAlbum(i,b){
+  if(!SERVER_ECON) return toast('Das Album braucht ein Konto');
+  b.disabled=true;
+  try{ const r=await rpc('gd_album_claim',{p_step:i}); applyEcon(r.state); albumData=r.album; refreshAlbumDot(); renderAlbum(); Sfx.buy();
+    const rw=r.reward||{}; let msg=`Meilenstein ${ALBUM_STEPS[i].need}: +${rw.amount|0} ✦`;
+    if(rw.item){ const [c,id]=rw.item.split(':'), it=shopItem(c,id); if(it) msg+=` · Neuer Titel „${it.name}“` }
+    toast(msg);
+    if(rw.crateRoll){ crateFrom='album'; openCrate(CRATES.find(c=>c.id===rw.crateRoll.crate),true,crateReward(rw.crateRoll)) } }
+  catch(e){ toast(econErr(e)); b.disabled=false }
+}
+function albTick(t){
+  if(current!=='album') return;
+  for(const p of albPreviews){ if(p.still&&p.drawn) continue; drawItemIcon(p.cv,p.skin,p.still?1.3:t,p); p.drawn=true }
 }
 function invTick(t){
   if(current!=='inventory') return;
@@ -7086,10 +7183,12 @@ tap('coverGo',coverReady);
 tap('toShop',goShop);
 tap('toInv',()=>openInventory());
 tap('invBack',()=>{ if(invFrom==='shop'){ renderShop(); show('shop') } else if(invFrom==='profile') openProfile(); else goHome() });
+tap('invToAlbum',()=>openAlbum());
+tap('albBack',()=>openInventory());
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
-tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else { renderShop(); show('shop') } });
+tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
 tap('qtab-tasks',()=>setQTab('tasks'));
 tap('qtab-season',()=>setQTab('season'));
 tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
@@ -7178,7 +7277,7 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); pickerTick(t); seasonTick(t); crateTick(t);
+  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT) openSetup('wait'); requestAnimationFrame(loop); netInit();
