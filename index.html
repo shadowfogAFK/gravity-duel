@@ -57,8 +57,8 @@ button:active{transform:translateY(1px)}
 #homeMusic{font-size:1.2rem}
 .topbar .iconbtn.round[aria-pressed="true"]{opacity:.45;text-decoration:line-through}
 #back{left:calc(10px + env(safe-area-inset-left,0px))}
-#emoteBtn{left:calc(10px + env(safe-area-inset-left,0px));top:calc(50px + env(safe-area-inset-top,0px));font-size:1.05rem;padding-left:12px;padding-right:12px}
-#emotes{position:absolute;z-index:3;left:calc(10px + env(safe-area-inset-left,0px));top:calc(92px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:repeat(3,64px);gap:6px;padding:8px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#emoteBtn{left:calc(12px + env(safe-area-inset-left,0px));top:auto;bottom:calc(66px + env(safe-area-inset-bottom,0px));font-size:1.45rem;width:54px;height:54px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+#emotes{position:absolute;z-index:3;left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(128px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,64px);gap:6px;padding:8px;border-radius:14px;background:var(--panel);border:1px solid var(--line);box-shadow:0 8px 30px rgba(0,0,0,.4)}
 #emotes button{font-size:.8rem;padding:8px 10px;text-align:left;white-space:nowrap;background:rgba(255,255,255,.05);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
 #emotes button.mute{grid-column:1/-1;color:var(--muted);text-align:center;font-size:.72rem;white-space:normal}
 #emotes button.emo{padding:2px;width:64px;height:64px;border-radius:14px}#emotes button.emo canvas{width:100%;height:100%;display:block}#emotes button.emo.myth{border-color:rgba(255,59,59,.6)}
@@ -2619,9 +2619,9 @@ if(!progress||typeof progress!=='object'||Array.isArray(progress)){
 }
 /* campaign difficulty: 1 as always, 2 a few shots more than the best solution, 3 exactly the best solution.
    Each one has its own progress (key "nova", "nova@2", "nova@3") and its own reward for every galaxy. */
-const DIFFS=[null,{name:'Stufe 1',short:'Entspannt',info:'Unbegrenzt viele Schüsse.'},
-  {name:'Stufe 2',short:'Knapp',info:'Begrenzte Schüsse: 4 mehr als die beste Lösung.'},
-  {name:'Stufe 3',short:'Perfekt',info:'Nur so viele Schüsse wie die beste Lösung braucht.'}];
+const DIFFS=[null,{name:'Kadett',short:'Freies Feuer',info:'Unbegrenzt viele Schüsse.'},
+  {name:'Kommandant',short:'Begrenzt',info:'Begrenzte Schüsse: 4 mehr als die beste Lösung.'},
+  {name:'Legende',short:'Kein Fehlschuss',info:'Nur so viele Schüsse wie die beste Lösung braucht.'}];
 let campDiff=Math.min(3,Math.max(1,load('gravityDuel.campDiff.v1',1)|0));
 const pkey=(g,d=campDiff)=>d===1?g.id:g.id+'@'+d;
 const shotLimit=L=>campDiff===2?L.par+4:campDiff===3?L.par:0;
@@ -5890,7 +5890,7 @@ function galaxyRewardWon(r){
   if(current==='clear') $('clearLevelUp').hidden=false, $('clearLevelUp').textContent=`Belohnung freigeschaltet: ${it.name} · ${RARITY[it.rarity].name}`;
 }
 function goGalaxies(){
-  phase='menu'; bodies=[]; players=[]; renderDiffSegs(); $('diffInfo').textContent=`${DIFFS[campDiff].name} · ${DIFFS[campDiff].info} Jede Stufe hat ihren eigenen Fortschritt und eigene Belohnungen.`;
+  phase='menu'; bodies=[]; players=[]; renderDiffSegs(); $('diffInfo').textContent=`${DIFFS[campDiff].name} · ${DIFFS[campDiff].info} Jeder Rang hat eigenen Fortschritt und eigene Belohnungen.`;
   const list=$('galaxyList'); list.innerHTML=''; galCards=[];
   GALAXIES.forEach((g,i)=>{
     const th=THEMES[g.id], open=galUnlocked(i);
