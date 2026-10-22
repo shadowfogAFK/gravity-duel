@@ -98,7 +98,7 @@ button:active{transform:translateY(1px)}
 .pager::-webkit-scrollbar{display:none}
 .page{flex:0 0 100%;scroll-snap-align:center;overflow-y:auto;display:flex;flex-direction:column;gap:14px;
   padding-block:6px 14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.page>*{width:100%;max-width:440px;margin-inline:auto}
+.page>*{width:100%;max-width:440px;margin-inline:auto;flex-shrink:0}
 .hero{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(167,123,255,.4);box-shadow:0 10px 40px rgba(0,0,0,.35)}
 .hero canvas{width:100%;height:auto;aspect-ratio:4/3.1}
 .hero .cap{position:absolute;left:0;right:0;bottom:0;padding:14px 16px;display:flex;flex-direction:column;gap:2px;
@@ -783,6 +783,19 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 #specBar i{font-style:normal;font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #specBar button{padding:8px 14px;border-radius:99px;font-size:.82rem;box-shadow:none;flex:none}
 #specCount{right:calc(10px + env(safe-area-inset-right,0px));top:calc(90px + env(safe-area-inset-top,0px));color:var(--gold);border-color:rgba(255,211,79,.45);pointer-events:none}
+/* "install as app" banner on the home screen */
+.installbar{display:flex;align-items:center;gap:10px;margin:0 12px 6px;padding:8px 8px 8px 10px;border-radius:16px;
+  background:linear-gradient(90deg,rgba(255,79,139,.18),rgba(46,230,255,.14));border:1px solid rgba(167,123,255,.5);box-shadow:0 6px 24px rgba(0,0,0,.35);animation:ibIn .35s ease-out}
+.installbar img{width:42px;height:42px;border-radius:11px;flex:none;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.installbar div{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.installbar b{font-family:var(--display);font-size:.9rem;line-height:1.15}.installbar span{font-size:.72rem;color:var(--muted);line-height:1.25}
+.installbar button.mini{flex:none;padding:8px 12px}
+.installbar .ibx{flex:none;width:30px;height:30px;padding:0;border-radius:50%;background:none;border:0;box-shadow:none;color:var(--muted);font-size:1rem}
+@keyframes ibIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.iossteps{display:flex;flex-direction:column;gap:10px;margin:12px 0 16px;padding:0;list-style:none;counter-reset:st}
+.iossteps li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);font-size:.9rem}
+.iossteps li::before{counter-increment:st;content:counter(st);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--p2);color:#03201c;font-family:var(--display);font-weight:700}
+.iossteps svg{flex:none;width:26px;height:26px;stroke:var(--p2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -858,6 +871,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
         <button class="ghost" id="duelRules">Regeln</button>
       </section>
     </div>
+    <div class="installbar" id="installBar" hidden><img src="icon-192.png" alt=""><div><b>Gravity Duel als App</b><span id="ibText">Startet schneller, geht offline und erinnert dich ans Tageslevel</span></div><button class="mini" id="ibGo">Installieren</button><button class="ibx" id="ibClose" aria-label="Hinweis schließen">✕</button></div>
     <nav class="navbar" role="tablist" aria-label="Spielmodus">
       <button role="tab" id="nav-0"><i></i>Kampagne</button>
       <button role="tab" id="nav-1"><i></i>Wettkampf</button>
@@ -953,6 +967,19 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       </div>
       <p class="fine">Nach mehreren Meldungen wird ein Level ausgeblendet und geprüft.</p>
       <button class="ghost" id="ugrBack">Abbrechen</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="iosInstall" hidden>
+    <div class="card">
+      <span class="label">Als App installieren</span><h2>Auf den Home-Bildschirm</h2>
+      <p class="invnote" style="margin:0">So hast du Gravity Duel wie eine App auf deinem iPhone, mit eigenem Symbol, schnellem Start und Benachrichtigungen.</p>
+      <ol class="iossteps">
+        <li><svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg><span>Tippe in Safari unten auf <b>Teilen</b></span></li>
+        <li><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg><span>Wähle <b>Zum Home-Bildschirm</b> (eventuell etwas nach unten scrollen)</span></li>
+        <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><span>Tippe oben rechts auf <b>Hinzufügen</b> und starte das Spiel ab jetzt über das Symbol</span></li>
+      </ol>
+      <button class="ghost" id="iosInstallBack">Verstanden</button>
     </div>
   </div>
 
@@ -7550,7 +7577,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -8852,11 +8879,12 @@ const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platfo
 window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; renderInstall() });
 window.addEventListener('appinstalled',()=>{ installEvt=null; renderInstall(); toast('Gravity Duel ist jetzt als App installiert') });
 function renderInstall(){
+  renderInstallBar();
   const row=$('installRow'); if(!row) return;
   const ios=isIOS()&&!isStandalone();
   row.hidden=isStandalone()||!(installEvt||ios);
   $('installText').textContent=ios?'Tippe auf „Teilen“ und dann „Zum Home-Bildschirm“':'Startet schneller und geht auch offline';
-  $('installBtn').hidden=!installEvt;
+  $('installBtn').hidden=!installEvt&&!ios; $('installBtn').textContent=ios?'So geht’s':'Installieren';
 }
 /* ---------- push notifications (opt-in): daily level at 18:00, tournament on Friday 17:00, crew tiers ---------- */
 const PUSH_KEY='gravityDuel.push.v1';
@@ -8905,7 +8933,25 @@ tap('dailyRemind',()=>pushEnable());
 renderPush();
 /* links from a notification: ?go=daily | tourney | crew */
 const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew)$/.test(g||'')?g:null }catch(e){ return null } })();
-tap('installBtn',async()=>{ if(!installEvt) return; installEvt.prompt(); try{ await installEvt.userChoice }catch(e){} installEvt=null; renderInstall() });
+/* the banner on the home screen: until installed; "✕" hides it for 14 days */
+const IB_KEY='gravityDuel.installBar.v1';
+function renderInstallBar(){
+  const bar=$('installBar'); if(!bar) return;
+  const st=load(IB_KEY,{visits:0,until:0}), ios=isIOS()&&!isStandalone();
+  const show=!isStandalone()&&(installEvt||ios)&&st.visits>=1&&Date.now()>(st.until||0)&&!window.__GD_TEST_NO_IB__;
+  bar.hidden=!show;
+  if(show){ $('ibGo').textContent=ios?'So geht’s':'Installieren';
+    $('ibText').textContent=ios?'Auf den Home-Bildschirm legen: startet schneller und erinnert dich ans Tageslevel':'Startet schneller, geht offline und erinnert dich ans Tageslevel' }
+}
+{ const st=load(IB_KEY,{visits:0,until:0}); st.visits=(st.visits|0)+1; save(IB_KEY,st) }
+async function installNow(){
+  if(installEvt){ installEvt.prompt(); let ok=false; try{ ok=(await installEvt.userChoice).outcome==='accepted' }catch(e){} installEvt=null; renderInstall(); if(!ok) toast('Kein Problem: in den Optionen geht es jederzeit') }
+  else if(isIOS()) show('iosInstall');
+}
+tap('ibGo',()=>{ Sfx.select(); installNow() });
+tap('ibClose',()=>{ const st=load(IB_KEY,{visits:0}); st.until=Date.now()+14*864e5; save(IB_KEY,st); renderInstallBar() });
+tap('iosInstallBack',()=>goHome());
+tap('installBtn',async()=>{ if(!installEvt){ if(isIOS()) show('iosInstall'); return } installEvt.prompt(); try{ await installEvt.userChoice }catch(e){} installEvt=null; renderInstall() });
 renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
