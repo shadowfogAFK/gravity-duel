@@ -559,6 +559,15 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 #void #voidPlay.stop{background:transparent;color:#ff8aa0;border:1px solid rgba(255,59,92,.75);box-shadow:0 0 16px rgba(255,59,92,.3)}
 @keyframes vcash{from{box-shadow:0 0 14px rgba(61,255,208,.45)}to{box-shadow:0 0 34px rgba(61,255,208,.9)}}
 @media (prefers-reduced-motion:reduce){#void #voidPlay.cash{animation:none}}
+/* replays */
+#rbar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px;border-radius:99px;background:rgba(14,6,34,.86);border:1px solid rgba(167,123,255,.4);box-shadow:0 0 20px rgba(0,0,0,.5);z-index:6;max-width:calc(100% - 24px)}
+#rbar button{min-width:44px;padding:8px 12px;border-radius:99px;font-size:.85rem;box-shadow:none}
+#rbar span{font-family:var(--display);font-size:.78rem;color:var(--muted);padding:0 6px;white-space:nowrap}
+.rplist{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.rp{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22)}
+.rp b{font-family:var(--display);font-size:.92rem;display:block;overflow-wrap:anywhere}.rp small{color:var(--muted);font-size:.72rem}
+.rp button{padding:8px 10px;font-size:.8rem}
+.rp .won{color:#3dffa8}.rp .lost{color:#ff8aa0}
 </style>
 </head>
 <body>
@@ -571,6 +580,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
   <button id="music" class="chip" aria-pressed="false" hidden>Musik an</button>
   <div id="weapons" hidden aria-label="Geschoss wählen"></div>
   <div id="toast" role="status" hidden></div>
+  <div id="rbar" hidden><span id="rbarInfo">Replay</span><button class="ghost" id="rbarPause" aria-label="Pause">❚❚</button><button class="ghost" id="rbarSpeed" aria-label="Geschwindigkeit">1×</button><button class="ghost" id="rbarClose" aria-label="Replay schließen">✕</button></div>
 
   <div id="home">
     <div class="topbar">
@@ -612,7 +622,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
-        <button class="ghost" id="toBoard" disabled>Bestenliste</button>
+        <div class="duo"><button class="ghost" id="toBoard" disabled>Bestenliste</button><button class="ghost" id="toReplays">▶ Replays</button></div>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
         <div class="hero"><canvas id="duelCanvas" width="440" height="341" aria-hidden="true"></canvas>
@@ -633,6 +643,15 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <button role="tab" id="nav-1"><i></i>Wettkampf</button>
       <button role="tab" id="nav-2"><i></i>Lokales Duell</button>
     </nav>
+  </div>
+
+  <div class="overlay" id="replays" hidden>
+    <div class="card">
+      <span class="label">Deine letzten Duelle</span><h2>Replays</h2>
+      <p class="invnote" style="margin:0">Die letzten 8 Duelle werden auf diesem Gerät gespeichert. Mit „Teilen“ bekommst du einen Link, den jeder ansehen kann.</p>
+      <div class="rplist" id="rpList"></div>
+      <button class="ghost" id="replaysBack">Zurück</button>
+    </div>
   </div>
 
   <div class="overlay" id="galaxies" hidden>
@@ -692,6 +711,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <p class="reward grav" id="overGrav" hidden></p>
       <div class="btns">
         <button id="again">Revanche auf neuer Karte</button>
+        <div class="duo"><button class="ghost" id="overReplay">▶ Replay</button><button class="ghost" id="overShare">Teilen</button></div>
         <button id="overBack" class="ghost">Hauptmenü</button>
       </div>
     </div>
@@ -3132,7 +3152,7 @@ function resize(){
   const r=cv.getBoundingClientRect();
   dpr=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
-  if(online){ scale=Math.min(r.width/400,r.height/ONLINE_H); W=400; H=ONLINE_H; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
+  if(online||replay){ const fh=replay?replay.r.H:ONLINE_H; scale=Math.min(r.width/400,r.height/fh); W=400; H=fh; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
   else { scale=r.width/400; W=400; H=Math.max(560,r.height/scale); offX=0; offY=0 }
   safeTop=probe.getBoundingClientRect().height||0;
   for(const b of bodies){ if(b.kind==='planet') b.fy=b.owner===0?(H-PLANET_GAP)/H:PLANET_GAP/H; b.y=b.fy*H }
@@ -3141,6 +3161,135 @@ function resize(){
 window.addEventListener('resize',resize);
 
 function rand(a,b){return a+Math.random()*(b-a)}
+/* ---------- replays: every duel is recorded as body snapshots + the flight path of each shot (60 points per second).
+   Played back with the normal renderer; nothing is simulated again, so a replay always looks exactly like the match ---------- */
+var rec=null, recVol=null, recIds=null, replay=null;
+const REPLAY_KEY='gravityDuel.replays.v1', REPLAY_MAX=8;
+const snapBodies=()=>bodies.map(b=>{ const o={}; for(const k in b){ const v=b[k]; if(typeof v==='function'||k==='to') continue; o[k]=v&&typeof v==='object'?JSON.parse(JSON.stringify(v)):v } if(typeof o.x==='number'){ o.x=Math.round(o.x*10)/10; o.y=Math.round(o.y*10)/10 } return o });
+function recStart(sd){
+  if(replay) return;
+  rec={v:1,H:Math.round(H),arena:duelArena,seed:sd,mode:duelMode,ev:curEvent?curEvent.id:null,me:meIdx(),ai:!!ai,on:!!online,
+    p:players.map(p=>({n:p.name,s:p.skin})),vols:[],at:Date.now()}; recVol=null; recIds=new Map();
+}
+function recLaunch(){
+  if(!rec||replay||mode!=='duel') return;
+  if(rec.vols.length>=90){ recVol=null; return }
+  recVol={b:snapBodies(),l:players.map(p=>p.lives),f:[]}; rec.vols.push(recVol);
+}
+function recFrame(){
+  const i=flightN/4|0, fr=[];
+  for(const s of proj){ let id=recIds.get(s); if(id==null){ id=recIds.size; recIds.set(s,id) } fr.push([id,s.o,Math.round(s.x),Math.round(s.y),s.type]) }
+  recVol.f[i]=fr;
+}
+function recFinish(){
+  const r=rec; rec=null; recVol=null; if(!r||!r.vols.length) return;
+  r.end={b:r.vols[r.vols.length-1].b,l:players.map(p=>p.lives),w:$('winner').textContent,c:$('winner').style.color||''};
+  r.won=r.end.l[r.me]>r.end.l[1-r.me]||(r.end.l[r.me]===r.end.l[1-r.me]&&/^Du /.test(r.end.w));
+  for(const v of r.vols){ for(let k=0;k<v.f.length;k++) if(!v.f[k]) v.f[k]=[]; while(v.f.length&&!v.f[v.f.length-1].length) v.f.pop() }
+  lastReplay=r; saveReplay(r);
+}
+var lastReplay=null;
+function loadReplays(){ try{ const l=JSON.parse(localStorage.getItem(REPLAY_KEY)||'[]'); return Array.isArray(l)?l:[] }catch(e){ return [] } }
+function saveReplay(r){
+  let l=[r,...loadReplays()].slice(0,REPLAY_MAX);
+  while(l.length){ try{ localStorage.setItem(REPLAY_KEY,JSON.stringify(l)); return }catch(e){ l.pop() } }
+}
+function startReplay(r,from){
+  if(!r||!r.vols||!r.vols.length) return toast('Dieses Replay ist leer');
+  replay={r,vi:-1,t:0,speed:1,paused:false,hold:0,rot:r.me===1,from:from||current,
+    saved:{online,ai,players,bodies,scene,mode,phase,turn,proj,lastTrail,tbMarks,curEvent,emoteBubbles,banner}};
+  online=null; ai=null; mode='duel'; tbMarks=[]; emoteBubbles=[]; lastTrail=[null,null]; curEvent=null;
+  scene=makeScene(ARENAS[r.arena]?ARENAS[r.arena].theme:ARENAS[0].theme,r.seed|0);
+  players=r.p.map(p=>mkPlayer(p.n,{},p.s||{})); phase='replay'; particles=[]; fx=[];
+  resize(); replayLoad(0); show(null);
+  $('back').hidden=true; $('mute').hidden=true; $('music').hidden=true; $('rbar').hidden=false;
+  $('rbarPause').textContent='❚❚'; $('rbarSpeed').textContent='1×';
+}
+function replayBodies(src,lives){
+  bodies=src.map(b=>JSON.parse(JSON.stringify(b)));
+  if(PHYS.linkPortals) PHYS.linkPortals(bodies);
+  for(const pl of players) pl.planet=null;
+  for(const b of bodies) if(b.kind==='planet'&&players[b.owner]) players[b.owner].planet=b;
+  lives.forEach((l,i)=>{ if(players[i]) players[i].lives=l });
+  PHYS.advance(bodies,0,H); visT=0;
+}
+function replayLoad(i){
+  const r=replay.r; replay.vi=i; replay.t=0; replay.fi=-1; replay.tr={}; replay.hold=0; proj=[];
+  if(i>=r.vols.length){ const e=r.end||{b:r.vols[r.vols.length-1].b,l:r.vols[r.vols.length-1].l}; replayBodies(e.b,e.l); replay.done=true;
+    banner={text:e.w||'Match vorbei',sub:'Ende des Replays',t:99,player:0,center:true}; $('rbarPause').textContent='↺'; $('rbarInfo').textContent='Ende'; return }
+  replay.done=false;
+  const v=r.vols[i]; replayBodies(v.b,v.l);
+  const first=v.f.find(f=>f&&f.length), shooters=first?[...new Set(first.map(x=>x[1]))]:[];
+  turn=shooters.length===1?shooters[0]:0;
+  $('rbarInfo').textContent=`Zug ${i+1} / ${r.vols.length}`;
+  if(first) Sfx.launch(.7);
+}
+function replayStep(dt){
+  for(const p of particles){ if(p.delay>0){p.delay-=dt;continue} p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.98;p.vy*=.98;if(p.rect)p.vy+=90*dt;p.life-=dt }
+  for(const f of fx) f.t+=dt; fx=fx.filter(f=>f.t<f.max); particles=particles.filter(p=>p.life>0);
+  if(shake>0) shake=Math.max(0,shake-dt*35); if(flash>0) flash=Math.max(0,flash-dt*2.5);
+  if(banner.t>0&&banner.t<90) banner.t-=dt;
+  if(!replay||replay.paused||replay.done) return;
+  const v=replay.r.vols[replay.vi];
+  if(replay.hold>0){ replay.hold-=dt*replay.speed; if(replay.hold<=0) replayLoad(replay.vi+1); return }
+  replay.t+=dt*replay.speed;
+  const fi=Math.min(v.f.length-1,Math.floor(replay.t*60));
+  while(replay.fi<fi){
+    replay.fi++; const fr=v.f[replay.fi]||[], prev=replay.fi>0?v.f[replay.fi-1]||[]:[];
+    for(const [id,o,x,y] of fr){ const tr=replay.tr[id]||(replay.tr[id]=[]), l=tr[tr.length-1]; if(l&&Math.hypot(l[0]-x,l[1]-y)>60) tr.push(null); tr.push([x,y]) }
+    const now=new Set(fr.map(x=>x[0]));
+    for(const [id,o,x,y] of prev) if(!now.has(id)){ const c=players[o]?players[o].color:'#fff'; explode(x,y,c,26); shake=Math.max(shake,5); Sfx.moon() }
+  }
+  visT=Math.max(0,fi)/60; PHYS.advance(bodies,visT,H);
+  const fr=v.f[Math.max(0,fi)]||[];
+  proj=fr.map(([id,o,x,y,type])=>{ const tr=replay.tr[id]||[], q=tr.length>1?tr[tr.length-2]:null; return {o,x,y,type,vx:q?x-q[0]:0,vy:q?y-q[1]:-1,trail:tr,armed:false,drills:0} });
+  if(fi>=v.f.length-1){ const last=v.f[v.f.length-1]||[]; for(const [id,o,x,y] of last){ const c=players[o]?players[o].color:'#fff'; explode(x,y,c,26) }
+    proj=[]; replay.hold=.9;
+    const nx=replay.vi+1<replay.r.vols.length?replay.r.vols[replay.vi+1].l:(replay.r.end&&replay.r.end.l);
+    if(nx) nx.forEach((l,i)=>{ if(players[i]&&l<players[i].lives){ Sfx.hit(); flash=Math.max(flash,.3); shake=Math.max(shake,10) } }); if(nx) nx.forEach((l,i)=>{ if(players[i]) players[i].lives=l }) }
+}
+function stopReplay(){
+  if(!replay) return; const sv=replay.saved, from=replay.from;
+  ({online,ai,players,bodies,scene,mode,phase,turn,proj,lastTrail,tbMarks,curEvent,emoteBubbles,banner}=sv);
+  replay=null; $('rbar').hidden=true; particles=[]; fx=[]; resize();
+  if(from==='over') show('over'); else if(from==='replays') openReplays(); else goHome();
+}
+function replayTogglePause(){
+  if(!replay) return; Sfx.select();
+  if(replay.done){ replay.paused=false; $('rbarPause').textContent='❚❚'; banner.t=0; return replayLoad(0) }
+  replay.paused=!replay.paused; $('rbarPause').textContent=replay.paused?'▶':'❚❚';
+}
+function replaySpeed(){ if(!replay) return; replay.speed=replay.speed===1?2:replay.speed===2?4:1; $('rbarSpeed').textContent=replay.speed+'×'; Sfx.select() }
+let rpFrom='home';
+function openReplays(){
+  if(current!=='replays'&&current) rpFrom=current;
+  const box=$('rpList'), l=loadReplays(); box.innerHTML='';
+  if(!l.length) box.innerHTML='<p class="hint">Noch keine Replays. Spiel ein Duell, danach findest du es hier.</p>';
+  l.forEach((r,i)=>{ const opp=r.p&&r.p[1-r.me]?r.p[1-r.me].n:'?', d=new Date(r.at||0);
+    const kind=r.on?'Online':r.ai?'KI-Duell':'Lokal', res=r.on||r.ai?`<span class="${r.won?'won':'lost'}">${r.won?'Sieg':'Niederlage'}</span>`:'';
+    const el=document.createElement('div'); el.className='rp';
+    el.innerHTML=`<div><b>${r.on||r.ai?'gegen ':''}${esc(cleanName(opp))}</b><small>${kind} · ${d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})} ${d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} · ${r.vols.length} Züge ${res?'· ':''}${res}</small></div><button class="mini">▶</button><button class="mini ghost">Teilen</button>`;
+    const [pb,sb]=el.querySelectorAll('button'); pb.setAttribute('aria-label','Replay abspielen'); sb.setAttribute('aria-label','Replay teilen');
+    pb.onclick=()=>startReplay(r,'replays'); sb.onclick=()=>shareReplay(r,sb); box.appendChild(el) });
+  show('replays');
+}
+async function shareReplay(r,btn){
+  if(!r) return; if(!SERVER_ECON) return toast('Zum Teilen brauchst du eine Verbindung');
+  const old=btn.textContent; btn.disabled=true; btn.textContent='…';
+  try{ let code=r.code; if(!code){ code=await rpc('gd_replay_save',{p_data:{...r,code:undefined}}); r.code=code;
+      const l=loadReplays(); const k=l.findIndex(x=>x.at===r.at); if(k>=0){ l[k].code=code; try{ localStorage.setItem(REPLAY_KEY,JSON.stringify(l)) }catch(e){} } }
+    const url=`${WEB_URL}?r=${code}`;
+    if(navigator.share){ try{ await navigator.share({title:'Gravity Duel Replay',text:'Schau dir mein Duell in Gravity Duel an:',url}); return }catch(e){ if(e&&e.name==='AbortError') return } }
+    try{ await navigator.clipboard.writeText(url); toast('Link kopiert') }catch(e){ prompt('Link zum Teilen:',url) } }
+  catch(e){ toast(/limit/.test(String(e&&e.message))?'Heute schon genug geteilt, morgen wieder':econErr(e)) }
+  finally{ btn.disabled=false; btn.textContent=old }
+}
+const REPLAY_CODE=(()=>{ try{ const c=new URLSearchParams(location.search).get('r'); return c&&/^[A-Z0-9]{8}$/i.test(c)?c.toUpperCase():null }catch(e){ return null } })();
+async function openSharedReplay(code){
+  try{ const r=await rpc('gd_replay_get',{p_code:code}); if(!r||!r.data) return toast('Replay nicht gefunden');
+    const d=r.data; d.code=code; toast(`Replay von ${cleanName(r.name||'?')}`); startReplay(d,'home') }
+  catch(e){ toast('Replay konnte nicht geladen werden') }
+}
 function mkPlanet(owner){ const fy=owner===0?(H-PLANET_GAP)/H:PLANET_GAP/H; return {x:W/2,fy,y:fy*H,r:24,m0:24*24*PHYS.PLANET_DENSITY,owner,kind:'planet',type:'planet'} }
 function withCraters(b){ b.craters=Array.from({length:3},()=>({a:rand(0,6.28),d:rand(0,.55),s:rand(.12,.26)})); return b }
 /* boss fights (level 30 of every galaxy): the guardian circles a point and needs three hits;
@@ -3264,7 +3413,7 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,op
   curEvent=o&&o.ev!=null?WEEK_EVENTS[o.ev|0]||null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:null;
   DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):curEvent&&curEvent.ammo?{...curEvent.ammo}:pickDuelAmmo();
   duelArena=o?o.arena:duelArenaPick>=0&&duelArenaPick<ARENAS.length?duelArenaPick:Math.floor(Math.random()*ARENAS.length);
-  scene=makeScene(ARENAS[duelArena].theme,o?o.seed:Math.floor(Math.random()*1e5)); bodies=[];
+  const sd=o?o.seed:Math.floor(Math.random()*1e5); scene=makeScene(ARENAS[duelArena].theme,sd); bodies=[];
   const p1=mkPlanet(0), p2=mkPlanet(1);
   bodies.push(p1,p2);
   const meP=mkPlayer(playerName(),DUEL_AMMO,mySkin()), other=o?mkPlayer(o.opp.name,DUEL_AMMO,o.opp.skin):mkPlayer('Spieler 2',DUEL_AMMO,duelRivalSkin());
@@ -3272,6 +3421,7 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,op
   players[0].planet=p1; players[1].planet=p2;
   resetShotState();
   layoutDuel(o&&o.specs);
+  recStart(sd);
 }
 let levelDiff=1; // the difficulty the running level was started with
 let dailyMode=false, dailyGal=null, dailyData=null;
@@ -3327,7 +3477,7 @@ const otherOf=o=>1-o;
 /* text for player 2 is turned upside down in the local duel; online everybody sees their own side at the bottom */
 /* the guest of an online match plays from the top planet and sees the field turned around */
 const meIdx=()=>online&&!online.host?1:0;
-const viewRot=()=>!!(online&&!online.host);
+const viewRot=()=>!!(online&&!online.host)||!!(replay&&replay.rot);
 const flipFor=o=>mode==='duel'&&(online?viewRot():!ai&&o===1);
 
 const TURN_TIME=10; // seconds per shot in duels, against stalling
@@ -3450,7 +3600,7 @@ function launch(shots){
   flightT=0; visT=0; flightN=0; flyAcc=0; trigs=[]; PHYS.advance(bodies,0,H);
   proj=[]; volley={owners:[],per:[null,null]};
   if(online) online.guestFin=false;
-  launchSnap=JSON.stringify(shots.map(x=>({s:x.s,power:x.per.power,type:x.per.type})));
+  launchSnap=JSON.stringify(shots.map(x=>({s:x.s,power:x.per.power,type:x.per.type}))); recLaunch();
   for(const {s,per} of shots){ proj.push(s); volley.owners.push(s.o); volley.per[s.o]=per }
   phase='fly'; banner.t=0;
   if(shots.length) Sfx.launch(Math.max(...shots.map(x=>x.per.power)));
@@ -4725,12 +4875,13 @@ function flightStep(){
     if(hit){ resolveProjectile(s,hit); continue }
     if(missed(s,h)) resolveProjectile(s,null);
   }
+  if(recVol&&flightN%4===0) recFrame();
 }
 /* a tap from the other phone arrived after this phone had already passed its moment:
    run the flight again from the launch, silently, with the tap at the right step */
 function replayFlight(){
 
-  const upTo=flightN, snap=JSON.parse(launchSnap);
+  const upTo=flightN, snap=JSON.parse(launchSnap); if(recVol) recVol.f.length=0;
   proj=snap.map(x=>x.s); volley.per=[null,null];
   for(const x of snap) volley.per[x.s.o]=newPer(x.power,x.type);
   flightN=0; flightT=0; PHYS.advance(bodies,0,H);
@@ -4738,6 +4889,7 @@ function replayFlight(){
   try{ while(flightN<upTo&&proj.length) flightStep() } finally { replaying=false }
 }
 function step(dt){
+  if(replay) return replayStep(dt);
   if(banner.t>0) banner.t-=dt;
   if(appearT>0) appearT=Math.max(0,appearT-dt);
   // the match clock runs while someone aims or a shot is flying, not on the hand-over screen
@@ -4998,7 +5150,7 @@ function draw(t){
   if(phase==='aim') drawLastPower();
   ctx.restore();
   if(mode==='campaign') drawCampaignHud();
-  if(mode==='duel') drawDuelClock(t);
+  if(mode==='duel'&&!replay) drawDuelClock(t);
   if(flash>0){ctx.fillStyle=`rgba(255,255,255,${flash*.35})`;ctx.fillRect(0,0,W,H)}
   // edge markers while projectiles are off screen
   for(const s of proj) if(s.x<0||s.x>W||s.y<0||s.y>H){
@@ -5630,6 +5782,7 @@ async function afterReady(){
   if(err){ cleanUrl(); toast(/already|exists|linked/i.test(err)?'Dieses Google-Konto hat schon einen Spielstand. Melde dich unter „Anmelden“ damit an.':/expired|invalid/i.test(err)?'Der Link ist abgelaufen oder wurde schon benutzt. Fordere bitte einen neuen an.':'Anmeldung fehlgeschlagen: '+err.slice(0,60)) }
   else if(RESET_RETURN){ cleanUrl(); if(isAccount()){ await switchedAccount('Angemeldet über den Link aus der E-Mail.'); return openAccount('reset') } }
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
+  if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
   if(LINK_CODE){
     cleanUrl();
     if(LINK_CODE===(Net.me&&Net.me.friend_code)) return;
@@ -6225,9 +6378,10 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['replays','setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
+  if(name==='over'&&rec&&!replay) recFinish();
   current=name;
   for(const s of screens) $(s).hidden=s!==name;
   const inGame=name===null||name==='intro';
@@ -7525,6 +7679,13 @@ tap('toShop',goShop);
 tap('toInv',()=>openInventory());
 tap('invBack',()=>{ if(invFrom==='shop'){ renderShop(); show('shop') } else if(invFrom==='profile') openProfile(); else goHome() });
 tap('invToAlbum',()=>openAlbum());
+tap('overReplay',()=>startReplay(lastReplay,'over'));
+tap('overShare',()=>shareReplay(lastReplay,$('overShare')));
+tap('toReplays',()=>openReplays());
+tap('replaysBack',()=>{ if(rpFrom==='over') show('over'); else goHome() });
+tap('rbarPause',()=>replayTogglePause());
+tap('rbarSpeed',()=>replaySpeed());
+tap('rbarClose',()=>{ Sfx.select(); stopReplay() });
 tap('albBack',()=>openInventory());
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
