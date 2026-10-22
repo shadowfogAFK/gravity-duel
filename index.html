@@ -28,7 +28,11 @@
 [hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--space);color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
 #wrap{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:min(560px,calc(100vh * .62));max-width:min(560px,calc(100dvh * .62));overflow:hidden}
-@media (min-aspect-ratio:62/100){#wrap{border-left:1px solid var(--line);border-right:1px solid var(--line);box-shadow:0 0 60px rgba(120,60,220,.25)}}
+/* computer: the sky continues left and right of the game column, the column's edges fade into it */
+#bgsky{position:fixed;inset:0;width:100%;height:100%;display:none}
+html.wide #bgsky{display:block}
+html.wide .navbar{background:none}
+html.wide.playing #wrap{outline:1px solid rgba(167,123,255,.22)} /* in a match: show where the field ends */
 canvas{display:block}
 #game{width:100%;height:100%;touch-action:none}
 .overlay{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;z-index:3;
@@ -682,6 +686,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 </style>
 </head>
 <body>
+<canvas id="bgsky" aria-hidden="true"></canvas>
 <div id="wrap">
   <canvas id="game" aria-label="Spielfeld"></canvas>
   <button id="back" class="chip" hidden>Menü</button>
@@ -4041,6 +4046,7 @@ let fx=[], particles=[], aim=null, banner={text:'',sub:'',t:0,player:0}, wins=[0
 
 function resize(){
   const r=cv.getBoundingClientRect();
+  document.documentElement.classList.toggle('wide',r.width<window.innerWidth-4);
   dpr=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
   if(online||replay){ const fh=replay?replay.r.H:ONLINE_H; scale=Math.min(r.width/400,r.height/fh); W=400; H=fh; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
@@ -4053,6 +4059,14 @@ function resize(){
 window.addEventListener('resize',resize);
 
 function rand(a,b){return a+Math.random()*(b-a)}
+/* computer: the same sky behind the game column, over the whole window (drawn at 30 fps, without retina detail) */
+const wideSky=()=>document.documentElement.classList.contains('wide');
+function bgTick(t){
+  if(!wideSky()||!scene) return;
+  const c=$('bgsky'), q=Math.min(dpr||1,1.5), iw=Math.round(window.innerWidth*q), ih=Math.round(window.innerHeight*q);
+  if(c.width!==iw||c.height!==ih){ c.width=iw; c.height=ih }
+  const g=c.getContext('2d'), k=(scale||1)*q; g.setTransform(k,0,0,k,0,0); paintSky(g,scene,iw/k,ih/k,t);
+}
 /* ---------- replays: every duel is recorded as body snapshots + the flight path of each shot (60 points per second).
    Played back with the normal renderer; nothing is simulated again, so a replay always looks exactly like the match ---------- */
 var rec=null, recVol=null, recIds=null, replay=null;
@@ -6065,7 +6079,8 @@ function draw(t){
   if(viewRot()){ ctx.translate(W,H); ctx.rotate(Math.PI) }
   ctx.save();
   if(shake>0) ctx.translate(rand(-shake,shake),rand(-shake,shake));
-  if(offX||offY){ ctx.save(); ctx.translate(-offX,-offY); paintSky(ctx,scene,W+2*offX,H+2*offY,t); ctx.restore() } else paintSky(ctx,scene,W,H,t);
+  if(wideSky()){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height); ctx.restore() } // the window-wide sky behind shows through
+  else if(offX||offY){ ctx.save(); ctx.translate(-offX,-offY); paintSky(ctx,scene,W+2*offX,H+2*offY,t); ctx.restore() } else paintSky(ctx,scene,W,H,t);
   if(phase==='menu'||!players.length){ctx.restore();return}
   for(const p of players) p.color=skinColor(p.skin,t);
   const pl=players[turn], col=pl.color;
@@ -7325,6 +7340,7 @@ function show(name){
   current=name;
   for(const s of screens) $(s).hidden=s!==name;
   const inGame=name===null||name==='intro';
+  document.documentElement.classList.toggle('playing',name===null);
   $('back').hidden=!inGame; $('mute').hidden=!inGame; $('music').hidden=!inGame;
   $('emoteBtn').hidden=!(name===null&&(online||ai)); $('emotes').hidden=true; $('emoteBtn').setAttribute('aria-expanded','false');
   // battle music while a match or level is on (including its result screen), menu music everywhere else
@@ -9465,7 +9481,7 @@ let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
+  step(dt); draw(t); bgTick(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT) openSetup('wait'); requestAnimationFrame(loop); netInit();
