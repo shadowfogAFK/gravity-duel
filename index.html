@@ -683,6 +683,11 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .tnclaim{border-color:rgba(255,211,79,.6);background:rgba(255,211,79,.08)}
 /* computer (wider than a phone): the column uses its full width, the picture cards get flatter so everything still fits */
 @media (min-aspect-ratio:62/100){.page>*{max-width:none}.hero canvas,#page-ranked .herobtn canvas{aspect-ratio:16/9}}
+.pushprefs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:-4px 0 0}
+.pushprefs button{padding:7px 4px;font-size:.78rem;border-radius:10px;box-shadow:none}
+.pushprefs button[aria-pressed="true"]{color:var(--p2);border-color:var(--p2);background:rgba(46,230,255,.1)}
+.pushprefs button[aria-pressed="false"]{opacity:.6}
+.remind{display:block;margin:8px auto 0;font-size:.82rem}
 </style>
 </head>
 <body>
@@ -972,6 +977,8 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       <div class="setting vol"><div><b>Musik</b><span>Eigene Musik für jede Galaxie</span></div><output id="musicVolTxt" for="musicVol">80 %</output><button class="switch" id="setMusic" role="switch" aria-checked="true" aria-label="Musik"><i></i></button><input type="range" id="musicVol" min="0" max="100" step="5" value="80" aria-label="Lautstärke Musik"></div>
       <div class="setting vol"><div><b>Soundeffekte</b><span>Schüsse, Treffer, Flugsummen</span></div><output id="sfxVolTxt" for="sfxVol">100 %</output><button class="switch" id="setSound" role="switch" aria-checked="true" aria-label="Soundeffekte"><i></i></button><input type="range" id="sfxVol" min="0" max="100" step="5" value="100" aria-label="Lautstärke Soundeffekte"></div>
       <div class="setting"><div><b>Spielername</b><span id="setNameNow">Pilot</span></div><button class="ghost" id="setName">Ändern</button></div>
+      <div class="setting" id="pushRow" hidden><div><b>Benachrichtigungen</b><span id="pushText">Tageslevel, Turnier und Crew</span></div><button class="switch" id="pushSwitch" role="switch" aria-checked="false" aria-label="Benachrichtigungen"><i></i></button></div>
+      <div class="pushprefs" id="pushPrefs" hidden><button class="ghost" data-k="daily" aria-pressed="true">☀ Tageslevel</button><button class="ghost" data-k="tourney" aria-pressed="true">🏆 Turnier</button><button class="ghost" data-k="crew" aria-pressed="true">👥 Crew</button></div>
       <div class="setting" id="installRow" hidden><div><b>Als App installieren</b><span id="installText">Startet schneller und geht auch offline</span></div><button class="ghost" id="installBtn">Installieren</button></div>
       <div class="setting" id="acctRow" hidden><div><b>Konto</b><span id="acctNow">Nur auf diesem Gerät</span></div><button class="ghost" id="acctBtn">Anmelden</button></div>
       <div class="setting" id="delRow" hidden><div><b>Konto löschen</b><span>Spielstand, Items und Daten endgültig entfernen</span></div><button class="ghost danger" id="delOpen">Löschen</button></div>
@@ -1115,6 +1122,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       </div>
       <p class="dres" id="dailyResult" hidden></p>
       <div class="btns"><button id="dailyPlay">Spielen</button></div>
+      <button class="ghost mini remind" id="dailyRemind" hidden>🔔 Erinnere mich jeden Tag um 18 Uhr</button>
       <h3 class="dhead">Bestenliste heute</h3>
       <ol class="dboard" id="dailyBoard"></ol>
       <button class="ghost" id="dailyBack">Zurück</button>
@@ -6748,6 +6756,7 @@ async function afterReady(){
   else if(RESET_RETURN){ cleanUrl(); if(isAccount()){ await switchedAccount('Angemeldet über den Link aus der E-Mail.'); return openAccount('reset') } }
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
+  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home') }
   if(LINK_CODE){
     cleanUrl();
     if(LINK_CODE===(Net.me&&Net.me.friend_code)) return;
@@ -7495,6 +7504,7 @@ function homeTick(t){
 
 /* ---------- daily level: one level for everyone, fewest shots wins (gd_daily / gd_daily_submit) ---------- */
 async function openDaily(result){
+  setTimeout(renderPush,0);
   dailyMode=false; phase='menu'; bodies=[]; players=[]; proj=[];
   if(!result) $('dailyResult').hidden=true;
   show('daily'); renderDaily();
@@ -8650,6 +8660,53 @@ function renderInstall(){
   $('installText').textContent=ios?'Tippe auf „Teilen“ und dann „Zum Home-Bildschirm“':'Startet schneller und geht auch offline';
   $('installBtn').hidden=!installEvt;
 }
+/* ---------- push notifications (opt-in): daily level at 18:00, tournament on Friday 17:00, crew tiers ---------- */
+const PUSH_KEY='gravityDuel.push.v1';
+let pushState=load(PUSH_KEY,{on:false,prefs:{daily:true,tourney:true,crew:true}}), pushBusy=false;
+const pushSupported=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window&&(location.protocol==='https:'||location.hostname==='localhost');
+function b64u(x){ const p='='.repeat((4-x.length%4)%4), b=atob((x+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(b,c=>c.charCodeAt(0)) }
+function renderPush(){
+  const row=$('pushRow'); if(!row) return;
+  row.hidden=!SERVER_ECON;
+  const sup=pushSupported(), denied=sup&&Notification.permission==='denied', on=pushState.on&&sup&&!denied;
+  $('pushSwitch').setAttribute('aria-checked',String(on)); $('pushSwitch').disabled=!sup||denied||pushBusy;
+  $('pushText').textContent=!sup?(isIOS()&&!isStandalone()?'Auf dem iPhone erst als App installieren (Teilen → Zum Home-Bildschirm)':'Dein Browser unterstützt das leider nicht')
+    :denied?'Im Browser blockiert: in den Website-Einstellungen erlauben':on?'An: wir melden uns nur, wenn sich etwas lohnt':'Tageslevel, Turnier und Crew';
+  $('pushPrefs').hidden=!on;
+  for(const b of $('pushPrefs').querySelectorAll('button')) b.setAttribute('aria-pressed',String(pushState.prefs[b.dataset.k]!==false));
+  const rb=$('dailyRemind'); if(rb) rb.hidden=!sup||denied||on||!SERVER_ECON;
+}
+async function pushEnable(){
+  if(!econReady()) return toast('Dafür brauchst du eine Verbindung');
+  pushBusy=true; renderPush();
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){ toast('Ohne Erlaubnis kann das Spiel dich nicht erinnern'); return }
+    const reg=await navigator.serviceWorker.ready, key=await rpc('gd_push_public');
+    if(!key) throw new Error('Noch nicht bereit, versuch es gleich nochmal');
+    const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(key)});
+    await rpc('gd_push_subscribe',{p_sub:sub.toJSON(),p_prefs:pushState.prefs});
+    pushState.on=true; save(PUSH_KEY,pushState); Sfx.select(); toast('🔔 Benachrichtigungen an');
+  }catch(e){ toast('Hat nicht geklappt: '+niceErr(e)) }
+  finally{ pushBusy=false; renderPush() }
+}
+async function pushDisable(){
+  pushBusy=true; renderPush();
+  try{ const reg=await navigator.serviceWorker.getRegistration(), sub=reg&&await reg.pushManager.getSubscription();
+    if(sub){ try{ await rpc('gd_push_unsubscribe',{p_endpoint:sub.endpoint}) }catch(e){} await sub.unsubscribe() } }catch(e){}
+  pushState.on=false; save(PUSH_KEY,pushState); pushBusy=false; renderPush(); toast('Benachrichtigungen aus');
+}
+async function pushPrefs(k){
+  pushState.prefs[k]=pushState.prefs[k]===false; save(PUSH_KEY,pushState); Sfx.select(); renderPush();
+  try{ const reg=await navigator.serviceWorker.getRegistration(), sub=reg&&await reg.pushManager.getSubscription();
+    if(sub&&econReady()) await rpc('gd_push_subscribe',{p_sub:sub.toJSON(),p_prefs:pushState.prefs}) }catch(e){ toast(niceErr(e)) }
+}
+tap('pushSwitch',()=>{ if(pushBusy) return; pushState.on?pushDisable():pushEnable() });
+for(const b of document.querySelectorAll('#pushPrefs button')) b.addEventListener('click',()=>pushPrefs(b.dataset.k));
+tap('dailyRemind',()=>pushEnable());
+renderPush();
+/* links from a notification: ?go=daily | tourney | crew */
+const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew)$/.test(g||'')?g:null }catch(e){ return null } })();
 tap('installBtn',async()=>{ if(!installEvt) return; installEvt.prompt(); try{ await installEvt.userChoice }catch(e){} installEvt=null; renderInstall() });
 renderInstall();
 /* name editing: tap the profile */
@@ -8764,7 +8821,7 @@ for(const k of ['music','sfx']){
 syncAudioUI();
 // browsers only allow sound after the first touch, so the music starts with it
 document.addEventListener('pointerdown',()=>Sfx.init(),{once:true,capture:true});
-tap('toSettings',()=>{ $('setNameNow').textContent=playerName(); renderAccountRow(); show('settings') });
+tap('toSettings',()=>{ $('setNameNow').textContent=playerName(); renderAccountRow(); renderPush(); renderInstall(); show('settings') });
 tap('settingsBack',()=>goHome());
 tap('setName',()=>{ nameBack='settings'; $('nameInput').value=playerName(); show('nameEdit'); setTimeout(()=>$('nameInput').focus(),50) });
 
