@@ -573,6 +573,109 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
 #over .card{transition:opacity .4s ease,transform .4s ease}#over{transition:background-color .4s ease}
 #over.vic{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
 #over.vic .card{opacity:0;transform:translateY(16px) scale(.97);pointer-events:none}
+/* ---------- level editor + community levels ---------- */
+.ugentry{cursor:pointer;z-index:1;color:var(--gold);border-color:rgba(255,211,79,.55);box-shadow:none;font-weight:700;letter-spacing:.04em}
+.ugcode{display:grid;grid-template-columns:1fr auto;gap:8px}
+.ugcode .text{font-size:1rem;text-transform:uppercase;letter-spacing:.08em;min-width:0}
+.ugcode .text::placeholder{text-transform:none;letter-spacing:0;font-size:.9rem}
+.ugcode button{padding:10px 14px;font-size:.9rem}
+.ugtabs{margin:2px -4px 0}
+.uglist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ugitem{border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.25);overflow:hidden}
+.ugrow{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;width:100%;padding:10px;background:none;color:var(--ink);box-shadow:none;text-align:left;font-family:var(--body);font-weight:400;font-size:.9rem;border-radius:0}
+.ugsky{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;color:#3dffd0;font-weight:700}
+.ugt{display:flex;flex-direction:column;min-width:0}
+.ugt b{font-family:var(--display);font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ugt small{color:var(--muted);font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ugst{display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ugst .lk{color:#ff7aa0}
+.ugmine{display:flex;align-items:center;gap:8px;padding:0 10px 10px}
+.ugmine b{font-family:var(--display);letter-spacing:.08em;color:var(--gold);flex:1;white-space:nowrap}
+.ugmine .mini{flex:none}
+.ugbig{font-family:var(--display);font-size:2.2rem;font-weight:700;letter-spacing:.14em;color:var(--gold);text-shadow:0 0 18px rgba(255,211,79,.5);user-select:text;-webkit-user-select:text}
+.edscreen{position:absolute;inset:0;z-index:3;pointer-events:none;display:flex;flex-direction:column}
+.edscreen>*{pointer-events:auto}
+.edtop{display:flex;align-items:center;gap:6px;padding:calc(8px + env(safe-area-inset-top,0px)) 10px 4px}
+.edbtn{flex:none;width:40px;height:40px;padding:0;border-radius:50%;background:rgba(22,10,52,.8);color:var(--ink);border:1px solid var(--line);box-shadow:none;font-size:1.1rem}
+.edname{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:4px 10px;background:rgba(22,10,52,.72);border:1px solid var(--line);box-shadow:none;color:var(--ink);text-align:left}
+.edname .label{font-size:.6rem}
+.edname b{font-size:.95rem;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.edtest{flex:none;padding:10px 12px;font-size:.88rem}
+.edmsg{pointer-events:none!important;align-self:center;margin:2px 12px 0;padding:4px 10px;border-radius:99px;background:rgba(13,6,38,.66);font-size:.75rem;text-align:center;color:var(--muted)}
+.edmsg.bad{color:#ff8aa0;border:1px solid rgba(255,79,107,.5)}
+.edbottom{margin-top:auto;display:flex;flex-direction:column;gap:6px;padding:0 8px calc(8px + env(safe-area-inset-bottom,0px));pointer-events:none!important}
+.edbottom>*{pointer-events:auto}
+.edsel{min-height:66px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:8px 10px;border-radius:12px;background:rgba(22,10,52,.9);border:1px solid var(--line)}
+.edsel>b{font-family:var(--display);font-size:.85rem;color:var(--p2)}
+.edrange{display:flex;align-items:center;gap:6px;flex:1 1 120px;font-size:.72rem;color:var(--muted)}
+.edrange input{flex:1;min-width:60px;accent-color:var(--p2)}
+.edpal{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px;border-radius:14px;background:rgba(13,6,38,.86);border:1px solid var(--line)}
+.edpal::-webkit-scrollbar{display:none}
+.edtool{flex:none;width:58px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px 5px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.25);box-shadow:none;color:var(--ink)}
+.edtool canvas{width:36px;height:36px}
+.edtool span{font-family:var(--body);font-weight:600;font-size:.62rem;letter-spacing:0;white-space:nowrap}
+#edAdd-T{border-color:rgba(255,211,79,.5)}
+#edAdd-T span{color:var(--gold)}
+.edsheet{position:absolute;inset:0;display:flex;align-items:flex-start;padding:max(20px,env(safe-area-inset-top,0px)) 16px 20px;background:rgba(10,4,30,.6);backdrop-filter:blur(2px);overflow-y:auto;pointer-events:auto}
+.edammos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.edammo{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.25);font-size:.8rem}
+.edammo span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.edammo b{font-family:var(--display);min-width:1ch;text-align:center}
+.edammo .mini{padding:4px 9px}
+button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
+
+/* ---------- crews + weekend tournament ---------- */
+.crewentry{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,rgba(46,230,255,.1),rgba(196,107,255,.12));border:1px solid rgba(46,230,255,.45);color:var(--ink);box-shadow:none;font-family:var(--body);font-weight:400;letter-spacing:0;font-size:.9rem}
+.crewentry canvas{flex:none;width:44px;height:44px}
+.crewentry>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.crewentry b{font-family:var(--display);font-size:1rem;overflow-wrap:anywhere}.crewentry i{font-style:normal;font-size:.75rem;color:var(--muted)}
+.crewentry em{font-style:normal;font-family:var(--display);color:var(--p2);font-size:.85rem}
+.crewtag{display:inline-block;font-family:var(--display);font-size:.72em;font-weight:700;letter-spacing:.06em;color:var(--c,var(--p2));border:1px solid var(--c,var(--p2));border-radius:6px;padding:0 4px;margin-right:5px;vertical-align:.08em;line-height:1.35}
+.chead{display:flex;align-items:center;gap:14px}
+.chead canvas{flex:none;width:76px;height:76px}
+.chead>div{flex:1;min-width:0}.chead h2{overflow-wrap:anywhere;font-size:1.35rem}
+.chead .fine{margin:3px 0 0;display:block}
+.cmotto{font-style:italic;color:var(--ink);font-size:.85rem;margin:0;overflow-wrap:anywhere}
+.cbox{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.cbox h3{font-family:var(--display);font-size:.95rem;margin:0;display:flex;justify-content:space-between;gap:8px}
+.cbox h3 small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.75rem}
+.cbox .fine{margin:0}
+.cgoal{position:relative}.cgoal .bar{height:10px}
+.cgoal u{position:absolute;top:-2px;width:2px;height:14px;background:var(--ink);opacity:.55;text-decoration:none}
+.ctier{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:.8rem;color:var(--muted)}
+.ctier b{font-family:var(--display);color:var(--ink);font-size:.85rem;min-width:62px}
+.ctier.ok b{color:var(--gold)}.ctier .done{color:#5cff9d;font-size:.78rem;padding:0 6px}
+#crewMembers .fr{grid-template-columns:30px minmax(0,1fr) auto}
+#crewMembers .fr .av{width:30px;height:30px}
+#crewMembers .fr .st{text-align:right;line-height:1.35}
+#crewMembers .role{display:inline-block;font-style:normal;font-size:.66rem;font-family:var(--display);color:var(--gold);border:1px solid rgba(255,211,79,.5);border-radius:99px;padding:0 6px;margin-left:5px;vertical-align:.1em}
+#crewMembers .role.v{color:var(--p2);border-color:rgba(46,230,255,.5)}
+#crewMembers .acts{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#crewMembers .fr.tappable{cursor:pointer}
+.crow{display:flex;gap:8px}.crow .text{flex:1;min-width:0}.crow button{flex:none}
+#crewList .fr{grid-template-columns:40px minmax(0,1fr) auto}
+#crewList canvas,#tnList canvas{width:40px;height:40px}
+.cswatch{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.cswatch button{aspect-ratio:1;padding:0;border-radius:50%;box-shadow:none;border:2px solid transparent;background:var(--c)}
+.cswatch button[aria-checked="true"]{border-color:var(--ink);box-shadow:0 0 10px var(--c)}
+.csym{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.csym button{padding:4px;background:rgba(255,255,255,.04);border:1px solid var(--line);box-shadow:none;border-radius:10px}
+.csym button[aria-checked="true"]{border-color:var(--p2);background:rgba(46,230,255,.12)}
+.csym canvas{width:100%;aspect-ratio:1;display:block}
+.cpreview{display:flex;align-items:center;gap:12px}.cpreview canvas{width:64px;height:64px;flex:none}
+.cpreview b{font-family:var(--display);font-size:1.1rem;overflow-wrap:anywhere}
+.chint{color:#ff8fa0;min-height:1em}
+#tnCard{padding:6px 10px;cursor:pointer;background:linear-gradient(90deg,rgba(255,211,79,.16),rgba(255,79,139,.1));border-color:rgba(255,211,79,.5)}
+#tnCard.live{box-shadow:0 0 14px rgba(255,211,79,.25)}
+#tnCard .evic{font-size:1.25rem}#tnCard span#tnCardText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow button{font-size:.9rem;padding:10px 14px}
+.tnlive{position:absolute;top:4px;right:5px;font-style:normal;font-weight:700;line-height:1.3;font-family:var(--display);font-size:.58rem;letter-spacing:.08em;padding:1px 5px;border-radius:99px;background:var(--gold);color:#2a1600;box-shadow:0 0 8px rgba(255,211,79,.7)}
+#nav-1{position:relative}
+.tnprize{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.8rem;color:var(--muted)}
+.tnprize b{font-family:var(--display);color:var(--ink);font-size:.8rem}
+#tnList .fr{grid-template-columns:26px 22px minmax(0,1fr) auto}
+#tnList .fr .av{width:22px;height:22px}
+.tnclaim{border-color:rgba(255,211,79,.6);background:rgba(255,211,79,.08)}
 </style>
 </head>
 <body>
@@ -602,7 +705,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
     </div>
     <div class="pager" id="pager">
       <section class="page" id="page-campaign" aria-label="Kampagne">
-        <div class="hero" id="campHero"><canvas id="campCanvas" width="440" height="341" aria-hidden="true"></canvas>
+        <div class="hero" id="campHero"><button class="heromore ugentry" id="toCommunity" aria-label="Community-Level und Level-Editor">✎ Community ›</button><canvas id="campCanvas" width="440" height="341" aria-hidden="true"></canvas>
           <div class="cap"><span class="label" id="campLabel">Kampagne · Galaxie 1</span><h2 id="campName">Nova-Nebel</h2><p id="campSub"></p></div></div>
         <div class="stats">
           <div class="stat"><b id="campLevels">0/30</b><span>Level geschafft</span></div>
@@ -622,6 +725,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
           <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
         <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
         <div class="evcard" id="evCard" hidden><span class="evic" id="evIcon">🎪</span><div><b id="evName">Wochen-Event</b><span id="evText"></span><div class="bar" aria-hidden="true"><i id="evBar"></i></div></div><button class="mini" id="evClaim" hidden>Abholen</button></div>
+        <div class="evcard" id="tnCard" role="button" tabindex="0" hidden><span class="evic" aria-hidden="true">🏆</span><div><b id="tnCardName">Wochenend-Turnier</b><span id="tnCardText"></span></div><button class="mini" id="tnCardBtn">Ansehen</button></div>
         <p class="netstate" id="netState" hidden>Verbinde …</p>
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
@@ -657,6 +761,72 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <p class="invnote" style="margin:0">Die letzten 8 Duelle werden auf diesem Gerät gespeichert. Mit „Teilen“ bekommst du einen Link, den jeder ansehen kann.</p>
       <div class="rplist" id="rpList"></div>
       <button class="ghost" id="replaysBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="community" hidden>
+    <div class="card">
+      <span class="label">Community</span>
+      <h2>Community-Level</h2>
+      <p>Bau eigene Level, teile sie per Code und spiel die Level der anderen.</p>
+      <button id="ugBuild">✎ Level bauen</button>
+      <form class="ugcode" id="ugCodeForm" autocomplete="off">
+        <input id="ugCode" class="text" maxlength="7" placeholder="Code, z. B. K7Q-2MF" autocapitalize="characters" spellcheck="false" aria-label="Level-Code">
+        <button type="submit" class="alt" id="ugCodeGo">Spielen</button>
+      </form>
+      <div class="invtabs ugtabs" role="tablist" aria-label="Community-Level">
+        <button class="tab" role="tab" id="ugt-new">Neu</button><button class="tab" role="tab" id="ugt-top">Beliebt</button><button class="tab" role="tab" id="ugt-mine">Meine</button>
+      </div>
+      <p class="hint" id="ugInfo" hidden></p>
+      <ul class="uglist" id="ugList"></ul>
+      <button class="ghost" id="ugMore" hidden>Mehr laden</button>
+      <button class="ghost" id="ugBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="edscreen" id="editor" hidden>
+    <div class="edtop">
+      <button class="edbtn" id="edBack" aria-label="Zurück zur Community">‹</button>
+      <button class="edname" id="edNameBtn" aria-label="Name und Einstellungen"><span class="label" id="edGalName">Nova-Nebel</span><b id="edName">Neues Level</b></button>
+      <button class="edbtn" id="edSet" aria-label="Level-Einstellungen">⚙</button>
+      <button class="edtest" id="edTest">▶ Testen</button>
+    </div>
+    <p class="edmsg" id="edMsg" role="status"></p>
+    <div class="edbottom">
+      <div class="edsel" id="edSel" hidden>
+        <b id="edSelName">Mond</b>
+        <label class="edrange" id="edSizeRow"><span>Größe</span><input type="range" id="edSize" step="1"></label>
+        <label class="edrange" id="edOrbitRow" hidden><span>Bahn</span><input type="range" id="edOrbit" step="1"></label>
+        <button class="mini x" id="edTurn" hidden>↻ Richtung</button>
+        <button class="mini x danger" id="edDel">Löschen</button>
+        <button class="mini" id="edSelOk" aria-label="Auswahl beenden">✓</button>
+      </div>
+      <div class="edpal" id="edPal" role="toolbar" aria-label="Hinzufügen"></div>
+    </div>
+    <div class="edsheet" id="edSheet" hidden>
+      <div class="card">
+        <span class="label">Level-Editor</span>
+        <h2>Einstellungen</h2>
+        <input id="edNameIn" class="text" maxlength="24" spellcheck="false" placeholder="Name des Levels (3–24 Zeichen)" aria-label="Name des Levels">
+        <label class="pick"><span class="label">Aussehen</span><select id="edGalSel"></select></label>
+        <p class="fine" id="edAmmoInfo"></p>
+        <div class="edammos" id="edAmmo"></div>
+        <p class="fine">Tippe unten auf einen Himmelskörper, um ihn hinzuzufügen. Ziehen verschiebt, der Regler ändert die Größe. Veröffentlichen kannst du erst, wenn du dein Level im Testflug geschafft hast.</p>
+        <div class="btns"><button id="edSheetOk">Fertig</button><button class="ghost danger" id="edClear">Alles löschen</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ugdone" hidden>
+    <div class="card center">
+      <span class="label" id="ugdLabel">Community</span>
+      <div class="bigstars" id="ugdStars" hidden></div>
+      <h2 id="ugdTitle"></h2>
+      <p id="ugdInfo"></p>
+      <div class="ugbig" id="ugdCode" hidden></div>
+      <p class="reward" id="ugdReward"></p>
+      <p class="levelup" id="ugdLevelUp" hidden></p>
+      <div class="btns" id="ugdBtns"></div>
     </div>
   </div>
 
@@ -825,6 +995,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <span class="label">Online</span>
       <h2>Freunde</h2>
       <p class="fine" id="friendsNote"></p>
+      <button class="crewentry" id="toCrewF" aria-label="Crew"><canvas width="88" height="88" aria-hidden="true"></canvas><span><b>Crew</b><i>Gemeinsam Wochenziele schaffen</i></span><em>›</em></button>
       <div class="codebox">
         <span class="label">Dein Freundescode</span>
         <b id="friendCode">GD-0000-0000</b>
@@ -949,6 +1120,75 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
       <div class="lcal" id="loginCal"></div>
       <p class="reward" id="loginReward"></p>
       <div class="btns"><button id="loginClaim">Abholen</button><button class="ghost" id="loginBack">Später</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="crew" hidden>
+    <div class="card">
+      <span class="label">Crew</span>
+      <div id="crewIn" hidden>
+        <div class="btns">
+          <div class="chead"><canvas id="crewEmblem" width="152" height="152" aria-hidden="true"></canvas>
+            <div><h2 id="crewName">Crew</h2><span class="fine" id="crewInfo"></span></div></div>
+          <p class="cmotto" id="crewMotto"></p>
+          <div class="cbox">
+            <h3>Wochenziel <small id="crewWeekEnds"></small></h3>
+            <div class="cgoal"><div class="bar" aria-hidden="true"><i id="crewBar"></i></div><u style="left:18.75%"></u><u style="left:50%"></u></div>
+            <p class="fine" id="crewWeekText"></p>
+            <div id="crewTiers" class="btns" style="gap:6px"></div>
+          </div>
+          <div class="cbox"><h3>Mitglieder <small id="crewCount"></small></h3><div class="friendlist" id="crewMembers"></div></div>
+          <div class="codebox"><span class="label">Crew-Code zum Einladen</span><b id="crewCode">CR-000000</b><button class="ghost" id="crewCopy">Kopieren</button></div>
+          <form class="cbox" id="crewEdit" hidden>
+            <h3>Crew bearbeiten</h3>
+            <input id="crewMottoIn" class="text" maxlength="60" placeholder="Motto (max. 60 Zeichen)" autocomplete="off" aria-label="Motto" style="font-family:var(--body);font-size:.95rem">
+            <div class="seg" role="radiogroup" aria-label="Beitritt"><button type="button" id="crewOpen1" role="radio">Offen</button><button type="button" id="crewOpen0" role="radio">Nur mit Code</button></div>
+            <button type="submit" class="alt" id="crewSave">Speichern</button>
+          </form>
+          <button class="ghost danger" id="crewLeave">Crew verlassen</button>
+        </div>
+      </div>
+      <div id="crewOut" hidden>
+        <div class="btns">
+          <h2>Crew finden</h2>
+          <p class="fine" id="crewOutNote">Spielt zusammen im Wettkampf: Jeder Sieg zählt fürs Wochenziel eurer Crew – und alle holen sich die Belohnungen ab.</p>
+          <form class="crow" id="crewCodeForm"><input id="crewCodeIn" class="text" placeholder="CR-ABC123" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Crew-Code eingeben"><button type="submit" id="crewCodeGo">Beitreten</button></form>
+          <form class="crow" id="crewSearchForm"><input id="crewSearchIn" class="text" placeholder="Name oder Kürzel" maxlength="20" autocomplete="off" spellcheck="false" aria-label="Crews suchen" style="font-family:var(--body);font-size:.95rem"><button type="submit" class="alt" id="crewSearchGo">Suchen</button></form>
+          <div class="friendlist" id="crewList"></div>
+          <button class="alt" id="crewCreateOpen">Crew gründen · ✦ 500</button>
+        </div>
+      </div>
+      <p class="fine chint" id="crewHint" aria-live="polite"></p>
+      <button class="ghost" id="crewBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="crewNew" hidden>
+    <form class="card" id="crewNewForm">
+      <span class="label">Crew gründen</span>
+      <div class="cpreview"><canvas id="cnPreview" width="128" height="128" aria-hidden="true"></canvas><div><b id="cnPrevName">Deine Crew</b><br><span class="crewtag" id="cnPrevTag">TAG</span></div></div>
+      <input id="cnName" class="text" placeholder="Name (3–20 Zeichen)" maxlength="20" autocomplete="off" aria-label="Crew-Name" style="font-family:var(--body);font-size:1rem">
+      <input id="cnTag" class="text" placeholder="Kürzel (2–4, z. B. GD7)" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Crew-Kürzel">
+      <span class="label">Farbe</span><div class="cswatch" id="cnColors" role="radiogroup" aria-label="Farbe"></div>
+      <span class="label">Wappen</span><div class="csym" id="cnSymbols" role="radiogroup" aria-label="Wappen"></div>
+      <div class="seg" role="radiogroup" aria-label="Beitritt"><button type="button" id="cnOpen1" role="radio">Offen für alle</button><button type="button" id="cnOpen0" role="radio">Nur mit Code</button></div>
+      <p class="fine chint" id="cnHint" aria-live="polite"></p>
+      <button type="submit" id="cnGo">Gründen · ✦ 500</button>
+      <button type="button" class="ghost" id="cnBack">Zurück</button>
+    </form>
+  </div>
+
+  <div class="overlay" id="tourney" hidden>
+    <div class="card">
+      <span class="label">Wettkampf</span>
+      <h2>Wochenend-Turnier</h2>
+      <p class="fine" id="tnStatus" style="margin:0"></p>
+      <div class="stats"><div class="stat"><b id="tnPoints">0</b><span>Punkte</span></div><div class="stat"><b id="tnMatches">0/20</b><span>Spiele gewertet</span></div><div class="stat"><b id="tnRank">–</b><span>Dein Platz</span></div></div>
+      <div class="cbox tnclaim" id="tnClaimBox" hidden><h3 id="tnClaimTitle">Letztes Turnier</h3><p class="fine" id="tnClaimText"></p><button id="tnClaim">Abholen</button></div>
+      <p class="fine" style="margin:0">Jedes Wettkampf-Spiel (online oder gegen die KI) von Freitag 18 Uhr bis Sonntag 22 Uhr zählt: Sieg 3 Punkte, Niederlage 1 Punkt. Höchstens 20 Spiele pro Turnier. Bei Gleichstand gewinnt, wer die Punkte zuerst hatte.</p>
+      <div class="cbox"><h3>Belohnungen</h3><div class="tnprize" id="tnPrizes"></div></div>
+      <div class="cbox"><h3 id="tnListTitle">Rangliste <small id="tnPlayers"></small></h3><div class="friendlist" id="tnList"></div></div>
+      <button class="ghost" id="tnBack">Zurück</button>
     </div>
   </div>
 
@@ -3378,7 +3618,7 @@ const DIFFS=[null,{name:'Kadett',short:'Freies Feuer',info:'Unbegrenzt viele Sch
   {name:'Legende',short:'Kein Fehlschuss',info:'Nur so viele Schüsse wie die beste Lösung braucht.'}];
 let campDiff=Math.min(3,Math.max(1,load('gravityDuel.campDiff.v1',1)|0));
 const pkey=(g,d=campDiff)=>d===1?g.id:g.id+'@'+d;
-const shotLimit=L=>dailyMode?0:campDiff===2?L.par+4:campDiff===3?L.par:0;
+const shotLimit=L=>dailyMode||ugPlay?0:campDiff===2?L.par+4:campDiff===3?L.par:0;
 for(const g of GALAXIES) for(const d of [1,2,3]) if(!Array.isArray(progress[pkey(g,d)])) progress[pkey(g,d)]=[];
 let seen=load(KEYS.seen,{});
 
@@ -3437,6 +3677,7 @@ function resize(){
   dpr=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
   if(online||replay){ const fh=replay?replay.r.H:ONLINE_H; scale=Math.min(r.width/400,r.height/fh); W=400; H=fh; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
+  else if(mode==='edit'){ scale=r.width/400; W=400; H=560; offX=0; offY=Math.max(0,(r.height/scale-H)/2) }
   else { scale=r.width/400; W=400; H=Math.max(560,r.height/scale); offX=0; offY=0 }
   safeTop=probe.getBoundingClientRect().height||0;
   for(const b of bodies){ if(b.kind==='planet') b.fy=b.owner===0?(H-PLANET_GAP)/H:PLANET_GAP/H; b.y=b.fy*H }
@@ -3709,8 +3950,8 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,op
   if(curEvent&&!online&&!ai) setTimeout(()=>toast(`${curEvent.icon} ${curEvent.name}: ${curEvent.desc}`),900);
 }
 let levelDiff=1; // the difficulty the running level was started with
-let dailyMode=false, dailyGal=null, dailyData=null;
-const curGalaxy=()=>dailyMode&&dailyGal?dailyGal:GALAXIES[galIdx];
+let ugPlay=null; let dailyMode=false, dailyGal=null, dailyData=null;
+const curGalaxy=()=>ugPlay?ugPlay.gal:dailyMode&&dailyGal?dailyGal:GALAXIES[galIdx];
 const curLevel=()=>curGalaxy().levels[levelIdx];
 function newLevelMap(){
   const L=curLevel(); curEvent=null; applyMod(0); scene=makeScene(curGalaxy().id,galIdx*100+levelIdx+1); bodies=[];
@@ -3837,9 +4078,9 @@ function coverFor(o){
 function coverReady(){ show(null); startTurn() }
 function startLevel(i){
   mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
-  levelDiff=campDiff; if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
+  levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
   const L=curLevel();
-  banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:dailyMode?'Tageslevel':`Level ${i+1}`,sub:L.name,t:1.8,player:0};
+  banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:ugPlay?(ugPlay.test?'Testflug':'Community-Level'):dailyMode?'Tageslevel':`Level ${i+1}`,sub:L.name,t:1.8,player:0};
   // explain new weapons and new kinds of bodies the first time they show up
   introQueue=[];
   for(const k of Object.keys(L.ammo||{})) if(!seen[k]){ seen[k]=true; introQueue.push({label:'Neues Geschoss',title:WEAPONS[k].name,text:WEAPONS[k].info}); players[0].weapon=k }
@@ -5120,7 +5361,7 @@ function levelFailed(){
   $('next').hidden=true; $('retry').hidden=false; $('retry').textContent='Nochmal versuchen';
   show('clear');
 }
-function levelCleared(){
+function levelCleared(){ if(ugPlay) return ugCleared();
   if(dailyMode) return dailyCleared();
   phase='over';
   const g=curGalaxy(), L=curLevel(), prog=progress[pkey(g)]||(progress[pkey(g)]=[]);
@@ -5379,7 +5620,7 @@ function drawLastPower(){
 }
 function drawCampaignHud(){
   const L=curLevel(), top=safeTop/scale+26; // level with the menu/sound chips
-  textAt(`${curGalaxy().name.toUpperCase()} · ${levelIdx+1}${campDiff>1?' · '+DIFFS[campDiff].name.toUpperCase():''}`,W/2,top,false,campDiff===3?'#ff8a8a':campDiff===2?COL.gold:COL.ink,13);
+  if(ugPlay) textAt((ugPlay.test?'TESTFLUG · ':'')+curGalaxy().name.toUpperCase(),W/2,top,false,ugPlay.test?'#2ee6ff':COL.ink,13); else textAt(`${curGalaxy().name.toUpperCase()} · ${levelIdx+1}${campDiff>1?' · '+DIFFS[campDiff].name.toUpperCase():''}`,W/2,top,false,campDiff===3?'#ff8a8a':campDiff===2?COL.gold:COL.ink,13);
   // stars still reachable: while aiming this counts the shot about to be fired
   const nextStars=starsFor(phase==='aim'?shotCount+1:shotCount,L.par);
   const lim=shotLimit(L), left=lim-shotCount;
@@ -5454,6 +5695,7 @@ function draw(t){
     ctx.beginPath(); ctx.moveTo(m.x-6,m.y-6); ctx.lineTo(m.x+6,m.y+6); ctx.moveTo(m.x+6,m.y-6); ctx.lineTo(m.x-6,m.y+6); ctx.stroke(); ctx.shadowBlur=0;
     textAt(m.d<=0?`Treffer · ${Math.round(m.dc)}`:String(m.d),m.x,m.y+(m.o===1?-16:16),flipFor(m.o),c,12);
   }
+  if(phase==='edit') edDraw(t);
   drawAim();
   if(phase==='aim') drawLastPower();
   ctx.restore();
@@ -6687,7 +6929,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['replays','setup','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -6771,7 +7013,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'&&page<2) $('nav-'+(page+1)).click();
   if(e.key==='ArrowLeft'&&page>0) $('nav-'+(page-1)).click();
 });
-function goHome(p){
+function goHome(p){ ugReset();
   dailyMode=false; if(p===1) setTimeout(loadEvent,300);
   if(online) onlineCleanup();
   endAi();
@@ -7014,6 +7256,7 @@ function renderShop(){
     else if(owned){ b.className='own'; b.textContent='Im Inventar'; b.onclick=()=>openInventory(shopTab) }
     else if(it.season){ b.textContent=`Saison ${it.season}`; b.disabled=true }
     else if(it.src==='campaign'){ const gi=GALAXIES.findIndex(g=>g.id===it.gal); b.textContent=`Kampagne · ${gi>=0?GALAXIES[gi].name:''} · ${DIFFS[it.diff].name}`; b.disabled=true; b.className='src' }
+    else if(it.src==='tourney'){ b.textContent='Wochenend-Turnier'; b.disabled=true; b.className='src' }
     else if(it.src==='void'){ b.textContent='Nur im Void'; b.disabled=true; b.className='src void' }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
@@ -7076,6 +7319,7 @@ function itemSource(cat,it){
   if(it.src==='void'||it.rarity==='void') return 'Void-Spiele';
   if(it.season) return `Saisonpass ${it.season}`;
   if(it.src==='campaign'){ const g=GALAXIES.find(x=>x.id===it.gal); return `Kampagne · ${g?g.name:it.gal} · ${DIFFS[it.diff||1].name}` }
+  if(it.src==='tourney') return 'Wochenend-Turnier';
   if(it.src==='album') return 'Sammelalbum';
   if(!it.price) return 'Startausrüstung';
   return `Shop · Kisten${it.minLevel?` · ab Stufe ${it.minLevel}`:''}`;
@@ -8007,7 +8251,7 @@ tap('albBack',()=>openInventory());
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
-tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
+tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='crew') return openCrew(); if(crateFrom==='tourney') return openTourney(); if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
 tap('qtab-tasks',()=>setQTab('tasks'));
 tap('qtab-season',()=>setQTab('season'));
 tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
@@ -8063,7 +8307,7 @@ tap('next',()=>{
 tap('retry',()=>startLevel(levelIdx));
 tap('clearBack',()=>goLevels());
 tap('introOk',nextIntro);
-tap('back',()=>{ if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
+tap('back',()=>{ if(ugPlay&&!online&&!ai) return ugBack(); if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
 /* sound settings: the volume sliders, the on/off switches and the in-game chips all show one state (kept in Sfx) */
 function syncAudioUI(){
   const m=Sfx.volume('music'), s=Sfx.volume('sfx');
@@ -8106,6 +8350,732 @@ tap('arenasBack',()=>goHome(1));
 tap('boardBack',()=>goHome(1));
 for(const m of ['classic','blitz']){ tap('om-'+m,()=>setOnlineMode(m)); tap('fm-'+m,()=>setOnlineMode(m)) }
 $('addForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); addFriend($('addCode').value) });
+
+/* ---------- level editor + community levels (server: gd_ulevel_* in schema-11-editor.sql) ----------
+   The editor works on a fixed field of 400×560 (the smallest field height), so a level that fits here
+   fits on every phone. The same checks run on the server in gd_ulevel_clean. */
+const ED_T={ // name, short label, r min, r max, r default
+  n:['Mond','Mond',16,36,24], i:['Eismond','Eis',20,40,28], h:['Neutronenstern','Neutron',9,13,11], r:['Abstoßer','Abstoßer',14,27,18],
+  p:['Pulsar','Pulsar',10,14,12], b:['Schwarzes Loch','Loch',9,12,10], o:['Wandermond','Wander',13,20,15], d:['Doppelstern','Doppel',9,12,10],
+  w:['Wurmloch','Wurmloch',15,15,15], g:['Gaswolke','Gas',36,60,44], f:['Sonnenwind','Wind',40,60,46], m:['Spiegelkristall','Spiegel',13,25,18], a:['Asteroid','Asteroid',7,11,9]};
+const ED_ORBIT={o:[30,65,40,3],d:[24,38,30,2.8]}; // orbit radius min, max, default; period in s
+const ED_ORDER=['n','i','h','r','p','b','o','d','w','g','f','m','a'];
+const ED_MAX=8, ED_HR=560, ED_KEY='gravityDuel.editorDraft.v1';
+const ugCode=c=>String(c||'').slice(0,3)+'-'+String(c||'').slice(3);
+let ED=null, ugPrevGal=0, ugTab='new', ugItems=[], ugMoreOk=false, ugBusy=false;
+function edBlank(){ return {name:'',gal:'nova',ammo:{},items:[],targets:[[200,.18]],tested:null,sel:null} }
+function edLoad(){
+  const d=load(ED_KEY,null); ED=edBlank();
+  if(d&&typeof d==='object'){
+    if(typeof d.name==='string') ED.name=d.name.slice(0,24);
+    if(THEMES[d.gal]&&GALAXIES.some(g=>g.id===d.gal)) ED.gal=d.gal;
+    if(d.ammo&&typeof d.ammo==='object') for(const k of SPECIALS) if(d.ammo[k]>0) ED.ammo[k]=Math.min(3,d.ammo[k]|0);
+    if(Array.isArray(d.items)) ED.items=d.items.filter(it=>it&&ED_T[it.t]&&isFinite(it.x)&&isFinite(it.fy)&&isFinite(it.r)).slice(0,ED_MAX);
+    if(Array.isArray(d.targets)) ED.targets=d.targets.filter(t=>Array.isArray(t)&&isFinite(t[0])&&isFinite(t[1])).slice(0,3);
+    if(d.tested&&typeof d.tested.key==='string') ED.tested={key:d.tested.key,shots:Math.max(1,d.tested.shots|0)};
+  }
+}
+const edSave=()=>save(ED_KEY,{name:ED.name,gal:ED.gal,ammo:ED.ammo,items:ED.items.map(({cr,...it})=>it),targets:ED.targets,tested:ED.tested});
+const edCount=()=>ED.items.reduce((a,it)=>a+(it.t==='d'?2:1),0);
+const edRound=(v,k)=>Math.round(v*10**k)/10**k;
+/* the bodies one editor item stands for (a double star is two) */
+function edSpecs(it){
+  const s={x:Math.round(it.x),fy:edRound(it.fy,3),r:Math.round(it.r),t:it.t};
+  if(ED_ORBIT[it.t]){ s.R=Math.round(it.R); s.P=ED_ORBIT[it.t][3]; s.ph=0 }
+  if(it.t==='w') s.pr=it.pr|0;
+  if(it.t==='f') s.a=edRound(it.a||0,3);
+  if(it.t==='d') return [s,{...s,ph:3.1416}];
+  return [s];
+}
+function edLevel(){
+  const moons=[]; for(const it of ED.items) moons.push(...edSpecs(it));
+  const ammo={}; for(const k of SPECIALS) if(ED.ammo[k]>0) ammo[k]=ED.ammo[k];
+  return {moons,targets:ED.targets.map(([x,fy])=>[Math.round(x),edRound(fy,3)]),ammo};
+}
+const edExt=s=>s.R?s.R+s.r:s.t==='b'?s.r*2.8:s.r;
+/* the server's rules (gd_ulevel_clean): returns the keys of the parts that break one, and why */
+function edCheck(){
+  const bad=new Set(); let why='';
+  const flag=(k,w)=>{ bad.add(k); if(!why) why=w };
+  const list=[]; ED.items.forEach((it,i)=>edSpecs(it).forEach(s=>list.push({s,i})));
+  const py=ED_HR-120, zone=s=>s.t==='g'||s.t==='f';
+  for(const {s,i} of list){
+    if(Math.hypot(s.x-200,s.fy*ED_HR-py)<edExt(s)+38) flag(i,'Zu nah an deinem Startplaneten');
+    if(s.x<10||s.x>390||s.fy<.08||s.fy>.8) flag(i,'Zu nah am Rand');
+  }
+  for(let a=0;a<list.length;a++) for(let b=a+1;b<list.length;b++){
+    const A=list[a].s, B=list[b].s;
+    if(zone(A)||zone(B)||list[a].i===list[b].i) continue;
+    if(Math.hypot(A.x-B.x,(A.fy-B.fy)*ED_HR)<edExt(A)+edExt(B)+4){ flag(list[a].i,'Himmelskörper überlappen sich'); flag(list[b].i,'Himmelskörper überlappen sich') }
+  }
+  const tg=edLevel().targets;
+  if(!tg.length) why=why||'Setze mindestens ein Ziel';
+  tg.forEach(([x,fy],k)=>{
+    if(Math.hypot(x-200,fy*ED_HR-py)<50) flag('T'+k,'Ziel zu nah an deinem Startplaneten');
+    if(x<20||x>380||fy<.06||fy>.8) flag('T'+k,'Ziel zu nah am Rand');
+    for(const {s,i} of list) if(!zone(s)&&Math.hypot(x-s.x,(fy-s.fy)*ED_HR)<edExt(s)+18){ flag('T'+k,'Ein Ziel liegt in einem Himmelskörper'); bad.add(i) }
+    for(let j=0;j<k;j++) if(Math.hypot(x-tg[j][0],(fy-tg[j][1])*ED_HR)<30){ flag('T'+k,'Ziele liegen zu dicht beieinander'); bad.add('T'+j) }
+  });
+  return {bad,why,ok:!why};
+}
+const edKey=()=>JSON.stringify(edLevel());
+const edTested=()=>!!(ED.tested&&ED.tested.key===edKey());
+
+/* ---------- editor screen ---------- */
+function edOpen(){
+  if(!ED) edLoad();
+  ugReset();
+  mode='edit'; phase='edit'; turn=0; banner={text:'',sub:'',t:0,player:0}; resetShotState();
+  resize(); scene=makeScene(ED.gal,11); ED.sel=null; edSync();
+  show('editor'); $('edSheet').hidden=true; edRenderTop();
+  requestAnimationFrame(edPalette);
+}
+function edSync(){
+  const p=mkPlanet(0); bodies=[p]; players=[mkPlayer('Du',{},mySkin())]; players[0].planet=p;
+  ED.items.forEach((it,i)=>{ for(const s of edSpecs(it)){ const b=PHYS.makeBody(s,H); b.craters=it.cr||(it.cr=withCraters({}).craters); b.ed=i; bodies.push(b) } });
+  PHYS.linkPortals(bodies);
+  ED.targets.forEach(([x,fy],k)=>{ const b=mkTarget(x,fy); b.spin=k*2.1; b.ed='T'+k; bodies.push(b) });
+  PHYS.advance(bodies,0,H);
+  ED.check=edCheck(); edRenderSel(); edRenderMsg();
+}
+function edChanged(){ edSync(); edSave() }
+function edRenderTop(){
+  $('edName').textContent=ED.name.trim()||'Neues Level';
+  $('edGalName').textContent=THEMES[ED.gal].name;
+}
+function edRenderMsg(){
+  const c=ED.check, el=$('edMsg');
+  el.classList.toggle('bad',!c.ok);
+  el.textContent=!c.ok?c.why:edTested()?`Getestet mit ${ED.tested.shots} ${ED.tested.shots===1?'Schuss':'Schüssen'} ✓ · bereit zum Veröffentlichen`:`Körper ${edCount()}/${ED_MAX} · Ziele ${ED.targets.length}/3 · Ziehen zum Verschieben`;
+  $('edTest').textContent=edTested()?'Teilen':'▶ Testen';
+}
+function edPalette(){
+  const box=$('edPal'); if(box.hidden) return; box.innerHTML='';
+  const add=(k,label,draw)=>{ const b=document.createElement('button'); b.className='edtool'; b.id='edAdd-'+k; b.setAttribute('aria-label',(k==='T'?'Ziel':ED_T[k][0])+' hinzufügen');
+    b.innerHTML=`<canvas aria-hidden="true"></canvas><span>${label}</span>`; box.appendChild(b);
+    b.addEventListener('click',()=>{ Sfx.init(); edAdd(k) });
+    const c=b.querySelector('canvas'), g=fitCanvas(c), w=c.width/dpr, h=c.height/dpr; if(!w) return;
+    g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h); draw(g,w/2,h/2);
+  };
+  add('T','Ziel',(g,x,y)=>{ g.shadowColor=COL.gold;g.shadowBlur=10;g.fillStyle=COL.gold;g.beginPath();g.arc(x,y,4,0,7);g.fill();g.strokeStyle=COL.gold;g.lineWidth=2;g.beginPath();g.arc(x,y,10,.3,1.9);g.stroke();g.beginPath();g.arc(x,y,10,3.4,5);g.stroke();g.shadowBlur=0 });
+  for(const t of ED_ORDER) add(t,ED_T[t][1],(g,x,y)=>{
+    const r={g:15,f:15,i:12,n:11,m:10,r:10,w:9,o:9}[t]||7;
+    const b={kind:t==='w'?'portal':t==='g'?'cloud':t==='f'?'field':'moon',type:t,x,y,r,m0:r*r*(PHYS.TYPES[t].density||1)*3,pair:0,a:-Math.PI/4,craters:[{a:.6,d:.4,s:.2},{a:2.4,d:.3,s:.15},{a:4.2,d:.5,s:.18}]};
+    g.save(); drawBody(g,b,1.3,0); g.restore();
+  });
+}
+/* a free spot for something new: scan from the middle outwards */
+function edFree(ext){
+  const all=[]; ED.items.forEach(it=>edSpecs(it).forEach(s=>all.push({x:s.x,y:s.fy*ED_HR,e:edExt(s)})));
+  ED.targets.forEach(([x,fy])=>all.push({x,y:fy*ED_HR,e:14}));
+  for(let ring=0;ring<12;ring++) for(let k=0;k<Math.max(1,ring*6);k++){
+    const a=k/Math.max(1,ring*6)*Math.PI*2, x=Math.round(200+Math.cos(a)*ring*28), y=Math.round(ED_HR*.4+Math.sin(a)*ring*24);
+    if(x-ext<12||x+ext>388||y<ED_HR*.1||y>ED_HR*.75) continue;
+    if(Math.hypot(x-200,y-(ED_HR-120))<ext+44) continue;
+    if(all.every(o=>Math.hypot(o.x-x,o.y-y)>=o.e+ext+10)) return {x,fy:edRound(y/ED_HR,3)};
+  }
+  return {x:200,fy:.4};
+}
+function edAdd(k){
+  if(k==='T'){
+    if(ED.targets.length>=3) return toast('Höchstens 3 Ziele pro Level');
+    const p=edFree(14); ED.targets.push([p.x,p.fy]); ED.sel='T'+(ED.targets.length-1);
+  } else {
+    const need=k==='d'||k==='w'?2:1;
+    if(edCount()+need>ED_MAX) return toast(`Höchstens ${ED_MAX} Himmelskörper pro Level`);
+    const [,, ,, r]=ED_T[k], it={t:k,r};
+    if(ED_ORBIT[k]) it.R=ED_ORBIT[k][2];
+    if(k==='f') it.a=-Math.PI/2;
+    if(k==='w'){
+      const used=new Set(ED.items.filter(x=>x.t==='w').map(x=>x.pr));
+      const pr=[0,1].find(n=>!used.has(n)); if(pr===undefined) return toast('Höchstens 2 Wurmloch-Paare');
+      it.pr=pr; Object.assign(it,edFree(15)); ED.items.push(it);
+      const it2={t:'w',r:15,pr}; Object.assign(it2,edFree(15)); ED.items.push(it2);
+      ED.sel=ED.items.length-1; Sfx.select(); return edChanged();
+    }
+    Object.assign(it,edFree(edExt({...it,R:it.R}))); ED.items.push(it); ED.sel=ED.items.length-1;
+  }
+  Sfx.select(); edChanged();
+}
+function edDelete(){
+  const s=ED.sel; if(s===null||s===undefined) return;
+  if(typeof s==='string'){ ED.targets.splice(+s.slice(1),1) }
+  else { const it=ED.items[s]; ED.items=ED.items.filter(x=>x!==it&&!(it.t==='w'&&x.t==='w'&&x.pr===it.pr)) }
+  ED.sel=null; Sfx.select(); edChanged();
+}
+function edRenderSel(){
+  const s=ED.sel, box=$('edSel');
+  const it=typeof s==='number'?ED.items[s]:null, isT=typeof s==='string'&&ED.targets[+s.slice(1)];
+  if(!it&&!isT){ ED.sel=null; box.hidden=true; if($('edPal').hidden){ $('edPal').hidden=false; if(!$('edPal').childElementCount) requestAnimationFrame(edPalette) } return }
+  box.hidden=false; $('edPal').hidden=true;
+  $('edSelName').textContent=it?ED_T[it.t][0]:'Ziel';
+  const sz=$('edSize'), fixed=!it||ED_T[it.t][2]===ED_T[it.t][3];
+  $('edSizeRow').hidden=fixed;
+  if(!fixed){ sz.min=ED_T[it.t][2]; sz.max=ED_T[it.t][3]; sz.value=it.r }
+  const orb=it&&ED_ORBIT[it.t]; $('edOrbitRow').hidden=!orb;
+  if(orb){ $('edOrbit').min=orb[0]; $('edOrbit').max=orb[1]; $('edOrbit').value=it.R }
+  $('edTurn').hidden=!(it&&it.t==='f');
+}
+/* pointer: pick the smallest thing under the finger and drag it */
+function edHit(p){
+  let best=null, bestR=1e9;
+  ED.targets.forEach(([x,fy],k)=>{ const r=22; if(Math.hypot(p.x-x,p.y-fy*H)<r&&r<bestR){ best='T'+k; bestR=r } });
+  ED.items.forEach((it,i)=>{
+    const cy=it.fy*H, d=Math.hypot(p.x-it.x,p.y-cy);
+    let r=Math.max(it.r+8,20);
+    if(ED_ORBIT[it.t]) r=Math.max(20,it.R+it.r);
+    if(d<r&&r<bestR){ best=i; bestR=r }
+    if(it.t==='o'){ const b=bodies.find(x=>x.ed===i); if(b&&Math.hypot(p.x-b.x,p.y-b.y)<Math.max(20,it.r+8)&&it.r+8<bestR){ best=i; bestR=it.r+8 } }
+  });
+  return best;
+}
+let edDrag=null;
+cv.addEventListener('pointerdown',e=>{
+  if(phase!=='edit'||current!=='editor') return;
+  const p=toWorld(e), h=edHit(p);
+  if(h===null){ if(ED.sel!==null){ ED.sel=null; edRenderSel() } return }
+  ED.sel=h; edRenderSel();
+  const o=typeof h==='string'?{x:ED.targets[+h.slice(1)][0],y:ED.targets[+h.slice(1)][1]*H}:{x:ED.items[h].x,y:ED.items[h].fy*H};
+  edDrag={id:e.pointerId,dx:o.x-p.x,dy:o.y-p.y,moved:false};
+  try{ cv.setPointerCapture(e.pointerId) }catch(_){}
+  Sfx.select();
+});
+cv.addEventListener('pointermove',e=>{
+  if(!edDrag||e.pointerId!==edDrag.id||phase!=='edit') return;
+  const p=toWorld(e), s=ED.sel; let x=p.x+edDrag.dx, y=p.y+edDrag.dy;
+  x=Math.round(Math.max(typeof s==='string'?20:10,Math.min(typeof s==='string'?380:390,x)));
+  const fy=edRound(Math.max(.08,Math.min(.8,y/H)),3);
+  if(typeof s==='string') ED.targets[+s.slice(1)]=[x,fy]; else if(ED.items[s]){ ED.items[s].x=x; ED.items[s].fy=fy }
+  edDrag.moved=true; edSync();
+});
+const edUp=e=>{ if(!edDrag||e.pointerId!==edDrag.id) return; const m=edDrag.moved; edDrag=null; if(m) edSave() };
+cv.addEventListener('pointerup',edUp); cv.addEventListener('pointercancel',edUp);
+/* drawn inside draw(): selection, problems and the start area */
+function edDraw(t){
+  const pl=bodies[0]; if(!pl||!ED) return;
+  ctx.save();
+  ctx.strokeStyle='rgba(169,156,214,.25)'; ctx.setLineDash([3,6]); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(pl.x,pl.y,62,0,7); ctx.stroke(); ctx.setLineDash([]);
+  const bad=ED.check?ED.check.bad:new Set();
+  const ring=(k,col,w,dash)=>{
+    let x,y,r;
+    if(typeof k==='string'){ const tg=ED.targets[+k.slice(1)]; if(!tg) return; x=tg[0]; y=tg[1]*H; r=20 }
+    else { const it=ED.items[k]; if(!it) return; x=it.x; y=it.fy*H; r=(ED_ORBIT[it.t]?it.R+it.r:it.t==='b'?it.r*2.8:it.r)+7 }
+    ctx.strokeStyle=col; ctx.lineWidth=w; ctx.setLineDash(dash); ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.stroke(); ctx.setLineDash([]);
+  };
+  for(const k of bad) ring(k,'rgba(255,79,107,.9)',2,[]);
+  if(ED.sel!==null&&ED.sel!==undefined){ ring(ED.sel,bad.has(ED.sel)?'#ff4f6b':'#2ee6ff',1.6,[5,4]);
+    const it=typeof ED.sel==='number'&&ED.items[ED.sel];
+    if(it&&it.t==='w'){ const o=ED.items.find(x=>x!==it&&x.t==='w'&&x.pr===it.pr); if(o) ring(ED.items.indexOf(o),'rgba(46,230,255,.45)',1.2,[2,5]) } }
+  ctx.restore();
+  textAt('START',pl.x,pl.y+pl.r+18,false,'rgba(169,156,214,.55)',10);
+}
+
+/* ---------- settings sheet: name, look, special shots ---------- */
+function edSheet(){
+  $('edNameIn').value=ED.name;
+  const sel=$('edGalSel'); sel.innerHTML=GALAXIES.map(g=>`<option value="${g.id}"${g.id===ED.gal?' selected':''}>${esc(THEMES[g.id].name)}</option>`).join('');
+  edAmmoRows(); $('edClear').textContent='Alles löschen'; $('edClear').dataset.sure='';
+  $('edSheet').hidden=false;
+}
+function edAmmoRows(){
+  const tot=SPECIALS.reduce((a,k)=>a+(ED.ammo[k]||0),0);
+  $('edAmmoInfo').textContent=`Spezialgeschosse ${tot}/6 · Standardschüsse hat man immer`;
+  $('edAmmo').innerHTML=SPECIALS.map(k=>`<div class="edammo"><span>${WEAPONS[k].name}</span><button class="mini x" data-k="${k}" data-d="-1" aria-label="${WEAPONS[k].name} weniger"${(ED.ammo[k]||0)<=0?' disabled':''}>−</button><b>${ED.ammo[k]||0}</b><button class="mini x" data-k="${k}" data-d="1" aria-label="${WEAPONS[k].name} mehr"${(ED.ammo[k]||0)>=3||tot>=6?' disabled':''}>+</button></div>`).join('');
+}
+$('edAmmo').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]'); if(!b) return;
+  const k=b.dataset.k, n=Math.max(0,Math.min(3,(ED.ammo[k]||0)+(+b.dataset.d)));
+  if(n) ED.ammo[k]=n; else delete ED.ammo[k];
+  Sfx.select(); edAmmoRows(); edChanged();
+});
+$('edNameIn').addEventListener('input',()=>{ ED.name=$('edNameIn').value.replace(/[\u0000-\u001f]/g,'').slice(0,24); edRenderTop(); edSave() });
+$('edGalSel').addEventListener('change',()=>{ ED.gal=$('edGalSel').value; scene=makeScene(ED.gal,11); edRenderTop(); edSave() });
+tap('edSheetOk',()=>{ $('edSheet').hidden=true });
+tap('edClear',()=>{ const b=$('edClear'); if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Wirklich alles löschen?'; return }
+  ED.items=[]; ED.targets=[[200,.18]]; ED.ammo={}; ED.sel=null; ED.name=''; $('edNameIn').value=''; edAmmoRows(); edRenderTop(); edChanged(); $('edSheet').hidden=true; toast('Neues, leeres Level') });
+tap('edSet',edSheet);
+tap('edNameBtn',edSheet);
+tap('edDel',edDelete);
+tap('edSelOk',()=>{ ED.sel=null; edRenderSel() });
+tap('edTurn',()=>{ const it=ED.items[ED.sel]; if(!it) return; it.a=edRound(((it.a||0)+Math.PI/4)%(Math.PI*2),3); Sfx.select(); edChanged() });
+$('edSize').addEventListener('input',()=>{ const it=ED.items[ED.sel]; if(!it) return; it.r=+$('edSize').value; edSync() });
+$('edOrbit').addEventListener('input',()=>{ const it=ED.items[ED.sel]; if(!it) return; it.R=+$('edOrbit').value; edSync() });
+$('edSize').addEventListener('change',edSave); $('edOrbit').addEventListener('change',edSave);
+tap('edBack',()=>{ ED.sel=null; openCommunity() });
+tap('edTest',()=>{ if(edTested()) return ugDone('test'); edTest() });
+
+/* ---------- test flight and play: a normal campaign level, wrapped ---------- */
+async function edTest(){
+  const c=ED.check=edCheck();
+  if(!c.ok){ toast(c.why); Sfx.miss(); return }
+  if(!ED.targets.length){ toast('Setze mindestens ein Ziel'); return }
+  const L=edLevel(), key=JSON.stringify(L);
+  $('edTest').disabled=true;
+  if(SERVER_ECON&&econReady()) try{ await rpc('gd_ulevel_test_start',{p_level:L}) }catch(e){ $('edTest').disabled=false; return toast(ugErr(e)) }
+  $('edTest').disabled=false;
+  ugStart({test:true,key,galId:ED.gal,level:{name:ED.name.trim()||'Neues Level',par:99,...L}});
+}
+function ugStart(o){
+  if(!ugPlay) ugPrevGal=galIdx;
+  const gi=Math.max(0,GALAXIES.findIndex(g=>g.id===o.galId));
+  ugPlay={...o,gal:{id:GALAXIES[gi].id,name:o.level.name,levels:[o.level]}};
+  galIdx=gi; dailyMode=false; mode='campaign'; resize();
+  startLevel(0);
+}
+function ugReset(){
+  if(ugPlay){ ugPlay=null; galIdx=ugPrevGal }
+  if(mode==='edit'){ mode='campaign'; resize() }
+}
+function ugBack(){ const test=ugPlay&&ugPlay.test; ugReset(); if(test) edOpen(); else openCommunity() }
+function ugCleared(){
+  phase='over'; const u=ugPlay, n=Math.max(1,shotCount);
+  if(u.test){ if(ED&&u.key===edKey()){ ED.tested={key:u.key,shots:n}; edSave() } [0,1,2].forEach(i=>setTimeout(()=>Sfx.star(i),150+i*180)); return ugDone('test') }
+  const st=starsFor(n,u.level.par);
+  [0,1,2].slice(0,st).forEach(i=>setTimeout(()=>Sfx.star(i),150+i*180));
+  ugDone('play',{st,n});
+  if(!SERVER_ECON||!econReady()){ $('ugdReward').textContent='Ohne Verbindung nicht gewertet'; return }
+  $('ugdReward').textContent='Wird gewertet …';
+  rpc('gd_ulevel_done',{p_id:u.id,p_shots:n}).then(r=>{
+    if(r.state) applyEcon(r.state);
+    if(r.level) Object.assign(u.item||{},r.level);
+    if(current!=='ugdone'||ugPlay!==u) return;
+    $('ugdReward').textContent=r.reward?`Erster Abschluss! ${rewardLine(r.reward)}`:r.why==='limit'?'Heute schon 5 Belohnungen für Community-Level abgeholt':r.why==='own'?'Dein eigenes Level · keine Belohnung':'Schon geschafft · keine neue Belohnung';
+    if(r.reward&&r.reward.up){ $('ugdLevelUp').hidden=false; $('ugdLevelUp').textContent=upLine(r.reward); Sfx.levelup() }
+    ugLikeBtn();
+  }).catch(e=>{ if(current==='ugdone') $('ugdReward').textContent=ugErr(e) });
+}
+function ugLikeBtn(){
+  const u=ugPlay, it=u&&u.item, b=$('ugdLike'); if(!b) return;
+  b.hidden=!it||it.mine||it.liked===true||!it.cleared;
+}
+/* result card: after a test flight, after publishing, after a community level */
+function ugDone(kind,o){
+  const u=ugPlay, btns=$('ugdBtns'); btns.innerHTML=''; $('ugdLevelUp').hidden=true; $('ugdReward').textContent=''; $('ugdCode').hidden=true; $('ugdStars').hidden=true;
+  const btn=(id,cls,txt,fn)=>{ const b=document.createElement('button'); b.id=id; if(cls) b.className=cls; b.textContent=txt; b.addEventListener('click',()=>{ Sfx.init(); fn(b) }); btns.appendChild(b); return b };
+  if(kind==='test'){
+    const n=ED.tested?ED.tested.shots:1;
+    $('ugdLabel').textContent='Testflug geschafft';
+    $('ugdTitle').textContent=ED.name.trim()||'Neues Level';
+    $('ugdInfo').textContent=`Du hast ${n} ${n===1?'Schuss':'Schüsse'} gebraucht. Das wird der Par-Wert: 3 Sterne gibt es für höchstens ${n} ${n===1?'Schuss':'Schüsse'}.`;
+    btn('ugdPublish','','Veröffentlichen',edPublish);
+    btn('ugdRetest','alt','Nochmal testen',()=>{ ugReset(); edOpen(); edTest() });
+    btn('ugdEdit','ghost','Weiter bearbeiten',()=>{ ugReset(); edOpen() });
+  } else if(kind==='published'){
+    $('ugdLabel').textContent='Veröffentlicht';
+    $('ugdTitle').textContent=o.name;
+    $('ugdInfo').textContent='Dein Level ist online. Teile den Code, damit andere es spielen können:';
+    $('ugdCode').hidden=false; $('ugdCode').textContent=ugCode(o.code);
+    btn('ugdCopy','alt','Code kopieren',b=>{ ugShare(o,false).then(ok=>{ b.textContent=ok?'Kopiert ✓':'Code: '+ugCode(o.code) }) });
+    if(navigator.share) btn('ugdShare','alt','Teilen …',()=>ugShare(o,true));
+    btn('ugdNew','ghost','Neues Level bauen',()=>{ ED=edBlank(); edSave(); edOpen() });
+    btn('ugdComm','ghost','Zur Community',openCommunity);
+  } else {
+    $('ugdLabel').textContent=`Community · von ${cleanName(u.item&&u.item.author)}`;
+    $('ugdStars').hidden=false; $('ugdStars').innerHTML=[0,1,2].map(i=>`<span class="${i<o.st?'on':'off'}">★</span>`).join('');
+    $('ugdStars').setAttribute('aria-label',`${o.st} von 3 Sternen`);
+    $('ugdTitle').textContent=u.level.name;
+    $('ugdInfo').textContent=`${o.n} ${o.n===1?'Schuss':'Schüsse'} · Par ${u.level.par} · Code ${ugCode(u.code)}`;
+    const lk=btn('ugdLike','','♥ Gefällt mir',async b=>{
+      b.disabled=true;
+      try{ const r=await rpc('gd_ulevel_like',{p_id:u.id}); if(u.item){ u.item.liked=true; u.item.likes=r.likes } b.textContent='♥ Danke!'; Sfx.buy() }
+      catch(e){ b.disabled=false; toast(ugErr(e)) }
+    });
+    lk.hidden=true;
+    btn('ugdAgain','alt','Nochmal',()=>{ const x=ugPlay; ugReset(); ugPlayItem(x.item) });
+    btn('ugdComm','ghost','Zur Community',()=>{ ugReset(); openCommunity() });
+    show('ugdone'); return ugLikeBtn();
+  }
+  show('ugdone');
+}
+async function ugShare(o,native){
+  const text=`Spiel mein Gravity-Duel-Level „${o.name}“! Code: ${ugCode(o.code)}`;
+  if(native&&navigator.share){ try{ await navigator.share({text}); return true }catch(e){ return false } }
+  try{ await navigator.clipboard.writeText(ugCode(o.code)); return true }catch(e){ return false }
+}
+async function edPublish(b){
+  const name=ED.name.trim().replace(/\s+/g,' ');
+  if(name.length<3){ toast('Gib deinem Level einen Namen (3–24 Zeichen)'); ugReset(); edOpen(); edSheet(); setTimeout(()=>$('edNameIn').focus(),50); return }
+  if(!edTested()){ toast('Teste das Level zuerst und schaffe es'); return }
+  if(!SERVER_ECON||!econReady()){ toast('Zum Veröffentlichen brauchst du eine Verbindung zum Server'); return }
+  b.disabled=true; b.textContent='Wird veröffentlicht …';
+  try{
+    const r=await rpc('gd_ulevel_publish',{p_name:name,p_gal:ED.gal,p_level:edLevel(),p_par:ED.tested.shots});
+    ED.tested=null; edSave(); Sfx.levelup();
+    ugReset(); ugDone('published',{code:r.code,name});
+  }catch(e){ b.disabled=false; b.textContent='Veröffentlichen'; toast(ugErr(e)) }
+}
+const ugErr=e=>{ const m=String(e&&(e.message||e)||'');
+  return /not tested/.test(m)?'Bitte teste das Level noch einmal und schaffe es':/publish limit/.test(m)?'Du kannst höchstens 5 Level pro Tag veröffentlichen':
+    /too many levels/.test(m)?'Du hast schon 50 Level. Lösche ein altes, um ein neues zu teilen':/already published/.test(m)?'Dieses Level hast du schon veröffentlicht':
+    /bad name: length/.test(m)?'Der Name braucht 3 bis 24 Zeichen':/bad name/.test(m)?'Dieser Name ist nicht erlaubt':/bad level/.test(m)?'Das Level ist so nicht erlaubt ('+m.replace(/^.*bad level: ?/,'')+')':
+    /no such level/.test(m)?'Kein Level mit diesem Code gefunden':/not started/.test(m)?'Nicht gewertet: Starte das Level bitte neu':
+    /already liked/.test(m)?'Du hast es schon geliked':/own level/.test(m)?'Dein eigenes Level kannst du nicht liken':/not cleared/.test(m)?'Schaffe das Level zuerst':econErr(e) };
+
+/* ---------- community list ---------- */
+function openCommunity(){
+  ugReset(); phase='menu'; bodies=[]; players=[]; proj=[];
+  if(!ED) edLoad();
+  show('community'); ugRenderTabs(); ugLoad(false);
+}
+function ugRenderTabs(){ for(const t of ['new','top','mine']) $('ugt-'+t).setAttribute('aria-selected',String(t===ugTab)) }
+async function ugLoad(more){
+  if(ugBusy) return;
+  const info=$('ugInfo'), list=$('ugList');
+  if(!more){ ugItems=[]; list.innerHTML='' }
+  if(!SERVER_ECON||!econReady()){ info.hidden=false; info.textContent='Community-Level brauchen eine Verbindung zum Server.'; $('ugMore').hidden=true; return }
+  ugBusy=true; info.hidden=false; info.textContent='Lade …';
+  const tab=ugTab;
+  try{
+    const r=await rpc('gd_ulevel_list',{p_tab:tab,p_offset:more?ugItems.length:0});
+    if(tab!==ugTab) return;
+    ugItems=ugItems.concat(r.items||[]); ugMoreOk=!!r.more;
+    info.textContent=ugItems.length?(tab==='mine'?`Heute kannst du noch ${r.publishLeft??5} ${r.publishLeft===1?'Level':'Level'} veröffentlichen.`:''):
+      tab==='mine'?'Du hast noch kein Level veröffentlicht. Bau eins und teile es!':'Hier ist noch nichts. Sei die oder der Erste!';
+    info.hidden=!info.textContent;
+    ugRenderList();
+  }catch(e){ info.textContent='Konnte die Level nicht laden: '+niceErr(e) }
+  finally{ ugBusy=false }
+}
+function ugRenderList(){
+  const list=$('ugList'); list.innerHTML='';
+  ugItems.forEach((it,i)=>{
+    const th=THEMES[it.gal]||THEMES.nova, rate=it.plays?Math.round(100*it.clears/it.plays)+' %':'–';
+    const li=document.createElement('li'); li.className='ugitem';
+    li.innerHTML=`<button class="ugrow" data-i="${i}" aria-label="${esc(it.name)} von ${esc(cleanName(it.author))} spielen">
+      <i class="ugsky" style="background:radial-gradient(circle at 32% 30%,${th.tints[1]}66,transparent 55%),linear-gradient(135deg,${th.bg[0]},${th.bg[2]})" aria-hidden="true">${it.cleared?'✓':''}</i>
+      <span class="ugt"><b>${esc(it.name)}</b><small>${it.mine?'Von dir':'von '+esc(cleanName(it.author))} · Par ${it.par|0}</small></span>
+      <span class="ugst"><span title="Gespielt">▶ ${it.plays|0}</span><span title="Geschafft">${rate}</span><span title="Likes" class="lk">♥ ${it.likes|0}</span></span></button>
+      ${it.mine?`<div class="ugmine"><b title="Code">${esc(ugCode(it.code))}</b><button class="mini x" data-copy="${i}">Kopieren</button><button class="mini x danger" data-del="${i}">Löschen</button></div>`:''}`;
+    list.appendChild(li);
+  });
+  $('ugMore').hidden=!ugMoreOk;
+}
+$('ugList').addEventListener('click',async e=>{
+  Sfx.init();
+  const row=e.target.closest('[data-i]'), del=e.target.closest('[data-del]'), cp=e.target.closest('[data-copy]');
+  if(row) return ugPlayItem(ugItems[+row.dataset.i]);
+  if(cp){ const it=ugItems[+cp.dataset.copy]; const ok=await ugShare(it,false); cp.textContent=ok?'Kopiert ✓':ugCode(it.code); return }
+  if(del){
+    if(!del.dataset.sure){ del.dataset.sure='1'; del.textContent='Wirklich?'; return }
+    const it=ugItems[+del.dataset.del]; del.disabled=true;
+    try{ await rpc('gd_ulevel_delete',{p_id:it.id}); ugItems=ugItems.filter(x=>x!==it); ugRenderList(); toast('Level gelöscht') }catch(err){ del.disabled=false; toast(ugErr(err)) }
+  }
+});
+async function ugPlayItem(it){
+  if(!it||!it.level) return;
+  if(!SERVER_ECON||!econReady()) return toast('Dafür brauchst du eine Verbindung zum Server');
+  try{ await rpc('gd_ulevel_start',{p_id:it.id}) }catch(e){ return toast(ugErr(e)) }
+  const L=it.level, level={name:it.name,par:Math.max(1,it.par|0),moons:Array.isArray(L.moons)?L.moons:[],targets:Array.isArray(L.targets)?L.targets:[],ammo:cleanLevelAmmo(L.ammo)};
+  ugStart({test:false,id:it.id,code:it.code,item:it,galId:it.gal,level});
+}
+const cleanLevelAmmo=a=>{ const o={}; if(a&&typeof a==='object') for(const k of SPECIALS) if(a[k]>0) o[k]=Math.min(3,a[k]|0); return o };
+async function ugOpenCode(){
+  const c=$('ugCode').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(c.length!==6){ toast('Ein Code hat 6 Zeichen, z. B. K7Q-2MF'); return }
+  if(!SERVER_ECON||!econReady()) return toast('Dafür brauchst du eine Verbindung zum Server');
+  $('ugCodeGo').disabled=true;
+  try{ const it=await rpc('gd_ulevel_get',{p_code:c}); $('ugCode').value=''; ugPlayItem(it) }
+  catch(e){ toast(ugErr(e)) }
+  finally{ $('ugCodeGo').disabled=false }
+}
+$('ugCodeForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); ugOpenCode() });
+$('ugCode').addEventListener('input',()=>{ const el=$('ugCode'), c=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); const v=c.length>3?c.slice(0,3)+'-'+c.slice(3):c; if(el.value!==v) el.value=v });
+for(const t of ['new','top','mine']) tap('ugt-'+t,()=>{ if(ugTab===t) return; ugTab=t; Sfx.select(); ugRenderTabs(); ugBusy=false; ugLoad(false) });
+tap('ugMore',()=>ugLoad(true));
+tap('ugBuild',edOpen);
+tap('ugBack',()=>goHome(0));
+tap('toCommunity',openCommunity);
+if(window.__GD_TEST__) window.__ed={state:()=>({ED:ED&&{...ED,items:ED.items.map(({cr,...x})=>x)},level:ED&&edLevel(),check:ED&&ED.check&&{ok:ED.check.ok,why:ED.check.why,bad:[...ED.check.bad]},tested:ED&&edTested(),ug:ugPlay&&{test:ugPlay.test,id:ugPlay.id},mode,phase,H,current}),
+  hit:(x,y)=>edHit({x,y}), toScreen:(x,y)=>{ const r=cv.getBoundingClientRect(); return {x:r.left+(x+offX)*scale,y:r.top+(y+offY)*scale} }};
+
+/* ---------- crews and the weekend tournament (supabase crews.sql) ---------- */
+if(!SHOP.title.some(i=>i.id==='turniersieger')) SHOP.title.push({id:'turniersieger',name:'Turniersieger',price:0,rarity:'legendary',src:'tourney'});
+const CREW_COLORS=['#ff4f8b','#2ee6ff','#ffd34f','#3dffd0','#c46bff','#ff9a4f','#7fdcff','#ff5a6e'];
+const CREW_SYMBOLS=['Stern','Ringplanet','Komet','Mond','Blitz','Krone','Rakete','Orbit'];
+const CREW_TIERS=[{n:15,t:'200 ✦'},{n:40,t:'Sternenkiste + 300 ✦'},{n:80,t:'Nebelkiste + 500 ✦'}];
+const CREW_ROLE={leader:'Anführer',vize:'Vize',member:'Mitglied'};
+const TN_PRIZES=[['Platz 1','3000 ✦ · Supernova-Kiste · Titel „Turniersieger“'],['Platz 2–3','1500 ✦ · Supernova-Kiste'],['Platz 4–10','800 ✦ · Nebelkiste'],['Platz 11–50','400 ✦ · Sternenkiste'],['Ab 5 Spielen','150 ✦']];
+const GDX={crew:null,cooldown:null,crewAt:-1e9,tn:null,tnAt:0,tnLoaded:0,list:null,from:'friends',tnFrom:'home',busy:false,open:-1,
+  nw:{color:1,emblem:0,open:true}};
+const crewCol=c=>CREW_COLORS[(c|0)&7];
+const crewErr=e=>{ const m=String(e&&(e.message||e)||'');
+  return /tag taken/.test(m)?'Dieses Kürzel ist schon vergeben':/bad name/.test(m)?'Name: 3–20 Zeichen, ohne Links oder Schimpfwörter':/bad tag/.test(m)?'Kürzel: 2–4 Großbuchstaben oder Ziffern'
+    :/bad motto/.test(m)?'Dieses Motto geht nicht (keine Links oder Schimpfwörter)':/in crew/.test(m)?'Du bist schon in einer Crew':/cooldown/.test(m)?'Nach dem Verlassen kannst du erst nach 24 Stunden wieder beitreten'
+    :/crew full/.test(m)?'Die Crew ist voll (20 Mitglieder)':/crew closed/.test(m)?'Diese Crew nimmt nur Mitglieder mit Code auf':/crew not found/.test(m)?'Keine Crew mit diesem Code gefunden'
+    :/no contribution/.test(m)?'Hol diese Woche erst einen Wettkampf-Sieg für deine Crew':/not reached/.test(m)?'Noch nicht erreicht':/not allowed/.test(m)?'Das darfst du nicht'
+    :/no crew/.test(m)?'Du bist in keiner Crew':/running/.test(m)?'Das Turnier läuft noch':econErr(e) };
+
+/* the emblem: a shield in the crew color with one of eight symbols */
+function drawCrewEmblem(cv,color,sym){
+  const g=cv.getContext('2d'), w=cv.width, h=cv.height, c=crewCol(color), r=Math.min(w,h)*.46, x=w/2, y=h/2;
+  g.clearRect(0,0,w,h); g.save(); g.translate(x,y);
+  g.beginPath(); for(let k=0;k<6;k++){ const a=k*Math.PI/3-Math.PI/2; g[k?'lineTo':'moveTo'](Math.cos(a)*r,Math.sin(a)*r) } g.closePath();
+  const bg=g.createRadialGradient(0,-r*.3,r*.1,0,0,r); bg.addColorStop(0,rgba(c,.42)); bg.addColorStop(1,'rgba(12,4,32,.95)');
+  g.fillStyle=bg; g.fill(); g.lineWidth=Math.max(2,r*.09); g.strokeStyle=c; g.shadowColor=c; g.shadowBlur=r*.25; g.stroke(); g.shadowBlur=0;
+  const s=r*.52; g.fillStyle=c; g.strokeStyle=c; g.lineWidth=Math.max(1.5,s*.16); g.lineCap='round'; g.lineJoin='round';
+  switch(sym|0){
+    case 0: star(g,0,0,s*1.05); g.fill(); break;
+    case 1: g.beginPath(); g.arc(0,0,s*.55,0,7); g.fill(); g.save(); g.rotate(-.35); g.beginPath(); g.ellipse(0,0,s*1.05,s*.32,0,0,7); g.stroke(); g.restore(); break;
+    case 2: g.beginPath(); g.arc(s*.4,-s*.4,s*.38,0,7); g.fill();
+      for(let k=-1;k<=1;k++){ g.beginPath(); g.moveTo(s*.4+k*s*.18,-s*.4-k*s*.18); g.lineTo(-s*.75+k*s*.25,s*.75-k*s*.25+(k?s*.1:0)); g.stroke() } break;
+    case 3: g.beginPath(); g.arc(0,0,s*.85,Math.PI*.35,Math.PI*1.65); g.arc(s*.38,0,s*.68,Math.PI*1.72,Math.PI*.28,true); g.closePath(); g.fill(); break;
+    case 4: g.beginPath(); g.moveTo(s*.25,-s); g.lineTo(-s*.5,s*.12); g.lineTo(0,s*.12); g.lineTo(-s*.25,s); g.lineTo(s*.5,-s*.15); g.lineTo(0,-s*.15); g.closePath(); g.fill(); break;
+    case 5: g.beginPath(); g.moveTo(-s*.85,s*.55); g.lineTo(-s*.85,-s*.45); g.lineTo(-s*.4,0); g.lineTo(0,-s*.7); g.lineTo(s*.4,0); g.lineTo(s*.85,-s*.45); g.lineTo(s*.85,s*.55); g.closePath(); g.fill();
+      for(const px of [-.85,0,.85]){ g.beginPath(); g.arc(px*s,(px?-.6:-.85)*s,s*.13,0,7); g.fill() } break;
+    case 6: g.save(); g.rotate(Math.PI/4); g.beginPath(); g.moveTo(0,-s*1.05); g.quadraticCurveTo(s*.45,-s*.5,s*.32,s*.45); g.lineTo(-s*.32,s*.45); g.quadraticCurveTo(-s*.45,-s*.5,0,-s*1.05); g.fill();
+      g.beginPath(); g.moveTo(-s*.32,s*.1); g.lineTo(-s*.6,s*.7); g.lineTo(-s*.3,s*.5); g.moveTo(s*.32,s*.1); g.lineTo(s*.6,s*.7); g.lineTo(s*.3,s*.5); g.fill();
+      g.fillStyle='rgba(12,4,32,.9)'; g.beginPath(); g.arc(0,-s*.3,s*.17,0,7); g.fill(); g.restore(); break;
+    default: for(let k=0;k<3;k++){ g.save(); g.rotate(k*Math.PI/3); g.beginPath(); g.ellipse(0,0,s*1.02,s*.36,0,0,7); g.stroke(); g.restore() } g.beginPath(); g.arc(0,0,s*.2,0,7); g.fill();
+  }
+  g.restore();
+}
+const crewTagHtml=c=>c?`<span class="crewtag" style="--c:${crewCol(c.color)}">${esc(c.tag)}</span>`:'';
+
+/* data */
+async function crewLoad(){ if(!econReady()) return; try{ const r=await rpc('gd_crew'); GDX.crew=r&&r.crew||null; GDX.cooldown=r&&r.cooldown||null; GDX.crewAt=Date.now(); crewSync() }catch(e){} }
+async function tnLoad(){ if(!econReady()) return; try{ GDX.tn=await rpc('gd_tourney'); GDX.tnAt=Date.now(); GDX.tnLoaded=performance.now(); tnSync() }catch(e){} }
+function gdxLoad(){ crewLoad(); tnLoad() }
+function crewSync(){ renderMe(); renderCrewEntry(); if(current==='crew') renderCrew() }
+function tnSync(){ renderTnCard(); if(current==='tourney') renderTourney() }
+// times from the server, corrected for this device's clock
+const tnNow=()=>{ const t=GDX.tn; return t&&t.now?Date.parse(t.now)+(Date.now()-GDX.tnAt):Date.now() };
+
+/* entry points */
+function renderCrewEntry(){
+  const b=$('toCrewF'), c=GDX.crew; if(!b) return;
+  drawCrewEmblem(b.querySelector('canvas'),c?c.color:1,c?c.emblem:0);
+  b.querySelector('b').innerHTML=c?`${crewTagHtml(c)}${esc(c.name)}`:'Crew';
+  b.querySelector('i').textContent=c?`${c.members.length}/20 Mitglieder · Wochenziel ${Math.min(c.week.wins,80)}/${crewNextGoal(c.week.wins)} Siege`:'Tritt einer Crew bei oder gründe eine';
+  const rb=$('toCrewR'); if(rb) rb.innerHTML=c?`${crewTagHtml(c)}Crew`:'Crew';
+}
+const tnShort=ms=>{ const h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000); return h>=24?`${Math.floor(h/24)} T ${h%24} Std`:h?`${h} Std ${m} Min`:`${m} Min` };
+const crewNextGoal=w=>(CREW_TIERS.find(t=>w<t.n)||CREW_TIERS[2]).n;
+function crewClaimable(c){ c=c||GDX.crew; if(!c||!c.week||c.week.mine<1) return 0; return CREW_TIERS.filter((t,i)=>c.week.wins>=t.n&&!c.week.claimed.includes(i+1)).length }
+
+function openCrew(from){
+  if(from) GDX.from=from;
+  if(!econReady()) return toast('Crews gibt es nur online');
+  $('crewHint').textContent=''; GDX.open=-1; renderCrew(); show('crew'); $('crew').scrollTop=0;
+  crewLoad().then(()=>{ if(current==='crew'&&!GDX.crew) crewSearch() });
+}
+function crewBack(){ if(GDX.from==='ranked') goHome(1); else openFriends() }
+function renderCrew(){
+  const c=GDX.crew; $('crewIn').hidden=!c; $('crewOut').hidden=!!c;
+  if(!c){
+    $('crewOutNote').textContent=GDX.cooldown?`Du hast deine Crew gerade verlassen. Beitreten kannst du wieder in ${untilText(Math.max(60000,Date.parse(GDX.cooldown)-Date.now()))}.`
+      :'Spielt zusammen im Wettkampf: Jeder Sieg zählt fürs Wochenziel eurer Crew – und jeder holt sich die Belohnungen selbst ab.';
+    $('crewCreateOpen').disabled=!!GDX.cooldown; $('crewCodeGo').disabled=!!GDX.cooldown;
+    renderCrewList(); return;
+  }
+  drawCrewEmblem($('crewEmblem'),c.color,c.emblem);
+  $('crewName').innerHTML=`${crewTagHtml(c)}${esc(c.name)}`;
+  $('crewInfo').innerHTML=`Platz ${c.rank} von ${c.crews} · <span class="gv" aria-hidden="true"></span> ${c.total} ${CURRENCY} · ${c.open?'offen':'nur mit Code'}`;
+  $('crewMotto').textContent=c.motto?`„${c.motto}“`:''; $('crewMotto').hidden=!c.motto;
+  const w=c.week, wins=w.wins|0;
+  $('crewBar').style.width=`${Math.min(100,Math.round(100*wins/80))}%`;
+  $('crewWeekEnds').textContent=`noch ${untilText(Math.max(0,Date.parse(w.ends)-Date.now()))}`;
+  $('crewWeekText').innerHTML=`<b>${wins}</b> Siege der Crew diese Woche · davon <b>${w.mine|0}</b> von dir`+(w.mine<1?'<br>Hol mindestens einen Sieg im Wettkampf, um Belohnungen abholen zu können.':'');
+  const tiers=$('crewTiers'); tiers.innerHTML='';
+  CREW_TIERS.forEach((t,i)=>{
+    const got=w.claimed.includes(i+1), ok=wins>=t.n, el=document.createElement('div'); el.className='ctier'+(ok?' ok':'');
+    el.innerHTML=`<b>${t.n} Siege</b><span>${esc(t.t)}</span>`;
+    if(got){ const d=document.createElement('span'); d.className='done'; d.textContent='✓ abgeholt'; el.appendChild(d) }
+    else{ const b=document.createElement('button'); b.className='mini'; b.id='crewClaim'+(i+1); b.textContent=ok?'Abholen':`${Math.min(wins,t.n)}/${t.n}`; b.disabled=!ok||w.mine<1; b.onclick=()=>{ Sfx.init(); crewClaim(i+1,b) }; el.appendChild(b) }
+    tiers.appendChild(el);
+  });
+  $('crewCount').textContent=`${c.members.length}/20`;
+  const me=c.role, box=$('crewMembers'); box.innerHTML='';
+  c.members.forEach((m,i)=>{
+    const el=document.createElement('div'), col=skinFromEquip(m.skin).color, tt=titleName(m.skin&&m.skin.title);
+    const canAct=!m.me&&(me==='leader'||(me==='vize'&&m.role==='member'));
+    el.className='fr'+(m.me?' me':'')+(canAct?' tappable':'');
+    el.innerHTML=`<span class="av" style="background:${col}"></span><span class="fn"><b>${badgeHtml(m.badge)}${esc(cleanName(m.name))}${m.role!=='member'?`<i class="role${m.role==='vize'?' v':''}">${CREW_ROLE[m.role]}</i>`:''}</b><i>${tt?esc(tt)+' · ':''}<span class="gv" aria-hidden="true"></span> ${m.gravitons|0}</i></span><span class="st">${m.week|0} ${(m.week|0)===1?'Sieg':'Siege'}<br>diese Woche</span>`;
+    if(canAct){
+      el.setAttribute('role','button'); el.tabIndex=0; el.setAttribute('aria-label',`${cleanName(m.name)}: Aktionen`);
+      el.onclick=ev=>{ if(ev.target.closest('button')) return; GDX.open=GDX.open===i?-1:i; Sfx.select(); renderCrew() };
+      if(GDX.open===i){
+        const acts=document.createElement('div'); acts.className='acts';
+        const btn=(t,cls,fn)=>{ const b=document.createElement('button'); b.className='mini'+(cls?' '+cls:''); b.textContent=t; b.onclick=()=>{ Sfx.init(); fn(b) }; acts.appendChild(b); return b };
+        if(me==='leader'){
+          btn(m.role==='vize'?'Zum Mitglied':'Zum Vize','x',b=>crewAct('gd_crew_role',{p_user:m.id,p_role:m.role==='vize'?'member':'vize'},b));
+          btn('Anführer machen','x',b=>{ if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='Wirklich übergeben?'; return } crewAct('gd_crew_role',{p_user:m.id,p_role:'leader'},b,`${cleanName(m.name)} führt jetzt die Crew`) });
+        }
+        btn('Rauswerfen','',b=>{ if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='Sicher?'; return } crewAct('gd_crew_kick',{p_user:m.id},b,`${cleanName(m.name)} ist nicht mehr in der Crew`) });
+        el.appendChild(acts);
+      }
+    }
+    box.appendChild(el);
+  });
+  $('crewCode').textContent=c.code;
+  const lead=me==='leader'||me==='vize'; $('crewEdit').hidden=!lead;
+  if(lead&&document.activeElement!==$('crewMottoIn')){ $('crewMottoIn').value=c.motto||''; GDX.editOpen=c.open; crewOpenSeg() }
+  $('crewLeave').textContent='Crew verlassen'; delete $('crewLeave').dataset.sure;
+}
+function crewOpenSeg(){ $('crewOpen1').setAttribute('aria-checked',String(!!GDX.editOpen)); $('crewOpen0').setAttribute('aria-checked',String(!GDX.editOpen)) }
+async function crewAct(fn,args,btn,msg){
+  if(btn) btn.disabled=true;
+  try{ const r=await rpc(fn,args); GDX.crew=r.crew||null; GDX.open=-1; if(msg) toast(msg); Sfx.select(); crewSync() }
+  catch(e){ toast(crewErr(e)); if(btn) btn.disabled=false }
+}
+async function crewClaim(tier,btn){
+  btn.disabled=true;
+  try{ const r=await rpc('gd_crew_claim',{p_tier:tier}); applyEcon(r.state); GDX.crew=r.crew||GDX.crew; crewSync();
+    if(r.reward&&r.reward.crate){ crateFrom='crew'; openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)); toast(`Crew-Belohnung: +${r.dust|0} ✦ und eine ${CRATE_NAME(r.reward.crate)}`) }
+    else { Sfx.buy(); toast(`Crew-Belohnung: +${r.dust|0} ✦`) } }
+  catch(e){ toast(crewErr(e)); btn.disabled=false }
+}
+async function crewSearch(){
+  const q=$('crewSearchIn').value.trim(); $('crewList').innerHTML='<div class="fr"><span></span><span class="fn"><b>Lade …</b></span></div>';
+  try{ GDX.list=await rpc('gd_crew_list',{p_q:q}); renderCrewList() }catch(e){ $('crewList').innerHTML=`<div class="fr"><span></span><span class="fn"><b>${esc(niceErr(e))}</b></span></div>` }
+}
+function renderCrewList(){
+  const box=$('crewList'); if(!GDX.list) return; box.innerHTML='';
+  if(!GDX.list.length){ box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Keine offene Crew gefunden</b><i>Gründe doch deine eigene!</i></span></div>'; return }
+  for(const c of GDX.list){
+    const el=document.createElement('div'); el.className='fr';
+    el.innerHTML=`<canvas width="80" height="80" aria-hidden="true"></canvas><span class="fn"><b>${crewTagHtml(c)}${esc(c.name)}</b><i>${c.members|0}/20 · <span class="gv" aria-hidden="true"></span> ${c.total|0}${c.motto?' · „'+esc(c.motto)+'“':''}</i></span>`;
+    drawCrewEmblem(el.querySelector('canvas'),c.color,c.emblem);
+    const b=document.createElement('button'); b.className='mini'; b.textContent=(c.members|0)>=20?'Voll':'Beitreten'; b.disabled=(c.members|0)>=20||!!GDX.cooldown;
+    b.setAttribute('aria-label',`${c.name} beitreten`); b.onclick=()=>{ Sfx.init(); crewJoin(c.id,b) };
+    el.appendChild(b); box.appendChild(el);
+  }
+}
+async function crewJoin(ref,btn){
+  if(!ref) return; if(btn) btn.disabled=true; $('crewHint').textContent='';
+  try{ const r=await rpc('gd_crew_join',{p_ref:ref}); GDX.crew=r.crew; Sfx.buy(); toast(`Willkommen in der Crew ${r.crew.name}!`); crewSync() }
+  catch(e){ $('crewHint').textContent=crewErr(e); if(btn) btn.disabled=false }
+}
+
+/* create */
+function openCrewNew(){
+  if(GDX.cooldown) return toast(crewErr('cooldown'));
+  $('cnHint').textContent=''; renderCrewNew(); show('crewNew'); $('crewNew').scrollTop=0; setTimeout(()=>$('cnName').focus(),50);
+}
+function renderCrewNew(){
+  const N=GDX.nw, cs=$('cnColors'), sy=$('cnSymbols');
+  if(!cs.children.length){
+    CREW_COLORS.forEach((c,i)=>{ const b=document.createElement('button'); b.type='button'; b.setAttribute('role','radio'); b.style.setProperty('--c',c); b.setAttribute('aria-label',`Farbe ${i+1}`); b.onclick=()=>{ Sfx.init(); Sfx.select(); N.color=i; renderCrewNew() }; cs.appendChild(b) });
+    CREW_SYMBOLS.forEach((n,i)=>{ const b=document.createElement('button'); b.type='button'; b.setAttribute('role','radio'); b.setAttribute('aria-label',n); b.innerHTML='<canvas width="72" height="72" aria-hidden="true"></canvas>'; b.onclick=()=>{ Sfx.init(); Sfx.select(); N.emblem=i; renderCrewNew() }; sy.appendChild(b) });
+  }
+  [...cs.children].forEach((b,i)=>b.setAttribute('aria-checked',String(i===N.color)));
+  [...sy.children].forEach((b,i)=>{ b.setAttribute('aria-checked',String(i===N.emblem)); drawCrewEmblem(b.firstChild,N.color,i) });
+  $('cnOpen1').setAttribute('aria-checked',String(N.open)); $('cnOpen0').setAttribute('aria-checked',String(!N.open));
+  drawCrewEmblem($('cnPreview'),N.color,N.emblem); cnPreviewText();
+  $('cnGo').disabled=profile.dust<500; $('cnGo').textContent=profile.dust<500?`Gründen · ✦ 500 (du hast ${profile.dust})`:'Gründen · ✦ 500';
+}
+function cnPreviewText(){
+  const t=$('cnTag').value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4); if($('cnTag').value!==t) $('cnTag').value=t;
+  $('cnPrevName').textContent=$('cnName').value.trim()||'Deine Crew';
+  const pt=$('cnPrevTag'); pt.textContent=t||'TAG'; pt.style.setProperty('--c',crewCol(GDX.nw.color));
+}
+async function crewCreate(){
+  const name=$('cnName').value.replace(/\s+/g,' ').trim(), tag=$('cnTag').value.trim().toUpperCase(), h=$('cnHint');
+  if(name.length<3||name.length>20) return h.textContent='Der Name braucht 3 bis 20 Zeichen';
+  if(!/^[A-Z0-9]{2,4}$/.test(tag)) return h.textContent='Das Kürzel braucht 2 bis 4 Großbuchstaben oder Ziffern';
+  if(/https?:|www\.|\.(com|de|net|org)\b|@/i.test(name)) return h.textContent='Bitte keine Links im Namen';
+  if(profile.dust<500) return h.textContent='Nicht genug Sternenstaub (500 ✦)';
+  if(GDX.busy) return; GDX.busy=true; $('cnGo').disabled=true; h.textContent='';
+  try{ const r=await rpc('gd_crew_create',{p_name:name,p_tag:tag,p_color:GDX.nw.color,p_emblem:GDX.nw.emblem,p_open:GDX.nw.open});
+    applyEcon(r.state); GDX.crew=r.crew; Sfx.buy(); toast(`Crew ${name} gegründet!`); $('cnName').value=''; $('cnTag').value=''; openCrew() }
+  catch(e){ h.textContent=crewErr(e); $('cnGo').disabled=false }
+  finally{ GDX.busy=false }
+}
+
+/* ---------- weekend tournament ---------- */
+const tnFmt=t=>{ const d=new Date(t); return d.toLocaleString('de-DE',{weekday:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'}).replace(',','') };
+const tnPrizeText=p=>p?[p.dust?`${p.dust} ✦`:'',p.crate?CRATE_NAME(p.crate):'',p.title?`Titel „${titleName(p.title)||'Turniersieger'}“`:''].filter(Boolean).join(' · '):'';
+const tnClaimable=()=>{ const l=GDX.tn&&GDX.tn.last; return !!(l&&l.prize&&!l.claimed) };
+function tnStatusText(short){
+  const t=GDX.tn; if(!t) return '';
+  const now=tnNow();
+  if(t.running) return `${short?'Läuft':'Läuft gerade'} · endet in ${untilText(Math.max(0,Date.parse(t.ends)-now))}`;
+  return `Nächstes Turnier ${tnFmt(t.next)} Uhr · in ${untilText(Math.max(0,Date.parse(t.next)-now))}`;
+}
+function renderTnCard(){
+  const t=GDX.tn, card=$('tnCard'); if(!card) return;
+  card.hidden=!t; let live=$('tnLive');
+  if(!live){ live=document.createElement('b'); live.id='tnLive'; live.className='tnlive'; live.textContent='TURNIER'; live.setAttribute('aria-hidden','true'); $('nav-1').appendChild(live) }
+  live.hidden=!(t&&(t.running||tnClaimable()));
+  if(!t) return;
+  card.classList.toggle('live',!!t.running);
+  const me=t.me||{};
+  $('tnCardText').textContent=tnClaimable()?`Belohnung bereit: ${tnPrizeText(t.last.prize)}`
+    :t.running?`${me.rank?`Platz ${me.rank} · `:''}${me.points|0} P. · ${me.matches|0}/20 · noch ${tnShort(Math.max(0,Date.parse(t.ends)-tnNow()))}`
+    :`Fr 18 bis So 22 Uhr · Start in ${tnShort(Math.max(0,Date.parse(t.next)-tnNow()))}`;
+  $('tnCardBtn').textContent=tnClaimable()?'Abholen':'Ansehen';
+}
+function openTourney(from){
+  if(from) GDX.tnFrom=from;
+  if(!econReady()) return toast('Das Turnier gibt es nur online');
+  renderTourney(); show('tourney'); $('tourney').scrollTop=0; tnLoad();
+}
+function renderTourney(){
+  const t=GDX.tn;
+  $('tnPrizes').innerHTML=TN_PRIZES.map(([a,b])=>`<b>${a}</b><span>${esc(b)}</span>`).join('');
+  if(!t){ $('tnStatus').textContent='Lade …'; $('tnList').innerHTML=''; return }
+  $('tnStatus').textContent=tnStatusText();
+  const me=t.me||{};
+  $('tnPoints').textContent=me.points|0; $('tnMatches').textContent=`${me.matches|0}/20`; $('tnRank').textContent=me.rank?`${me.rank}.`:'–';
+  const l=t.last; $('tnClaimBox').hidden=!(l&&l.prize);
+  if(l&&l.prize){
+    $('tnClaimTitle').textContent=l.claimed?'Letztes Turnier · abgeholt ✓':'Letztes Turnier · Belohnung bereit';
+    $('tnClaimText').textContent=`Platz ${l.rank} mit ${l.points} Punkten (${l.matches} Spiele): ${tnPrizeText(l.prize)}`+(l.claimed?'':' · abholbar bis zum Start des nächsten Turniers');
+    $('tnClaim').hidden=!!l.claimed; $('tnClaim').disabled=false;
+  }
+  $('tnListTitle').firstChild.textContent=t.running?'Live-Rangliste ':'Ergebnis letztes Turnier ';
+  $('tnPlayers').textContent=t.players?`${t.players} ${t.players===1?'Pilot':'Piloten'}`:'';
+  const top=t.top||[];
+  let html=top.map((p,i)=>{ const col=skinFromEquip(p.skin).color;
+    return `<div class="fr${p.me?' me':''}"><span class="rank">${i+1}</span><span class="av" style="background:${col}"></span><span class="fn"><b>${badgeHtml(p.badge)}${esc(cleanName(p.name))}</b><i>${p.matches|0} Spiele</i></span><span class="st"><b>${p.points|0}</b> P.</span></div>` }).join('');
+  if(me.rank&&me.rank>top.length) html+=`<div class="fr me"><span class="rank">${me.rank}</span><span class="av" style="background:${mySkin().color}"></span><span class="fn"><b>${esc(playerName())}</b><i>${me.matches|0} Spiele</i></span><span class="st"><b>${me.points|0}</b> P.</span></div>`;
+  $('tnList').innerHTML=html||`<div class="fr"><span></span><span></span><span class="fn"><b>${t.running?'Noch keine Punkte':'Noch kein Turnier gespielt'}</b><i>${t.running?'Spiel jetzt im Wettkampf und hol dir Platz 1!':'Das erste Turnier startet am Freitag um 18 Uhr.'}</i></span></div>`;
+}
+async function tnClaim(){
+  const b=$('tnClaim'); b.disabled=true;
+  try{ const r=await rpc('gd_tourney_claim'); applyEcon(r.state); GDX.tn=r.tourney||GDX.tn; GDX.tnAt=Date.now(); tnSync();
+    const msg=`Turnier-Belohnung (Platz ${r.rank}): ${tnPrizeText(r.prize)}`;
+    if(r.reward&&r.reward.crate){ crateFrom='tourney'; openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)) } else Sfx.buy();
+    toast(msg) }
+  catch(e){ toast(crewErr(e)); b.disabled=false }
+}
+
+/* hooks into the existing game: refresh with the weekly event, crew tag next to the name */
+{ const le=loadEvent; loadEvent=async function(){ const r=await le.apply(this,arguments); gdxLoad(); return r } }
+{ const rm=renderMe; renderMe=function(){ rm.apply(this,arguments); const c=GDX.crew, b=$('me')&&$('me').querySelector('.who b'); if(c&&b&&!b.querySelector('.crewtag')) b.insertAdjacentHTML('afterbegin',crewTagHtml(c)) } }
+{ // Wettkampf page: "Bestenliste" and "Crew" side by side
+  const tb=$('toBoard'), duo=document.createElement('div'), cb=document.createElement('button');
+  duo.className='duo'; cb.className='ghost'; cb.id='toCrewR'; cb.textContent='Crew';
+  tb.replaceWith(duo); duo.append(tb,cb);
+}
+tap('toCrewR',()=>openCrew('ranked'));
+tap('toCrewF',()=>openCrew('friends'));
+tap('crewBack',crewBack);
+tap('crewCopy',()=>{ const c=GDX.crew&&GDX.crew.code; if(!c) return; try{ navigator.clipboard.writeText(c).then(()=>toast('Crew-Code kopiert'),()=>toast(c)) }catch(e){ toast(c) } });
+tap('crewCreateOpen',openCrewNew);
+tap('cnBack',()=>openCrew());
+tap('cnOpen1',()=>{ GDX.nw.open=true; Sfx.select(); renderCrewNew() });
+tap('cnOpen0',()=>{ GDX.nw.open=false; Sfx.select(); renderCrewNew() });
+tap('crewOpen1',()=>{ GDX.editOpen=true; Sfx.select(); crewOpenSeg() });
+tap('crewOpen0',()=>{ GDX.editOpen=false; Sfx.select(); crewOpenSeg() });
+tap('crewLeave',async()=>{ const b=$('crewLeave'), c=GDX.crew; if(!c) return;
+  if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent=c.members.length<=1?'Sicher? Die Crew wird aufgelöst':c.role==='leader'?'Sicher? Die Führung geht weiter':'Sicher verlassen?'; return }
+  b.disabled=true; try{ const r=await rpc('gd_crew_leave'); GDX.crew=null; GDX.cooldown=r&&r.cooldown||null; toast('Du hast die Crew verlassen'); crewSync(); crewSearch() }catch(e){ toast(crewErr(e)) } finally{ b.disabled=false } });
+$('crewEdit').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); crewAct('gd_crew_edit',{p_motto:$('crewMottoIn').value.trim().slice(0,60),p_open:!!GDX.editOpen},$('crewSave'),'Gespeichert') ; setTimeout(()=>$('crewSave').disabled=false,800) });
+$('crewCodeForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); const v=$('crewCodeIn').value.trim(); if(v.replace(/[^a-z0-9]/gi,'').length<6) return $('crewHint').textContent='Der Code sieht so aus: CR-ABC123'; crewJoin(v,$('crewCodeGo')) });
+$('crewSearchForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); crewSearch() });
+$('crewNewForm').addEventListener('submit',e=>{ e.preventDefault(); Sfx.init(); crewCreate() });
+$('cnName').addEventListener('input',cnPreviewText); $('cnTag').addEventListener('input',cnPreviewText);
+tap('tnCardBtn',()=>openTourney('home'));
+$('tnCard').addEventListener('click',e=>{ if(e.target.closest('button')) return; Sfx.init(); openTourney('home') });
+$('tnCard').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openTourney('home') } });
+tap('tnBack',()=>goHome(1));
+tap('tnClaim',tnClaim);
+setInterval(()=>{ // live countdowns; reload when the tournament starts or ends
+  const t=GDX.tn; if(!t) return;
+  const edge=Date.parse(t.running?t.ends:t.next); if(tnNow()>edge&&performance.now()-GDX.tnLoaded>30000) tnLoad();
+  if(current==='tourney') $('tnStatus').textContent=tnStatusText(); else if(current==='home') renderTnCard();
+},1000);
 
 let last=performance.now();
 function loop(now){
