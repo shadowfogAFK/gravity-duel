@@ -638,6 +638,7 @@ button.mini.x{background:transparent;color:var(--muted);border:1px solid var(--l
         </div>
                 <p class="score" id="duelTally">Bisher 0 : 0</p>
         <label class="pick"><span class="label">Arena</span><select id="arenaPick"></select></label>
+        <label class="pick"><span class="label">Modifikator</span><select id="modPick"></select></label>
         <button id="duelPlay">Duell starten</button>
         <button class="alt" id="duelFriend">Gegen Freund spielen</button>
         <button class="ghost" id="duelRules">Regeln</button>
@@ -1089,6 +1090,7 @@ const PHYS=(()=>{
   const G=1600, PLANET_DENSITY=.3, MAX_DRAG=130, POWER=3.8, DT=1/240, PLANET_GAP=120, MAX_FLIGHT=8;
   const PULSE_PERIOD=1.4; // seconds of flight per pulsar beat
   const CLOUD_DRAG=1.6;   // gas clouds: speed falls by this share per second inside
+  const ENV={gk:1,wx:0,wy:0}; // duel modifiers: gravity factor and a constant wind (px/s²)
   const WIND=320;         // solar wind: push inside a stream, px/s²
   const BOUNCE=.92, MAX_BOUNCES=12; // mirror crystals: speed kept per bounce
   /* body types: density sets the pull (negative pushes away) */
@@ -1131,11 +1133,11 @@ const PHYS=(()=>{
   function pulse(t){ return .12+.88*(.5+.5*Math.sin(2*Math.PI*t/PULSE_PERIOD)) }
   function mass(b,t){ return b.type==='p'?b.m0*pulse(t):b.m0 }
   function accel(bodies,x,y,t){
-    let ax=0,ay=0;
+    let ax=ENV.wx,ay=ENV.wy;
     for(const b of bodies){
       if(b.kind==='field'){ if((b.x-x)**2+(b.y-y)**2<b.r*b.r){ ax+=Math.cos(b.a)*WIND; ay+=Math.sin(b.a)*WIND } continue }
       const m=b.m0?mass(b,t):0; if(!m) continue;
-      const dx=b.x-x, dy=b.y-y, d2=dx*dx+dy*dy+30, inv=G*m/(d2*Math.sqrt(d2));
+      const dx=b.x-x, dy=b.y-y, d2=dx*dx+dy*dy+30, inv=G*ENV.gk*m/(d2*Math.sqrt(d2));
       ax+=dx*inv; ay+=dy*inv;
     }
     return [ax,ay];
@@ -1180,7 +1182,7 @@ const PHYS=(()=>{
     return spec.r;
   }
   return {G,PLANET_DENSITY,MAX_DRAG,POWER,DT,PLANET_GAP,MAX_FLIGHT,PULSE_PERIOD,CLOUD_DRAG,WIND,TYPES,
-    makeBody,linkPortals,place,advance,pulse,mass,accel,collide,integrate,footprint};
+    makeBody,linkPortals,place,advance,pulse,mass,accel,collide,integrate,footprint,ENV};
 })();
 if(typeof module!=='undefined') module.exports=PHYS;
 
@@ -3680,10 +3682,10 @@ function rearrange(why,given){
   layoutWhy=why||'neu'; // no banner: the bodies just fade in at their new places
 }
 function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,opp:{name,skin}}
-  curEvent=o&&o.ev!=null?WEEK_EVENTS[o.ev|0]||null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:null;
+  curEvent=o&&o.ev!=null?MODS[o.ev|0]||null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:(online&&!online.host)?null:duelModPick>=0?MODS[duelModPick]||null:null;
   DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):curEvent&&curEvent.ammo?{...curEvent.ammo}:pickDuelAmmo();
   duelArena=o?o.arena:duelArenaPick>=0&&duelArenaPick<ARENAS.length?duelArenaPick:Math.floor(Math.random()*ARENAS.length);
-  const sd=o?o.seed:Math.floor(Math.random()*1e5); scene=makeScene(ARENAS[duelArena].theme,sd); bodies=[];
+  const sd=o?o.seed:Math.floor(Math.random()*1e5); applyMod(sd); scene=makeScene(ARENAS[duelArena].theme,sd); bodies=[];
   const p1=mkPlanet(0), p2=mkPlanet(1);
   bodies.push(p1,p2);
   const meP=mkPlayer(playerName(),DUEL_AMMO,mySkin()), other=o?mkPlayer(o.opp.name,DUEL_AMMO,o.opp.skin):mkPlayer('Spieler 2',DUEL_AMMO,duelRivalSkin());
@@ -3692,13 +3694,14 @@ function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,op
   resetShotState();
   layoutDuel(o&&o.specs);
   recStart(sd);
+  if(curEvent&&!online&&!ai) setTimeout(()=>toast(`${curEvent.icon} ${curEvent.name}: ${curEvent.desc}`),900);
 }
 let levelDiff=1; // the difficulty the running level was started with
 let dailyMode=false, dailyGal=null, dailyData=null;
 const curGalaxy=()=>dailyMode&&dailyGal?dailyGal:GALAXIES[galIdx];
 const curLevel=()=>curGalaxy().levels[levelIdx];
 function newLevelMap(){
-  const L=curLevel(); scene=makeScene(curGalaxy().id,galIdx*100+levelIdx+1); bodies=[];
+  const L=curLevel(); curEvent=null; applyMod(0); scene=makeScene(curGalaxy().id,galIdx*100+levelIdx+1); bodies=[];
   const p1=mkPlanet(0); bodies.push(p1);
   for(const spec of L.moons) bodies.push(withCraters(PHYS.makeBody(spec,H)));
   PHYS.linkPortals(bodies);
@@ -3760,6 +3763,11 @@ const WEEK_EVENTS=[
   {id:'bombs', name:'Bombenstimmung',icon:'💣', desc:'Schwerkraftbomben und Splitter für alle.', ammo:{gbomb:3,split:2}},
   {id:'blitz', name:'Schnellfeuer',  icon:'⚡', desc:'Nur 6 Sekunden pro Schuss.'}
 ];
+const MODS=[...WEEK_EVENTS,
+  {id:'wind', name:'Sonnenwind', icon:'🌬️', desc:'Ein ständiger Wind treibt jedes Geschoss zur Seite.'},
+  {id:'heavy',name:'Doppelte Schwerkraft',icon:'🪐',desc:'Alle Himmelskörper ziehen viel stärker.'}];
+let duelModPick=load('gravityDuel.duelMod.v1',-1);
+function applyMod(sd){ PHYS.ENV.gk=curEvent&&curEvent.id==='heavy'?1.7:1; PHYS.ENV.wy=0; PHYS.ENV.wx=curEvent&&curEvent.id==='wind'?((sd|0)%2?1:-1)*55:0 }
 const EVENT_START=Date.parse('2026-10-19T00:00:00+02:00');
 let curEvent=null, eventData=null, aimStart=0;
 const eventIdx=()=>eventData&&Number.isFinite(eventData.idx)?eventData.idx%WEEK_EVENTS.length:Math.floor((Date.now()-EVENT_START)/604800000)%WEEK_EVENTS.length;
@@ -5408,6 +5416,8 @@ function draw(t){
     if(b.kind!=='target'&&b.kind!=='planet'&&curEvent&&curEvent.id==='ghost'&&mode==='duel'&&phase==='aim'&&appearT<=0){ ctx.save(); ctx.globalAlpha=Math.max(.06,1-(performance.now()-aimStart)/1800); drawBody(ctx,b,t,visT); ctx.restore(); continue }
     if(b.kind==='target') drawTarget(b,t); else if(b.kind==='planet') drawPlanet(b,t); else if(appearT>0){ ctx.save(); const k=1-appearT/.9; ctx.globalAlpha=k; ctx.translate(b.x,b.y); ctx.scale(.6+.4*k,.6+.4*k); ctx.translate(-b.x,-b.y); drawBody(ctx,b,t,visT); ctx.restore() } else drawBody(ctx,b,t,visT);
   }
+  if(mode==='duel'&&curEvent&&curEvent.id==='wind'){ const dir=Math.sign(PHYS.ENV.wx)||1; ctx.save(); ctx.strokeStyle='rgba(255,236,170,.24)'; ctx.lineWidth=1.6; ctx.lineCap='round';
+    for(let i=0;i<26;i++){ const y=((i*97.3)%1)*H+((i*53)%H), sp=60+(i*37)%70, x=((t*sp*dir+i*151)%(W+120)+W+120)%(W+120)-60; ctx.beginPath(); ctx.moveTo(x,y%H); ctx.lineTo(x-dir*(18+(i%5)*6),y%H); ctx.stroke() } ctx.restore() }
   for(const s of proj){ const q=players[s.o]; drawStyledTrail(ctx,s.trail,q.color,q.skin.trail,t,.85); drawProjectile(s,q.color,t,q.skin) }
   drawParticles(); drawVictoryFx(t);
   // deciding shot: mark how close each shot came
@@ -6451,10 +6461,10 @@ async function beginOnline(m){
 function hostStart(){
   const o=online;
   const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):o.arenaPick>=0&&ARENAS[o.arenaPick]?o.arenaPick:Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
-  o.arena=arena; newDuelMap({arena,seed,ammo:pickDuelAmmo(),opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
+  o.arena=arena; newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
   starter=Math.random()<.5?0:1;
-  onlineSend('start',{arena,seed,specs:duelSpecs,ammo:DUEL_AMMO,ev:curEvent?WEEK_EVENTS.indexOf(curEvent):null,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
-  if(curEvent) setTimeout(()=>toast(`${curEvent.icon} Wochen-Event: ${curEvent.name}`),1600);
+  onlineSend('start',{arena,seed,specs:duelSpecs,ammo:DUEL_AMMO,ev:curEvent?MODS.indexOf(curEvent):null,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
+  if(curEvent) setTimeout(()=>toast(`${curEvent.icon} ${o.ranked?'Wochen-Event':'Modifikator'}: ${curEvent.name}`),1600);
   o.sentLayout=layoutId; o.started=true;
   beginOnlineRounds();
 }
@@ -7935,6 +7945,10 @@ tap('rulesBack',()=>goHome(2));
   sel.innerHTML='<option value="-1">Zufällige Arena</option>'+ARENAS.map((a,i)=>`<option value="${i}">${i+1} · ${a.name}</option>`).join('');
   sel.value=String(duelArenaPick);
   sel.addEventListener('change',()=>{ duelArenaPick=+sel.value; save('gravityDuel.duelArena.v1',duelArenaPick) }) })();
+(()=>{ const sel=$('modPick');
+  sel.innerHTML='<option value="-1">Keiner · normale Regeln</option>'+MODS.map((m,i)=>`<option value="${i}">${m.icon} ${m.name}</option>`).join('');
+  sel.value=String(duelModPick); sel.title=duelModPick>=0&&MODS[duelModPick]?MODS[duelModPick].desc:'';
+  sel.addEventListener('change',()=>{ duelModPick=+sel.value; save('gravityDuel.duelMod.v1',duelModPick); sel.title=duelModPick>=0?MODS[duelModPick].desc:''; if(duelModPick>=0) toast(`${MODS[duelModPick].icon} ${MODS[duelModPick].desc}`) }) })();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
