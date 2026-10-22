@@ -762,6 +762,26 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .ughid{align-self:flex-start;margin-top:3px;font-family:var(--display);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#ff8a8a;border:1px solid rgba(255,138,138,.5);border-radius:6px;padding:1px 6px}
 .ugitem.hid .ugsky{opacity:.45}
 #ugrReasons button{text-align:left}
+
+/* ---------- friends: online status, mode chooser, spectator mode ---------- */
+.fr .av{position:relative}
+.fr .av.on::after,.fr .av.duel::after{content:'';position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-radius:50%;background:#5cff9d;box-shadow:0 0 0 2px var(--space),0 0 8px rgba(92,255,157,.8)}
+.fr .av.duel::after{background:var(--gold);box-shadow:0 0 0 2px var(--space),0 0 8px rgba(255,211,79,.8)}
+.fr .fn i .fs{color:var(--muted)}
+.fr .fn i .fs.on{color:#5cff9d}
+.fr .fn i .fs.duel{color:var(--gold)}
+#friendList .fr{grid-template-columns:34px minmax(0,1fr) auto auto}
+#friendList .fr button.watch{background:rgba(255,211,79,.14);color:var(--gold);border:1px solid rgba(255,211,79,.55)}
+#friendList .fr button.open{background:rgba(46,230,255,.16);color:var(--ink);box-shadow:inset 0 0 0 1px rgba(46,230,255,.6)}
+#friendList .frpick{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}
+#friendList .frpick button{font-size:.8rem;padding:9px 6px}
+#friendList .frpick span{grid-column:1/-1;font-size:.72rem;color:var(--muted)}
+#specBar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:99px;background:rgba(14,6,34,.86);border:1px solid rgba(255,211,79,.45);box-shadow:0 0 20px rgba(0,0,0,.5);z-index:6;max-width:calc(100% - 24px)}
+#specBar span{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+#specBar b{font-family:var(--display);font-size:.78rem;color:var(--gold);white-space:nowrap}
+#specBar i{font-style:normal;font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#specBar button{padding:8px 14px;border-radius:99px;font-size:.82rem;box-shadow:none;flex:none}
+#specCount{right:calc(10px + env(safe-area-inset-right,0px));top:calc(90px + env(safe-area-inset-top,0px));color:var(--gold);border-color:rgba(255,211,79,.45);pointer-events:none}
 </style>
 </head>
 <body>
@@ -775,6 +795,8 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
   <button id="music" class="chip" aria-pressed="false" hidden>Musik an</button>
   <div id="weapons" hidden aria-label="Geschoss wählen"></div>
   <div id="toast" role="status" hidden></div>
+  <div id="specBar" hidden><span><b>👁 Zuschauer-Modus</b><i id="specWho"></i></span><button class="ghost" id="specLeave">Verlassen</button></div>
+  <div id="specCount" class="chip" hidden aria-live="polite"></div>
   <div id="rbar" hidden><span id="rbarInfo">Replay</span><button class="ghost" id="rbarPause" aria-label="Pause">❚❚</button><button class="ghost" id="rbarSpeed" aria-label="Geschwindigkeit">1×</button><button class="ghost" id="rbarClose" aria-label="Replay schließen">✕</button></div>
 
   <div id="home">
@@ -4535,7 +4557,7 @@ function launchFrom(vec,o=turn){
 /* ---------- weapon bar ---------- */
 function renderWeapons(){
   const bar=$('weapons'), pl=players[turn];
-  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&turn!==meIdx())&&!(ai&&turn===1);
+  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&(turn!==meIdx()||online.spec))&&!(ai&&turn===1);
   bar.hidden=!showBar; if(!showBar) return;
   bar.classList.toggle('flip',mode==='duel'&&!online&&turn===1);
   const c=skinColor(pl.skin,performance.now()/1000);
@@ -4563,8 +4585,8 @@ let roundShot=0, round=1, tiebreak=false, tbMarks=[], blitzQueue=[null,null], bl
 const otherOf=o=>1-o;
 /* text for player 2 is turned upside down in the local duel; online everybody sees their own side at the bottom */
 /* the guest of an online match plays from the top planet and sees the field turned around */
-const meIdx=()=>online&&!online.host?1:0;
-const viewRot=()=>!!(online&&!online.host)||!!(replay&&replay.rot);
+const meIdx=()=>online?(online.spec?online.view:online.host?0:1):0;
+const viewRot=()=>!!(online&&meIdx()===1)||!!(replay&&replay.rot);
 const flipFor=o=>mode==='duel'&&(online?viewRot():!ai&&o===1);
 
 const TURN_TIME=10; // seconds per shot in duels, against stalling
@@ -4595,8 +4617,9 @@ function startTurn(){
     const enemyDown=players[otherOf(turn)].lives<=0||pl.lives<=0;
     if(tiebreak) banner={text:'Entscheidungsschuss',sub:`Neue Anordnung · so nah wie möglich an die Planetenmitte`,t:2.4,player:turn};
     else if(roundShot===1&&enemyDown) banner={text:'Letzte Chance!',sub:`${pl.name} darf noch ausgleichen`,t:2.2,player:turn};
+    else if(online&&online.spec&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Beide zielen gleichzeitig',t:1.8,player:meIdx()};
     else if((online||ai)&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Ihr zielt gleichzeitig · Ziehen und loslassen',t:1.8,player:meIdx()};
-    else if((online||ai)&&turn===meIdx()) banner={text:'Du bist dran',sub:`Runde ${round} · Ziehen und loslassen`,t:1.6,player:turn};
+    else if((online&&!online.spec||ai)&&turn===meIdx()) banner={text:'Du bist dran',sub:`Runde ${round} · Ziehen und loslassen`,t:1.6,player:turn};
     else if(ai) banner={text:pl.name+' zielt …',sub:`Runde ${round}`,t:1.6,player:0};
     else banner={text:pl.name+' ist dran',sub:`Runde ${round}${online?' · warte auf den Schuss':' · Ziehen und loslassen'}`,t:1.6,player:turn};
   }
@@ -4699,7 +4722,7 @@ function launch(shots){
   if(shots.length) Sfx.launch(Math.max(...shots.map(x=>x.per.power)));
   const w=shots.length===1?shots[0].per.type:null;
   if(w&&WEAPONS[w].hint&&w!=='drill'&&(!online||shots[0].s.o===meIdx())) banner={text:WEAPONS[w].hint,sub:'',t:2.2,player:mode==='duel'?turn:0,small:true};
-  if(shots.length>1&&shots.some(x=>x.s.armed)) banner=online?{text:'Tippen zum Auslösen',sub:'',t:2,player:meIdx(),small:true}:{text:'Tippe auf deine Hälfte',sub:'zum Auslösen deines Geschosses',t:2.2,player:0,small:true,center:true};
+  if(shots.length>1&&shots.some(x=>x.s.armed)&&!(online&&online.spec)) banner=online?{text:'Tippen zum Auslösen',sub:'',t:2,player:meIdx(),small:true}:{text:'Tippe auf deine Hälfte',sub:'zum Auslösen deines Geschosses',t:2.2,player:0,small:true,center:true};
   renderWeapons();
 }
 function turnTimeout(){
@@ -4710,7 +4733,7 @@ function turnTimeout(){
 }
 function fire(v){
   if(mode==='campaign') shotCount++;
-  if(online) return onlineFire(v);
+  if(online) return online.spec?undefined:onlineFire(v);
   if(mode==='duel'&&(duelMode==='blitz'||tiebreak)){
     blitzQueue[turn]=v||'skip'; phase='wait'; renderWeapons();
     const nxt=blitzOrder.find(o=>!blitzQueue[o]);
@@ -5622,7 +5645,7 @@ function sendEmote(id){
   if(performance.now()-emoteLast<2500) return toast('Kurz warten, dann kannst du wieder reagieren');
   emoteLast=performance.now(); Sfx.select();
   showEmote(meIdx(),id);
-  if(online) try{ online.ch.send({e:id}) }catch(e){}
+  if(online&&!online.spec) try{ online.ch.send({e:id,f:meIdx()}) }catch(e){}
   if(ai&&Math.random()<.5) aiEmote(['gg','thumbs','wow','wink'][Math.floor(Math.random()*4)],900+Math.random()*900);
 }
 /* the AI uses the whole collection, so players get to see what is out there */
@@ -6023,7 +6046,7 @@ function step(dt){
     turnLeft-=dt;
     const sec=Math.ceil(turnLeft);
     if(sec<=3&&sec>0&&sec!==lastTick){ lastTick=sec; Sfx.tick(.2+.2*(3-sec)) }
-    if(turnLeft<=0){ if(online&&turn!==meIdx()) turnLeft=0; else turnTimeout() } // online the shooter's phone keeps its own clock
+    if(turnLeft<=0){ if(online&&(turn!==meIdx()||online.spec)) turnLeft=0; else turnTimeout() } // online the shooter's phone keeps its own clock
   }
   if(mode==='duel'&&!tiebreak&&!timeUp&&(phase==='aim'||phase==='fly'||phase==='boom'||phase==='wait'||phase==='syncRes'||phase==='syncState')){
     matchLeft-=dt;
@@ -6051,6 +6074,7 @@ function step(dt){
 function toWorld(e){ const r=cv.getBoundingClientRect(), x=(e.clientX-r.left)/scale-offX, y=(e.clientY-r.top)/scale-offY; return viewRot()?{x:W-x,y:H-y}:{x,y} }
 cv.addEventListener('pointerdown',e=>{
   Sfx.init();
+  if(online&&online.spec) return;
   if(phase==='fly'&&online){ onlineTap(); return }
   if(phase==='fly'){ const p=toWorld(e); trigger(ai?0:mode==='duel'&&(duelMode==='blitz'||tiebreak)?(p.y>H/2?0:1):undefined); return }
   if(phase!=='aim'||(online&&turn!==meIdx())||(ai&&turn===1)) return;
@@ -6507,7 +6531,7 @@ const questDef=id=>QUEST_POOL.daily.find(t=>t.id===id)||QUEST_POOL.weekly.find(t
 /* the game reports events here; finished tasks show a short note */
 const CLIENT_EVENTS=['shot','special','target','longshot','portal']; // everything else the server counts itself
 function track(ev,n=1){
-  if(!n) return;
+  if(!n||(online&&online.spec)) return;
   if(SERVER_ECON){ if(CLIENT_EVENTS.includes(ev)) econEvent(ev,n); return }
   const q=ensureQuests(); let done=[];
   for(const list of [q.daily,q.weekly]) for(const s of list){
@@ -6752,7 +6776,7 @@ async function netPing(){
     }
     else if(inv&&!online&&!search&&phase==='menu'&&['home','friends','quests','shop','settings','board'].includes(current)) showInvite(inv);
     else if(inv&&!search&&current==='over'&&online&&online.over&&!online.ranked&&inv.from.id===online.opp.id) showInvite(inv,true);
-    if(current==='friends') loadFriends(true);
+    if(current==='friends'&&performance.now()-frLoadedAt>18000) loadFriends(true); // the list refreshes about every 20 s
   }catch(e){}
   schedulePing(current==='friends'||current==='invite'||current==='search'||(current==='over'&&online&&!online.ranked)?3000:9000);
 }
@@ -6833,7 +6857,7 @@ async function playAi(){
   if(rk&&typeof rk.gravitons==='number'){ profile.trophies=rk.gravitons; saveProfile() }
   startAiDuel(arenaIndex(profile.trophies+(rk&&rk.ranked?rk.loss|0:0)),s.mode,rk);
 }
-function cancelSearch(){
+function cancelSearch(){ if(online&&online.spec) return specExit(true);
   const s=search; search=null; $('searchCancel').textContent='Abbrechen'; $('searchAi').hidden=true;
   if(s){ clearInterval(s.poll); if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{}) }
   if(s&&s.kind==='challenge'&&!s.rematch) openFriends(); else goHome(s&&s.rematch&&friendCtx?2:1);
@@ -6866,16 +6890,16 @@ function openFriends(ctx){
   if(ctx!==undefined) friendCtx=ctx;
   $('friendCode').textContent=(Net.me&&Net.me.friend_code)||friendCode();
   const where=friendCtx?`${MODE_NAME[duelMode]} · ${duelArenaPick>=0?`Arena ${duelArenaPick+1}: ${esc(ARENAS[duelArenaPick].name)}`:'Zufällige Arena'}`:'';
-  $('friendsNote').innerHTML=Net.state==='ready'?(friendCtx?`Freundesduell · ${where}. Tippe bei einem Freund auf „Duell“.`:'Teile deinen Code oder Link. Wer online ist, kannst du herausfordern.')
+  $('friendsNote').innerHTML=Net.state==='ready'?(friendCtx?`Freundesduell · ${where}. Tippe bei einem Freund auf „Duell“.`:'Teile deinen Code oder Link. Wer online ist, kannst du herausfordern – läuft gerade ein Duell, kannst du zuschauen.')
     :Net.state==='nocfg'?`Freunde gibt es in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`:'Gerade keine Verbindung zum Server.';
-  $('addForm').hidden=Net.state!=='ready'; $('fmodes').hidden=Net.state!=='ready'||!!friendCtx; $('shareLink').hidden=Net.state!=='ready';
+  $('addForm').hidden=Net.state!=='ready'; $('fmodes').hidden=true; frPick=null; $('shareLink').hidden=Net.state!=='ready';
   renderFriends(); show('friends'); renderOnline();
   if(Net.state==='ready'){ loadFriends(); schedulePing(3000) }
 }
 async function loadFriends(quiet){
-  try{ Net.friends=await rpc('gd_friends'); if(current==='friends') renderFriends() }catch(e){ if(!quiet) $('addHint').textContent=niceErr(e) }
+  try{ Net.friends=await friendsLive(); if(current==='friends') renderFriends() }catch(e){ if(!quiet) $('addHint').textContent=niceErr(e) }
 }
-function renderFriends(){
+function renderFriendsV1(){
   const box=$('friendList'); box.innerHTML='';
   if(!Net.friends.length){ box.innerHTML='<div class="fr"><span class="av"></span><span class="fn"><b>Noch keine Freunde</b><i>Füge jemanden mit seinem Code hinzu</i></span></div>'; return }
   for(const f of Net.friends){
@@ -7320,7 +7344,7 @@ async function beginOnline(m){
 function hostStart(){
   const o=online;
   const arena=o.ranked?arenaIndex(Math.min(o.myG,o.oppG)):o.arenaPick>=0&&ARENAS[o.arenaPick]?o.arenaPick:Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
-  o.arena=arena; newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
+  o.arena=arena; o.seed=seed; newDuelMap({arena,seed,opp:{name:cleanName(o.opp.name),skin:skinFromEquip(o.opp.skin)}});
   starter=Math.random()<.5?0:1;
   onlineSend('start',{arena,seed,specs:duelSpecs,ammo:DUEL_AMMO,ev:curEvent?MODS.indexOf(curEvent):null,starter,mode:duelMode,name:playerName(),skin:{...profile.equip}});
   if(curEvent) setTimeout(()=>toast(`${curEvent.icon} ${o.ranked?'Wochen-Event':'Modifikator'}: ${curEvent.name}`),1600);
@@ -7335,9 +7359,11 @@ function beginOnlineRounds(){
 }
 
 /* numbered messages with acknowledgement and resend */
-function onlineSend(t,d){ const o=online; if(!o) return; const msg={s:o.seq++,t,d}; o.out.push({msg,at:performance.now()}); try{ o.ch.send(msg) }catch(e){} }
+function onlineSend(t,d){ const o=online; if(!o||o.spec) return; const msg={s:o.seq++,t,d,f:o.host?0:1}; o.out.push({msg,at:performance.now()}); try{ o.ch.send(msg) }catch(e){} }
 function onlineRecv(msg){
   const o=online; if(!o||!msg) return;
+  if(o.spec) return specRecv(msg);
+  if(msg.sp!=null) return specReq(msg); // a spectator: not the opponent, so it does not count as a sign of life
   o.lastHeard=performance.now();
   if(msg.e!=null){ showEmote(1-meIdx(),typeof msg.e==='number'?msg.e|0:String(msg.e).slice(0,16)); return }
   if(msg.a!=null){ o.out=o.out.filter(x=>x.msg.s!==msg.a); return }
@@ -7350,6 +7376,8 @@ function onlineRecv(msg){
 }
 function onlineTick(){
   const o=online; if(!o) return;
+  if(o.spec) return specTick(o);
+  specCountUi(o);
   const now=performance.now();
   for(const x of o.out) if(now-x.at>1000){ x.at=now; try{ o.ch.send(x.msg) }catch(e){} }
   if(now-o.lastHb>1500){ o.lastHb=now; try{ o.ch.send({hb:1}) }catch(e){} }
@@ -7360,6 +7388,7 @@ function onlineTick(){
 }
 /* messages are handled strictly in order; one that does not fit the current moment waits */
 function onlinePump(){
+  if(online&&online.spec) return specPump();
   let n=0;
   while(online&&online.queue.length&&n++<30){
     const m=online.queue[0];
@@ -7476,6 +7505,7 @@ function applyState(d){
 }
 function onlineEnd(w,byTb,how){
   const o=online; if(o.over) return; o.over=true;
+  if(o.spec) return specEnd(w,byTb,how);
   if(o.host) onlineSendState('over',{w,tb:!!byTb,how:how||''});
   const me=meIdx(), won=w===me;
   phase='over'; Sfx.win(); track('duel_played'); if(won) track('duel_won');
@@ -7505,12 +7535,13 @@ async function netReport(id,winner,tries=0){
   }catch(e){ if(tries<3) setTimeout(()=>netReport(id,winner,tries+1),5000); else if(current==='over') $('overGrav').textContent='Wertung gerade nicht möglich' }
 }
 let ffArmed=0;
-function onlineForfeit(){
+function onlineForfeit(){ if(online&&online.spec) return specExit(true);
   if(performance.now()-ffArmed>3000){ ffArmed=performance.now(); toast('Nochmal tippen, um aufzugeben'); return }
   onlineSend('ff',{}); endMatch(1-meIdx(),false,'– du hast aufgegeben');
 }
 function onlineCleanup(){
   const o=online; if(!o) return;
+  if(o.spec) specCleanup(o);
   clearInterval(o.tick); const ch=o.ch; setTimeout(()=>ch.close(),1500);
   duelMode=o.prevMode; online=null; $('back').textContent='Menü'; resize();
 }
@@ -7527,7 +7558,7 @@ function show(name){
   const inGame=name===null||name==='intro';
   document.documentElement.classList.toggle('playing',name===null);
   $('back').hidden=!inGame; $('mute').hidden=!inGame; $('music').hidden=!inGame;
-  $('emoteBtn').hidden=!(name===null&&(online||ai)); $('emotes').hidden=true; $('emoteBtn').setAttribute('aria-expanded','false');
+  $('emoteBtn').hidden=!(name===null&&(online&&!online.spec||ai)); specUi(name); $('emotes').hidden=true; $('emoteBtn').setAttribute('aria-expanded','false');
   // battle music while a match or level is on (including its result screen), menu music everywhere else
   const battle=inGame||name==='clear'||name==='over'||name==='cover';
   // campaign: every galaxy has its own track, boss levels a harder variant of it; duels get the duel track
@@ -8950,7 +8981,7 @@ tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item
 $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.revealed) revealCrate() });
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
-tap('again',()=>{ if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
+tap('again',()=>{ if(online&&online.spec) return specExit(); if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
 tap('overBack',()=>goHome(ai||online&&!online.fromDuel?1:2));
 tap('next',()=>{
   const g=curGalaxy();
@@ -9986,6 +10017,281 @@ $('ugrReasons').addEventListener('click',async e=>{
 });
 tap('ugrBack',ugRepClose);
 if(window.__GD_TEST__) window.__ug={week:()=>ugWeekData,items:()=>ugItems,rep:()=>ugRepItem};
+
+/* ---------- friends: online status ("Online", "Im Duell", "zuletzt vor …"), challenge with a mode chooser ----------
+   gd_friends_live = gd_friends plus seconds since last seen and the friend's running online match (if any).
+   Loaded when the screen opens and about every 20 s while it is open (piggybacks on the heartbeat). */
+var frLoadedAt=-1e9, frPick=null, frLiveOk=true;
+async function friendsLive(){
+  frLoadedAt=performance.now();
+  if(frLiveOk){ try{ return await rpc('gd_friends_live') }catch(e){ if(!/gd_friends_live|function|schema/i.test(String(e&&e.message||e))) throw e; frLiveOk=false } }
+  return await rpc('gd_friends'); // older server: online flag only
+}
+function seenText(f){
+  const s=f.seen;
+  if(f.online) return 'Online';
+  if(s==null) return 'offline';
+  if(s<3600) return `zuletzt vor ${Math.max(2,Math.round(s/60))} Min.`;
+  if(s<86400) return `zuletzt vor ${Math.round(s/3600)} Std.`;
+  if(s<172800) return 'zuletzt gestern';
+  if(s<2592000) return `zuletzt vor ${Math.round(s/86400)} Tagen`;
+  return 'länger nicht online';
+}
+function renderFriends(){
+  const box=$('friendList'); box.innerHTML='';
+  if(!Net.friends.length){ box.innerHTML='<div class="fr"><span class="av"></span><span class="fn"><b>Noch keine Freunde</b><i>Füge jemanden mit seinem Code hinzu</i></span></div>'; return }
+  const rank=f=>f.duel&&f.online?0:f.online?1:2;
+  const list=[...Net.friends].sort((a,b)=>rank(a)-rank(b)||(a.seen??1e12)-(b.seen??1e12));
+  for(const f of list){
+    const el=document.createElement('div'); el.className='fr';
+    const col=skinFromEquip(f.skin).color, duel=!!(f.duel&&f.online);
+    const st=duel?`<span class="fs duel">Im Duell${f.duel.mode&&MODE_NAME[f.duel.mode]?' · '+MODE_NAME[f.duel.mode]:''}</span>`:`<span class="fs${f.online?' on':''}">${seenText(f)}</span>`;
+    el.innerHTML=`<span class="av${duel?' duel':f.online?' on':''}" style="background:${col};box-shadow:0 0 10px ${col}"></span>
+      <span class="fn"><b>${badgeHtml(f.badge)}${esc(cleanName(f.name))}</b><i>${st} · ${f.gravitons|0} ${CURRENCY}</i></span>`;
+    const nm=cleanName(f.name);
+    let btn=null;
+    if(duel){
+      btn=document.createElement('button'); btn.className='mini watch'; btn.textContent='Zuschauen';
+      btn.setAttribute('aria-label',`${nm} beim Duell zuschauen`); btn.onclick=()=>{ Sfx.init(); Sfx.select(); watchFriend(f) };
+    } else if(f.online){
+      btn=document.createElement('button'); btn.className='mini'+(frPick===f.id?' open':'');
+      btn.textContent=friendCtx?'Duell':'Herausfordern';
+      btn.setAttribute('aria-label',`${nm} herausfordern`); btn.setAttribute('aria-expanded',String(frPick===f.id));
+      btn.onclick=()=>{ Sfx.init();
+        if(friendCtx) return challengeFriend(f); // from the local duel: its mode and arena are used
+        Sfx.select(); frPick=frPick===f.id?null:f.id; renderFriends() };
+    } else { btn=document.createElement('span'); btn.className='st'; }
+    const rm=document.createElement('button'); rm.className='mini x'; rm.textContent='×'; rm.setAttribute('aria-label',`${nm} entfernen`);
+    rm.onclick=async()=>{ if(rm.dataset.sure!=='1'){ rm.dataset.sure='1'; rm.textContent='Sicher?'; return }
+      try{ await rpc('gd_remove_friend',{p_id:f.id}); Net.friends=Net.friends.filter(x=>x.id!==f.id); renderFriends() }catch(e){ toast(niceErr(e)) } };
+    el.append(btn,rm);
+    if(frPick===f.id&&f.online&&!duel&&!friendCtx){
+      const pk=document.createElement('div'); pk.className='frpick'; pk.setAttribute('role','group'); pk.setAttribute('aria-label','Modus wählen');
+      pk.innerHTML='<span>Modus für die Herausforderung</span>';
+      for(const m of ['classic','blitz']){
+        const b=document.createElement('button'); b.className=onlineMode===m?'':'ghost'; b.textContent=MODE_NAME[m]; b.dataset.mode=m;
+        b.onclick=()=>{ frPick=null; setOnlineMode(m); challengeFriend(f) };
+        pk.appendChild(b);
+      }
+      el.appendChild(pk);
+    }
+    box.appendChild(el);
+  }
+}
+
+/* ---------- watching a friend's online match ("Zuschauen") ----------
+   The spectator joins the match's broadcast channel and only listens; it never acknowledges or sends match messages,
+   so the players' protocol is untouched. Every match message carries f (0 host, 1 guest), so the spectator keeps one
+   ordered stream per player. It runs the same deterministic engine as the guest: the host's 'st' messages start every
+   turn, shots/'go' launch the volleys, 'trig' replays the flight from the tap, 'res' carries the result.
+   Joining mid-match: the spectator asks with {sp:'?'} and the host answers {ss:snapshot} (map, layout, lives, clock,
+   turn, both players and where both message streams stand). Mid-flight the spectator waits for the next turn.
+   Spectators say {sp:'hi'} every 5 s, so the players can show how many are watching. */
+var SPEC_HOST_T=['start','st','res','go','tu'], SPEC_GUEST_T=['bshot','fin'];
+async function watchFriend(f){
+  if(Net.state!=='ready'||search||online) return;
+  let w;
+  try{ w=await rpc('gd_watch',{p_friend:f.id}) }catch(e){ return toast(niceErr(e)) }
+  if(!w||!w.id||w.status==='none'){ toast(`${cleanName(f.name)} spielt gerade kein Online-Duell`); return loadFriends(true) }
+  if(online||search) return;
+  const host=w.host||{}, guest=w.guest||{};
+  const ch=Net.backend.channel('gd-match-'+w.id);
+  online={spec:true,id:w.id,host:false,ranked:!!w.ranked,mode:w.mode==='blitz'?'blitz':'classic',ch,view:guest.id===f.id?1:0,friend:f,
+    p:[host,guest],sid:Math.random().toString(36).slice(2,10),st:[{inSeq:null,buf:{},queue:[],gapAt:0},{inSeq:null,buf:{},queue:[],gapAt:0}],
+    seq:0,out:[],queue:[],inSeq:0,buf:{},k:0,lastHeard:performance.now(),t0:performance.now(),lastReq:-1e9,lastHi:-1e9,
+    started:false,over:false,pendingRes:null,guestFin:false,finK:-1,myBlitz:null,remoteBlitz:null,prevMode:duelMode,opp:f,meId:null,fromDuel:false};
+  const o=online;
+  showSearch(`Zuschauen · ${o.ranked?'Wettkampf':'Freundschaftsduell'}`,`${cleanName(host.name)} gegen ${cleanName(guest.name)}`,'Verbinde mit dem Duell …');
+  ch.onMsg(onlineRecv);
+  try{ await ch.subscribe() }catch(e){ if(online===o){ online=null; searchFailed(e) } return }
+  if(online!==o) return;
+  o.tick=setInterval(onlineTick,400); specTick(o);
+}
+function specSay(o,sp){ try{ o.ch.send({sp,id:o.sid}) }catch(e){} }
+function specTick(o){
+  const now=performance.now();
+  if(!o.started&&now-o.lastReq>1500){ o.lastReq=now; specSay(o,'?') }
+  if(now-o.lastHi>5000){ o.lastHi=now; specSay(o,'hi') }
+  // a message that never arrives (sent before we joined) must not hold up the rest
+  for(const S of o.st) if(S.inSeq!=null&&S.gapAt&&now-S.gapAt>2500){ const ks=Object.keys(S.buf).map(Number); if(ks.length){ S.inSeq=Math.min(...ks); S.gapAt=0; specDrain(S) } }
+  specPump();
+  if(online!==o||o.over) return;
+  if(!o.started&&now-o.t0>12000){ toast('Das Duell ist schon vorbei oder gerade nicht erreichbar'); return specExit() }
+  if(o.started&&now-o.lastHeard>20000){ toast('Die Übertragung ist abgebrochen'); return specExit() }
+}
+function specRecv(msg){
+  const o=online; if(!o||!o.spec) return;
+  if(msg.sp!=null) return; // another spectator
+  o.lastHeard=performance.now();
+  if(msg.ss){ if(!msg.to||msg.to===o.sid) specSnap(o,msg.ss); return }
+  if(msg.a!=null||msg.hb!=null) return; // acknowledgements and heartbeats: never answered by spectators
+  let f=msg.f===0||msg.f===1?msg.f:SPEC_HOST_T.includes(msg.t)?0:SPEC_GUEST_T.includes(msg.t)?1:null;
+  if(msg.e!=null){ if(o.started&&f!=null) showEmote(f,typeof msg.e==='number'?msg.e|0:String(msg.e).slice(0,16)); return }
+  if(msg.s==null||f==null||!Number.isFinite(+msg.s)) return;
+  const S=o.st[f], n=msg.s|0;
+  if(!o.started&&f===0&&msg.t==='start'){ S.inSeq=n; o.st[1].inSeq=0; for(const k in S.buf) if(+k<n) delete S.buf[k] }
+  if(S.inSeq!=null&&n<S.inSeq) return;
+  if(S.buf[n]) return;
+  S.buf[n]=msg; specDrain(S); specPump();
+}
+function specDrain(S){
+  if(S.inSeq==null) return;
+  while(S.buf[S.inSeq]){ S.queue.push(S.buf[S.inSeq]); delete S.buf[S.inSeq]; S.inSeq++ }
+  S.gapAt=Object.keys(S.buf).length?(S.gapAt||performance.now()):0;
+}
+function specPump(){
+  const o=online; if(!o||!o.spec) return;
+  let n=0, moved=true;
+  while(moved&&n++<60){
+    moved=false;
+    for(const f of [0,1]){
+      const q=o.st[f].queue; if(!q.length) continue;
+      const m=q[0], r=specHandle(m.t,m.d||{},f);
+      if(online!==o) return;
+      if(r==='wait') continue;
+      q.shift(); moved=true;
+    }
+  }
+}
+function specHandle(t,d,f){
+  const o=online;
+  if(o.over) return;
+  if(t==='start'){ if(!o.started&&f===0) specStart(o,d); return }
+  if(!o.started) return 'wait';
+  const k=d.k|0;
+  if(t==='ff'){ endMatch(1-f,false,`– ${players[f].name} hat aufgegeben`); return }
+  if(t==='bshot'||t==='fin') return; // the host answers these with 'go' and 'res'
+  if(t==='shot'){
+    if(k<o.k) return;
+    if(k>o.k||phase!=='aim'||turn!==f||duelMode==='blitz'||tiebreak) return 'wait';
+    return launchShots([{o:f,v:finite(d.v),w:d.w}]);
+  }
+  if(t==='go'){
+    if(f!==0||k<o.k) return;
+    if(k>o.k||!(phase==='aim'||phase==='wait')) return 'wait';
+    return launchShots((d.shots||[]).map(x=>({o:x.o?1:0,v:finite(x.v),w:x.w})));
+  }
+  if(t==='trig'){
+    if(k<o.k) return;
+    if(k>o.k||phase==='aim'||phase==='wait') return 'wait'; // its volley has not started here yet
+    if(!launchSnap||!['fly','syncRes','syncFin'].includes(phase)) return;
+    trigs.push({n:d.n|0,o:f});
+    if(flightN>(d.n|0)){ replayFlight(); if(proj.length) phase='fly' }
+    return;
+  }
+  if(f!==0) return;
+  // a volley we never saw (joined just as it was fired): skip ahead to the next turn
+  if(t==='st'&&(phase==='aim'||phase==='wait')&&(k>o.k||d.kind==='over')){ proj=[]; phase='syncState' }
+  return onlineHandle(t,d); // 'st', 'res', 'tu': exactly like the guest
+}
+function specPlayers(o,hp){
+  const a=Object.assign({},o.p[0]||{},hp&&hp[0]||{}), b=Object.assign({},o.p[1]||{},hp&&hp[1]||{});
+  const sa=specSkin(a.skin), sb=specSkin(b.skin);
+  if(!sa.anim&&!sb.anim&&sa.color===sb.color){ sb.color=sa.color==='#5fb3c4'?'#d9a05b':'#5fb3c4'; sb.c2=null }
+  [[a,sa],[b,sb]].forEach(([x,sk],i)=>{ const old=players[i], p=mkPlayer(cleanName(x.name),DUEL_AMMO,sk); p.planet=old.planet; p.lives=old.lives; players[i]=p });
+  o.names=players.map(p=>p.name);
+  rec=null; recVol=null; // spectators keep no replay
+}
+/* like skinFromEquip, but without swapping a color that happens to match the spectator's own planet */
+function specSkin(e){
+  const s=skinFromEquip(e), id=e&&typeof e==='object'&&typeof e.color==='string'&&SHOP.color.some(i=>i.id===e.color)?e.color:SHOP.color[0].id, c=shopItem('color',id);
+  s.color=c.color; s.c2=c.c2; s.anim=c.anim; return s;
+}
+function specMap(o,d,hp){
+  mode='duel'; duelMode=o.mode; resize();
+  o.arena=d.arena|0;
+  newDuelMap({arena:d.arena|0,seed:d.seed|0,specs:d.specs,ammo:d.ammo,ev:d.ev==null?null:d.ev|0,opp:{name:'',skin:mySkin()}});
+  specPlayers(o,hp);
+  roundShot=0; round=1; tiebreak=false; tbMarks=[]; matchLeft=MATCH_TIME; timeUp=false; missRounds=0; roundHit=false;
+  o.started=true; o.lastHeard=performance.now(); phase='syncState';
+  show(null);
+  $('specWho').textContent=`${players[o.view].name} gegen ${players[1-o.view].name}`;
+  toast(`👁 Du schaust ${players[o.view].name} zu · Arena ${duelArena+1}: ${ARENAS[duelArena].name}`);
+}
+function specStart(o,d){
+  specMap(o,d,[{name:d.name,skin:d.skin},null]);
+  starter=d.starter?1:0;
+}
+/* host: everything a spectator needs to join a running match */
+function specSnapshot(o){
+  return {v:1,arena:o.arena|0,seed:o.seed|0,specs:duelSpecs,ammo:DUEL_AMMO,ev:curEvent?MODS.indexOf(curEvent):null,mode:duelMode,
+    starter,k:o.k,turn,round,roundShot,tiebreak,lives:players.map(p=>p.lives),pa:players.map(p=>p.ammo),matchLeft,timeUp,missRounds,phase,
+    tb:tbMarks.map(m=>({o:m.o,x:m.x,y:m.y,dc:m.dc,d:m.d})),
+    p:[{name:playerName(),skin:{...profile.equip}},{name:o.opp&&o.opp.name,skin:o.opp&&o.opp.skin}],hs:o.seq,gs:o.inSeq};
+}
+function specSnap(o,d){
+  if(o.started||!d||!Array.isArray(d.specs)||!ARENAS[d.arena|0]) return;
+  specMap(o,d,d.p);
+  for(const [i,S] of o.st.entries()){ S.inSeq=i?d.gs|0:d.hs|0; S.queue=[]; for(const k in S.buf) if(+k<S.inSeq) delete S.buf[k]; specDrain(S) }
+  if(Array.isArray(d.pa)) d.pa.forEach((a,i)=>{ if(!players[i]||!a||typeof a!=='object') return; const m={}; for(const k of SPECIALS) if(a[k]>0) m[k]=Math.min(9,a[k]|0); players[i].ammo=m });
+  if(Array.isArray(d.tb)) tbMarks=d.tb.map(m=>({o:m.o?1:0,x:+m.x||0,y:+m.y||0,dc:+m.dc||0,d:m.d|0}));
+  const st={...d,kind:'turn'}; delete st.layout;
+  if(d.phase==='aim'||d.phase==='wait'){ o.k=(d.k|0)-1; applyState(st) } // someone is aiming right now: join this turn
+  else { // a volley is flying: show the field and wait for the next turn
+    round=d.round|0; roundShot=d.roundShot|0; starter=d.starter?1:0; tiebreak=!!d.tiebreak; matchLeft=+d.matchLeft||0; timeUp=!!d.timeUp; missRounds=d.missRounds|0;
+    if(Array.isArray(d.lives)) players.forEach((p,i)=>p.lives=Math.max(0,Math.min(3,d.lives[i]|0)));
+    o.k=d.k|0; phase='syncState';
+    banner={text:'Gleich geht’s los',sub:'Du steigst beim nächsten Zug ein',t:2,player:o.view,small:true};
+  }
+  specPump();
+}
+/* players: spectators ask for a snapshot or say hello */
+function specReq(msg){
+  const o=online; if(!o||o.spec) return;
+  const id=String(msg.id||'').slice(0,16); if(!id) return;
+  const W=o.watchers||(o.watchers={});
+  if(msg.sp==='bye') delete W[id];
+  else if(Object.keys(W).length<50||W[id]) W[id]=performance.now();
+  if(msg.sp==='?'&&o.host&&o.started&&!o.over&&performance.now()-(o.lastSnap||0)>300){ o.lastSnap=performance.now(); try{ o.ch.send({ss:specSnapshot(o),to:id}) }catch(e){} }
+  specCountUi(o);
+}
+function specCountUi(o){
+  const el=$('specCount'); if(!el) return;
+  const W=o&&o.watchers||{}, now=performance.now();
+  for(const k in W) if(now-W[k]>12000) delete W[k];
+  const n=Object.keys(W).length;
+  el.hidden=!(n>0&&online===o&&!o.spec&&current===null);
+  const t=`👁 ${n}`; if(el.textContent!==t){ el.textContent=t; el.setAttribute('aria-label',n===1?'1 Person schaut zu':`${n} Personen schauen zu`) }
+}
+function specEnd(w,byTb,how){
+  const o=online;
+  phase='over'; Sfx.win();
+  const lose=players[1-w].name;
+  how=String(how||''); if(/aufgegeben/.test(how)) how=`– ${lose} hat aufgegeben`; else if(/Verbindung/.test(how)) how=`– ${lose} hat die Verbindung verloren`;
+  $('winner').textContent=`${players[w].name} gewinnt`+(byTb?' im Entscheidungsschuss':how?' '+how:'');
+  $('winner').style.color=players[w].color; $('tally').dataset.title='';
+  $('tally').textContent=`Zuschauer-Modus · ${o.ranked?'Wettkampf':'Freundschaftsduell'} · ${MODE_NAME[o.mode]}`;
+  $('overReward').textContent=`Endstand: ${players[0].name} ${players[0].lives} : ${players[1].lives} ${players[1].name}`;
+  $('overLevelUp').hidden=true; $('overGrav').hidden=true;
+  $('again').textContent='Zurück zu den Freunden';
+  const duo=$('overReplay').parentElement; if(duo) duo.hidden=true;
+  $('back').textContent='Menü';
+  show('over'); vicStart(w);
+}
+function specExit(say){
+  const o=online;
+  if(o&&o.spec){ if(say||!o.over) specSay(o,'bye'); onlineCleanup() }
+  phase='menu'; bodies=[]; players=[]; proj=[];
+  openFriends();
+}
+function specCleanup(o){
+  $('specBar').hidden=true;
+  const duo=$('overReplay').parentElement; if(duo) duo.hidden=false;
+  o.st.forEach(S=>{ S.queue=[]; S.buf={} });
+}
+function specUi(name){
+  const sp=!!(online&&online.spec);
+  $('specBar').hidden=!(sp&&name===null);
+  if(sp&&name===null) $('back').hidden=true;
+  if(name!==null) $('specCount').hidden=true;
+}
+function specInfo(){
+  const o=online;
+  return {spec:!!(o&&o.spec),view:o&&o.spec?o.view:null,started:!!(o&&o.started),over:!!(o&&o.over),k:o?o.k:null,
+    names:players.map(p=>p.name),ammo:players.map(p=>p.ammo),lives:players.map(p=>p.lives),phase,turn,bar:!$('specBar').hidden,count:$('specCount').hidden?'':$('specCount').textContent,
+    trails:JSON.stringify(lastTrail),winner:current==='over'?$('winner').textContent:''};
+}
+tap('specLeave',()=>specExit(true));
 let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
@@ -9996,6 +10302,7 @@ function loop(now){
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT&&!(!navigator.onLine&&load('gravityDuel.hadAccount.v1',false))) openSetup('wait'); requestAnimationFrame(loop); netInit();
 /* test hook: only present when a test harness asks for it before the page loads */
 if(window.__GD_TEST__) window.__gd={
+  specInfo:()=>specInfo(), friendRows:()=>[...document.querySelectorAll('#friendList .fr')].map(r=>r.innerText.replace(/\s+/g,' ').trim()),
   state:()=>({phase,turn,round,roundShot,tiebreak,lives:players.map(p=>p.lives),wins:[...wins],duelMode,current,marks:tbMarks.length,online:online?{host:online.host,k:online.k,over:online.over,q:online.queue.length,out:online.out.length}:null,net:Net.state,H,flightN,matchLeft,timeUp}),
   specs:()=>JSON.stringify(duelSpecs), lastTrails:()=>JSON.stringify(lastTrail), fireAt:(x,y)=>{ if(phase==='aim') fire({x,y}) }, tap:()=>onlineTap(), aimHit:(n=400)=>{ const me=meIdx(), en=players[1-me].planet;
     for(let i=0;i<n;i++){ const a=rand(0,6.283), l=rand(30,MAX_DRAG), v={x:Math.cos(a)*l,y:Math.sin(a)*l}, L=launchFrom(v,me), s={x:L.x,y:L.y,vx:L.vx,vy:L.vy}; let t=0, ok=false;
