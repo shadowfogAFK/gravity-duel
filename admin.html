@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0d0626">
+<title>Gravity Duel · Admin</title>
+<link rel="icon" href="icon-192.png">
+<style>
+@font-face{font-family:"Chakra Petch";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/chakra-500.woff) format("woff")}
+@font-face{font-family:"Chakra Petch";font-weight:700 900;font-style:normal;font-display:swap;src:url(fonts/chakra-700.woff) format("woff")}
+@font-face{font-family:"Figtree";font-weight:300 900;font-style:normal;font-display:swap;src:url(fonts/figtree.woff) format("woff")}
+:root{
+  --space:#0d0626; --ink:#f3eeff; --muted:#a99cd6; --p1:#ff4f8b; --p2:#2ee6ff; --gold:#ffd34f; --panel:rgba(22,10,52,.94); --line:rgba(167,123,255,.35);
+  --soft:rgba(255,255,255,.04); --bad:#ff8a8a; --good:#3dffd0; --grid:rgba(167,123,255,.16);
+  --display:"Chakra Petch",ui-monospace,"SF Mono",monospace; --body:"Figtree",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:var(--space);color:var(--ink);font-family:var(--body);font-size:15px}
+body{background:radial-gradient(1200px 600px at 80% -10%,rgba(46,230,255,.08),transparent 60%),radial-gradient(900px 500px at -10% 10%,rgba(255,79,139,.09),transparent 60%),var(--space);background-attachment:fixed}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
+h1{font-size:1.25rem;letter-spacing:.03em}
+h2{font-size:1.05rem;letter-spacing:.02em}
+h3{font-size:.95rem}
+p{margin:0;line-height:1.5;color:var(--muted)}
+a{color:var(--p2)}
+.label{font-family:var(--display);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+button,select,input,textarea{font:inherit;color:inherit}
+button{font-family:var(--display);font-weight:700;letter-spacing:.04em;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;
+  background:linear-gradient(90deg,var(--p1),#ff9a4f);color:#2a0614;box-shadow:0 0 14px rgba(255,79,139,.35)}
+button.alt{background:transparent;color:var(--p2);border:1px solid rgba(46,230,255,.55);box-shadow:none}
+button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);box-shadow:none}
+button.gold{background:transparent;color:var(--gold);border:1px solid rgba(255,211,79,.6);box-shadow:none}
+button.danger{background:transparent;color:var(--bad);border:1px solid rgba(255,138,138,.55);box-shadow:none}
+button.mini{font-size:.75rem;padding:6px 10px;border-radius:8px}
+button[disabled]{opacity:.5;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--p2);outline-offset:2px}
+input,select,textarea{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+textarea{resize:vertical}
+select option{background:#1a0d3d}
+
+.top{position:sticky;top:0;z-index:5;background:rgba(13,6,38,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topin{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
+.brand h1 span{color:var(--p1)}
+.who{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.tabs{max-width:1180px;margin:0 auto;padding:0 16px 10px;display:flex;gap:6px;overflow-x:auto}
+.tab{background:transparent;color:var(--muted);border:1px solid var(--line);box-shadow:none;font-size:.85rem;padding:8px 14px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);background:rgba(167,123,255,.18);border-color:rgba(167,123,255,.7)}
+main{max-width:1180px;margin:0 auto;padding:18px 16px 60px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid rgba(167,123,255,.4);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.center{max-width:420px;margin:12vh auto 0;text-align:center;box-shadow:0 0 40px rgba(255,79,139,.15),0 0 80px rgba(46,230,255,.1)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.spacer{flex:1}
+.hint{font-size:.85rem}
+.err{color:var(--bad);font-size:.85rem}
+.ok{color:var(--good);font-size:.85rem}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.tile{background:var(--soft);border:1px solid rgba(167,123,255,.25);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile b{font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile small{color:var(--muted);font-size:.75rem}
+.tile.gold b{color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:900px){ .grid2{grid-template-columns:1fr 1fr} }
+.chart{position:relative;width:100%;min-height:190px}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{font-family:var(--body);font-size:11px;fill:var(--muted)}
+.chart .val{fill:var(--ink);font-weight:600}
+.tip{position:fixed;z-index:20;pointer-events:none;background:#1a0d3d;border:1px solid rgba(167,123,255,.6);border-radius:8px;padding:6px 9px;font-size:.8rem;color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.4);white-space:nowrap}
+.tip b{font-family:var(--display)}
+.hbars{display:flex;flex-direction:column;gap:6px}
+.hbar{display:grid;grid-template-columns:minmax(90px,38%) 1fr 44px;gap:10px;align-items:center;font-size:.85rem}
+.hbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbar i{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--p2);min-width:2px}
+.hbar em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{font-family:var(--display);font-weight:500;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--soft);border:1px solid rgba(167,123,255,.25);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.item.hid{border-color:rgba(255,138,138,.45)}
+.item.feat{border-color:rgba(255,211,79,.7);background:linear-gradient(135deg,rgba(255,211,79,.1),rgba(255,79,139,.05))}
+.ihead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.ihead b{font-family:var(--display);font-size:1rem;overflow-wrap:anywhere}
+.code{font-family:var(--display);letter-spacing:.08em;color:var(--gold);font-size:.85rem}
+.meta{font-size:.8rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink);white-space:nowrap}
+.chip.bad{color:var(--bad);border-color:rgba(255,138,138,.55)}
+.chip.gold{color:var(--gold);border-color:rgba(255,211,79,.55)}
+.chip.good{color:var(--good);border-color:rgba(61,255,208,.45)}
+.msg{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.82rem;overflow-wrap:anywhere;color:var(--ink)}
+details summary{cursor:pointer;color:var(--p2);font-size:.8rem}
+pre{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem;background:rgba(0,0,0,.25);border-radius:8px;padding:8px;color:#d9d0ff;max-height:260px;overflow:auto}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);min-width:0}
+.form .wide{grid-column:1/-1}
+@media (max-width:520px){ .form{grid-template-columns:1fr} }
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.kv div{display:flex;flex-direction:column;gap:2px;font-size:.85rem;min-width:0}
+.kv div span{color:var(--muted);font-size:.72rem}
+.kv div b{font-weight:600;overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:30;background:#1a0d3d;border:1px solid rgba(167,123,255,.6);border-radius:10px;padding:10px 16px;font-size:.9rem;box-shadow:0 8px 30px rgba(0,0,0,.45);max-width:calc(100vw - 32px)}
+.empty{padding:14px;text-align:center;color:var(--muted);font-size:.9rem}
+.brand h1{white-space:nowrap}
+#lvSearch input{flex:1}
+@media (max-width:600px){
+  .who,.hidesm{display:none} .brand h1{font-size:1.02rem} .topin{gap:8px;padding:10px 16px}
+  #lvSearch{width:100%}
+  .tiles{grid-template-columns:1fr 1fr} .tile b{font-size:1.3rem}
+}
+.loginform{display:flex;flex-direction:column;gap:10px;text-align:left}
+</style>
+</head>
+<body>
+<script>window.GD_CONFIG=window.GD_CONFIG||{"url": "https://hwkdyngctnazvdgarwqu.supabase.co", "key": "sb_publishable_65cKf_wXStwtU_92huvlhg_kzMoV334"};</script>
+
+<header class="top" id="top" hidden>
+  <div class="topin">
+    <div class="brand"><h1>Gravity <span>Duel</span> · Admin</h1></div>
+    <span class="who" id="who"></span>
+    <button class="ghost mini" id="reload" title="Neu laden" aria-label="Aktualisieren">↻<span class="hidesm"> Aktualisieren</span></button>
+    <button class="ghost mini" id="logout">Abmelden</button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Bereiche">
+    <button class="tab" role="tab" id="t-overview" aria-selected="true">Übersicht</button>
+    <button class="tab" role="tab" id="t-levels" aria-selected="false">Level</button>
+    <button class="tab" role="tab" id="t-errors" aria-selected="false">Fehler</button>
+    <button class="tab" role="tab" id="t-players" aria-selected="false">Spieler</button>
+  </nav>
+</header>
+
+<div id="gate">
+  <div class="card center" id="gLoading"><span class="label">Gravity Duel · Admin</span><p>Verbinde …</p></div>
+  <div class="card center" id="gLogin" hidden>
+    <span class="label">Gravity Duel · Admin</span>
+    <h2>Anmelden</h2>
+    <p>Melde dich mit deinem Spielkonto an. Bist du im Spiel auf diesem Gerät schon angemeldet, geht es automatisch.</p>
+    <form class="loginform" id="loginForm" autocomplete="on">
+      <input type="email" id="lEmail" placeholder="E-Mail" autocomplete="username" required>
+      <input type="password" id="lPw" placeholder="Passwort" autocomplete="current-password" required>
+      <button type="submit" id="lGo">Anmelden</button>
+    </form>
+    <p class="err" id="lErr" role="alert"></p>
+    <p class="hint">Mit Google angemeldet? Öffne zuerst <a href="./">das Spiel</a>, melde dich dort an und lade diese Seite dann neu.</p>
+  </div>
+  <div class="card center" id="gDenied" hidden>
+    <span class="label">Gravity Duel · Admin</span>
+    <h2>Kein Zugriff</h2>
+    <p id="deniedText">Dieses Konto ist kein Admin.</p>
+    <div class="row" style="justify-content:center"><a href="./">Zum Spiel</a><button class="ghost mini" id="deniedOut">Anderes Konto</button></div>
+  </div>
+  <div class="card center" id="gError" hidden>
+    <span class="label">Gravity Duel · Admin</span>
+    <h2>Keine Verbindung</h2>
+    <p id="errorText"></p>
+    <div class="row" style="justify-content:center"><button class="alt" id="retry">Nochmal</button></div>
+  </div>
+</div>
+
+<main id="app" hidden>
+  <!-- Übersicht -->
+  <section id="p-overview" role="tabpanel" aria-labelledby="t-overview">
+    <div class="list">
+      <div class="tiles" id="tiles"></div>
+      <div class="grid2">
+        <div class="card"><div><h2>Aktive Spieler pro Tag</h2><p class="hint">Spieler mit mindestens einer Aktion am Tag (letzte 14 Tage)</p></div><div class="chart" id="cDau"></div></div>
+        <div class="card"><div><h2>Rückkehr am Folgetag</h2><p class="hint">Anteil der neuen Spieler eines Tages, die am nächsten Tag wiederkommen</p></div><div class="chart" id="cRet"></div></div>
+        <div class="card"><div><h2>Duelle pro Tag</h2><p class="hint">Abgeschlossene Online-Duelle</p></div><div class="chart" id="cMatch"></div></div>
+        <div class="card"><div><h2>Neue Spieler pro Tag</h2><p class="hint">Erster Tag mit Aktivität</p></div><div class="chart" id="cNew"></div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h2>Beliebteste Items</h2><p class="hint">Wie viele Spieler das Item besitzen (ohne Start-Items)</p><div class="hbars" id="topItems"></div></div>
+        <div class="card"><h2>Wirtschaft</h2><div class="tablewrap"><table id="econTable"></table></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Level -->
+  <section id="p-levels" role="tabpanel" aria-labelledby="t-levels" hidden>
+    <div class="list">
+      <div class="card">
+        <div class="row"><h2>Level der Woche</h2><span class="spacer"></span><span class="label" id="weekLabel"></span></div>
+        <div id="featured"></div>
+        <p class="hint" id="history"></p>
+      </div>
+      <div class="card">
+        <div class="row">
+          <div class="seg" role="radiogroup" aria-label="Filter" id="lvFilter">
+            <button class="tab mini" data-f="reported" aria-selected="true">Gemeldet</button>
+            <button class="tab mini" data-f="hidden" aria-selected="false">Ausgeblendet</button>
+            <button class="tab mini" data-f="top" aria-selected="false">Beliebt</button>
+            <button class="tab mini" data-f="all" aria-selected="false">Alle</button>
+          </div>
+          <span class="spacer"></span>
+          <form class="row" id="lvSearch"><input id="lvQ" placeholder="Name oder Code" aria-label="Level suchen"><button class="alt mini" type="submit">Suchen</button></form>
+        </div>
+        <div class="list" id="levels"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fehler -->
+  <section id="p-errors" role="tabpanel" aria-labelledby="t-errors" hidden>
+    <div class="list">
+      <div class="card">
+        <div class="row"><h2>Fehlermeldungen pro Tag</h2><span class="spacer"></span>
+          <label class="hint">Zeitraum <select id="errDays"><option value="1">24 Stunden</option><option value="7" selected>7 Tage</option><option value="30">30 Tage</option></select></label></div>
+        <div class="chart" id="cErr"></div>
+      </div>
+      <div class="card"><h2>Nach Meldung gruppiert</h2><div class="list" id="errors"></div></div>
+    </div>
+  </section>
+
+  <!-- Spieler -->
+  <section id="p-players" role="tabpanel" aria-labelledby="t-players" hidden>
+    <div class="list">
+      <div class="card">
+        <h2>Spieler suchen</h2>
+        <form class="row" id="plSearch"><input id="plQ" placeholder="Name, Freundescode, E-Mail oder ID" aria-label="Spieler suchen" style="flex:1"><button type="submit">Suchen</button></form>
+        <div class="list" id="players"></div>
+      </div>
+      <div class="card" id="plDetail" hidden></div>
+      <div class="card"><h2>Letzte Admin-Aktionen</h2><div class="tablewrap"><table id="logTable"></table></div></div>
+    </div>
+  </section>
+</main>
+<div class="tip" id="tip" hidden></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n==null?'–':Number(n).toLocaleString('de-DE');
+const dShort=d=>{ const [y,m,dd]=String(d).split('-'); return `${+dd}.${+m}.` };
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const dLong=d=>{ const x=new Date(String(d)+'T12:00:00'); return `${WD[x.getDay()]} ${dShort(d)}` };
+const when=t=>{ if(!t) return '–'; const x=new Date(t), s=(Date.now()-x)/1000;
+  if(s<90) return 'gerade eben'; if(s<3600) return `vor ${Math.round(s/60)} Min.`; if(s<86400) return `vor ${Math.round(s/3600)} Std.`;
+  return x.toLocaleDateString('de-DE',{day:'numeric',month:'numeric',year:'2-digit'})+' '+x.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) };
+let toastT=0;
+function toast(t){ const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,3200) }
+const errText=e=>{ const m=String(e&&(e.message||e)||'Fehler');
+  return /not admin/.test(m)?'Kein Zugriff':/reason required/.test(m)?'Bitte einen Grund angeben (3–200 Zeichen)':/nothing to grant/.test(m)?'Bitte ✦, XP oder ein Item angeben':
+    /bad amount/.test(m)?'Ungültige Menge (0–100 000)':/no such item/.test(m)?'Dieses Item gibt es nicht':/no such player/.test(m)?'Spieler nicht gefunden':
+    /level hidden/.test(m)?'Ausgeblendete Level können kein Level der Woche werden':/query too short/.test(m)?'Mindestens 2 Zeichen':/fetch|network/i.test(m)?'Keine Verbindung zum Server':m.slice(0,140) };
+
+/* ---------- backend: the game's Supabase project and login (same origin → same stored session) ---------- */
+const SB_URLS=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.js','https://unpkg.com/@supabase/supabase-js@2.111.0/dist/umd/supabase.js'];
+const loadScript=src=>new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('load')); document.head.appendChild(s) });
+async function makeBackend(){
+  if(window.GD_ADMIN_MOCK) return window.GD_ADMIN_MOCK;
+  if(!window.supabase){ for(const u of SB_URLS){ try{ await loadScript(u); if(window.supabase) break }catch(e){} } }
+  if(!window.supabase) throw new Error('Die Supabase-Bibliothek konnte nicht geladen werden.');
+  const cfg=window.GD_CONFIG;
+  const sb=window.supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'gravityDuel.auth.v1'}});
+  return {
+    async getUser(){ const {data:{session}}=await sb.auth.getSession(); return session?session.user:null },
+    async signIn(email,password){ const {data,error}=await sb.auth.signInWithPassword({email,password}); if(error) throw error; return data.user },
+    async signOut(){ await sb.auth.signOut() },
+    async rpc(n,a){ const {data,error}=await sb.rpc(n,a||{}); if(error) throw error; return data }
+  };
+}
+let B=null, me=null;
+const rpc=(n,a)=>B.rpc(n,a);
+
+function gate(which,text){
+  for(const id of ['gLoading','gLogin','gDenied','gError']) $(id).hidden=id!==which;
+  $('gate').hidden=!which; $('app').hidden=!!which; $('top').hidden=!!which;
+  if(which==='gError') $('errorText').textContent=text||'';
+  if(which==='gDenied'&&text) $('deniedText').textContent=text;
+}
+async function start(){
+  gate('gLoading');
+  try{
+    B=B||await makeBackend();
+    me=await B.getUser();
+    if(!me||me.is_anonymous) return gate('gLogin');
+    let ok=false; try{ ok=await rpc('gd_is_admin') }catch(e){ ok=false }
+    if(!ok) return gate('gDenied',`Das Konto ${me.email||''} ist kein Admin.`);
+    $('who').textContent=me.email||me.id;
+    gate(null); openTab(tab);
+  }catch(e){ gate('gError',errText(e)) }
+}
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); $('lErr').textContent=''; $('lGo').disabled=true;
+  try{ await B.signIn($('lEmail').value.trim(),$('lPw').value); $('lPw').value=''; await start() }
+  catch(err){ $('lErr').textContent=/invalid/i.test(String(err&&err.message))?'E-Mail oder Passwort falsch.':errText(err) }
+  finally{ $('lGo').disabled=false }
+});
+const logout=async()=>{ if(!confirm('Abmelden? Du wirst damit auch im Spiel auf diesem Gerät abgemeldet.')) return; try{ await B.signOut() }catch(e){} me=null; gate('gLogin') };
+$('logout').addEventListener('click',logout); $('deniedOut').addEventListener('click',logout);
+$('retry').addEventListener('click',start);
+$('reload').addEventListener('click',()=>openTab(tab));
+
+/* ---------- tabs ---------- */
+const TABS=['overview','levels','errors','players'];
+let tab=(()=>{ try{ const t=localStorage.getItem('gdAdmin.tab'); return TABS.includes(t)?t:'overview' }catch(e){ return 'overview' } })();
+function openTab(t){
+  tab=t; try{ localStorage.setItem('gdAdmin.tab',t) }catch(e){}
+  for(const x of TABS){ $('t-'+x).setAttribute('aria-selected',String(x===t)); $('p-'+x).hidden=x!==t }
+  ({overview:loadOverview,levels:loadLevels,errors:loadErrors,players:loadPlayersTab})[t]();
+}
+for(const x of TABS) $('t-'+x).addEventListener('click',()=>openTab(x));
+
+/* ---------- charts: inline SVG, one series each, hover tooltip ---------- */
+const tip=$('tip');
+function showTip(ev,html){ tip.innerHTML=html; tip.hidden=false; const r=tip.getBoundingClientRect();
+  let x=ev.clientX+12, y=ev.clientY-r.height-10; if(x+r.width>innerWidth-8) x=ev.clientX-r.width-12; if(y<8) y=ev.clientY+16; tip.style.left=x+'px'; tip.style.top=y+'px' }
+const hideTip=()=>{ tip.hidden=true };
+const charts=new Map();
+function niceMax(v){ if(v<=4) return 4; const p=Math.pow(10,Math.floor(Math.log10(v))), f=v/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p }
+/* data: [{label, value (null = keine Daten), tip}] */
+function barChart(el,data,o={}){
+  charts.set(el,[data,o]);
+  const W=Math.max(260,el.clientWidth||600), H=o.h||190, L=34, R=8, T=14, Bm=24;
+  const vals=data.map(d=>d.value).filter(v=>v!=null), max=o.max||niceMax(Math.max(1,...vals));
+  const n=data.length, step=(W-L-R)/n, bw=Math.max(4,Math.min(34,step*.62)), y=v=>T+(H-T-Bm)*(1-v/max), color=o.color||'var(--p2)';
+  let g='';
+  for(const t of [0,.5,1]){ const v=max*t, yy=y(v);
+    g+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/><text x="${L-6}" y="${yy+4}" text-anchor="end">${esc(o.unit==='%'?Math.round(v)+' %':fmt(Math.round(v*10)/10))}</text>` }
+  const every=step<30?2:1;
+  data.forEach((d,i)=>{
+    const cx=L+step*i+step/2;
+    if(i%every===(n-1)%every) g+=`<text x="${cx}" y="${H-6}" text-anchor="middle">${esc(d.label)}</text>`;
+    if(d.value==null){ g+=`<text x="${cx}" y="${y(0)-4}" text-anchor="middle" opacity=".6">–</text>` }
+    else if(d.value>0){ const top=y(d.value), h=y(0)-top, r=Math.min(4,bw/2,h);
+      g+=`<path d="M${cx-bw/2},${y(0)} V${top+r} Q${cx-bw/2},${top} ${cx-bw/2+r},${top} H${cx+bw/2-r} Q${cx+bw/2},${top} ${cx+bw/2},${top+r} V${y(0)} Z" fill="${color}"/>` }
+    g+=`<rect x="${L+step*i}" y="${T}" width="${step}" height="${H-T-Bm}" fill="transparent" data-i="${i}"/>`;
+  });
+  const last=data[n-1];
+  if(last&&last.value!=null) g+=`<text class="val" x="${L+step*(n-1)+step/2}" y="${y(last.value)-5}" text-anchor="middle">${esc(o.unit==='%'?last.value+' %':fmt(last.value))}</text>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="${esc(o.title||'Diagramm')}">${g}</svg>`;
+  const svg=el.firstChild;
+  svg.addEventListener('pointermove',ev=>{ const r=ev.target.closest&&ev.target.closest('[data-i]'); if(!r) return hideTip(); const d=data[+r.dataset.i]; showTip(ev,d.tip||`<b>${esc(d.label)}</b> · ${d.value==null?'keine Daten':fmt(d.value)}`) });
+  svg.addEventListener('pointerleave',hideTip);
+}
+let rsT=0; addEventListener('resize',()=>{ clearTimeout(rsT); rsT=setTimeout(()=>{ for(const [el,[d,o]] of charts) if(el.isConnected&&el.offsetParent) barChart(el,d,o) },150) });
+
+/* ---------- Übersicht ---------- */
+async function loadOverview(){
+  $('tiles').innerHTML='<p class="hint">Lade …</p>';
+  let s; try{ s=await rpc('gd_admin_stats') }catch(e){ $('tiles').innerHTML=`<p class="err">${esc(errText(e))}</p>`; return }
+  const dau=s.dau||[], today=dau[dau.length-1]||{n:0}, e=s.economy||{}, ul=s.ulevels||{};
+  const tile=(label,val,sub,cls='')=>`<div class="tile ${cls}"><span class="label">${esc(label)}</span><b>${esc(val)}</b>${sub?`<small>${esc(sub)}</small>`:''}</div>`;
+  const rets=(s.retention||[]).filter(r=>r.pct!=null&&r.cohort>0), avgRet=rets.length?Math.round(rets.reduce((a,r)=>a+r.back,0)/rets.reduce((a,r)=>a+r.cohort,0)*100):null;
+  $('tiles').innerHTML=
+    tile('Spieler (Konten)',fmt(s.players),`${fmt(s.anonymous)} anonym · ${fmt(s.profiles)} Profile`)+
+    tile('Neu heute',fmt(s.newToday),`${fmt(s.new7)} in 7 Tagen`)+
+    tile('Aktiv heute',fmt(today.n),`${fmt(s.online)} gerade online`)+
+    tile('Rückkehr D+1',avgRet==null?'–':avgRet+' %','Schnitt über 14 Tage')+
+    tile('Sternenstaub',fmt(e.dust)+' ✦',`im Umlauf · Ø ${fmt(e.avgDust)} pro Spieler`,'gold')+
+    tile('Kisten geöffnet',fmt(s.crates),'insgesamt')+
+    tile('Community-Level',fmt(ul.total),`${fmt(ul.new7)} neu · ${fmt(ul.reported)} gemeldet · ${fmt(ul.hidden)} ausgeblendet`)+
+    tile('Fehler (24 h)',fmt(s.errors24),'Meldungen aus dem Spiel');
+  barChart($('cDau'),dau.map(d=>({label:dShort(d.day),value:d.n,tip:`<b>${dLong(d.day)}</b> · ${fmt(d.n)} aktiv · ${fmt(d.new)} neu`})),{title:'Aktive Spieler pro Tag'});
+  barChart($('cRet'),(s.retention||[]).map(d=>({label:dShort(d.day),value:d.pct==null?null:Math.round(d.pct),tip:`<b>${dLong(d.day)}</b> · ${d.cohort?`${fmt(d.back)} von ${fmt(d.cohort)} zurück (${d.pct==null?'–':d.pct+' %'})`:'keine neuen Spieler'}`})),{unit:'%',max:100,color:'var(--p1)',title:'Rückkehr am Folgetag'});
+  barChart($('cMatch'),(s.matches||[]).map(d=>({label:dShort(d.day),value:d.done,tip:`<b>${dLong(d.day)}</b> · ${fmt(d.done)} abgeschlossen · ${fmt(d.all)} gestartet`})),{color:'var(--gold)',title:'Duelle pro Tag'});
+  barChart($('cNew'),dau.map(d=>({label:dShort(d.day),value:d.new,tip:`<b>${dLong(d.day)}</b> · ${fmt(d.new)} neue Spieler`})),{color:'#b48cff',title:'Neue Spieler pro Tag'});
+  const top=s.topItems||[], tmax=Math.max(1,...top.map(t=>t.n));
+  $('topItems').innerHTML=top.length?top.map(t=>`<div class="hbar" title="${esc(t.key)}"><span>${esc(t.name)} <small class="hint">${esc(t.key.split(':')[0])}</small></span><i style="width:${Math.max(1,100*t.n/tmax)}%"></i><em>${fmt(t.n)}</em></div>`).join(''):'<p class="empty">Noch keine Items gekauft.</p>';
+  $('econTable').innerHTML=`<tr><th>Wert</th><th class="n">Menge</th></tr>
+    <tr><td>Sternenstaub im Umlauf</td><td class="n">${fmt(e.dust)} ✦</td></tr>
+    <tr><td>Durchschnitt pro Spieler</td><td class="n">${fmt(e.avgDust)} ✦</td></tr>
+    <tr><td>Größtes Guthaben</td><td class="n">${fmt(e.maxDust)} ✦</td></tr>
+    <tr><td>XP insgesamt</td><td class="n">${fmt(e.xp)}</td></tr>
+    <tr><td>Spieler mit Wirtschaftsdaten</td><td class="n">${fmt(e.wallets)}</td></tr>
+    <tr><td>Kisten geöffnet</td><td class="n">${fmt(s.crates)}</td></tr>
+    <tr><td>Tageslevel gespielt (heute)</td><td class="n">${fmt(((s.daily||[]).slice(-1)[0]||{}).n)}</td></tr>`;
+}
+
+/* ---------- Level ---------- */
+let lvFilter='reported', lvData=null;
+const REASON={unfair:'Unfair/unlösbar',name:'Unpassender Name',other:'Sonstiges'};
+const HIDBY={reports:'durch Meldungen',unsolved:'niemand schafft es',admin:'von Admin'};
+function levelCard(l,feat){
+  const rate=l.plays?Math.round(100*l.clears/l.plays)+' %':'–';
+  const reasons=Object.entries(l.reasons||{}).map(([k,n])=>`<span class="chip bad">${esc(REASON[k]||k)} · ${fmt(n)}</span>`).join('');
+  const isFeat=lvData&&lvData.featured&&lvData.featured.level&&lvData.featured.level.id===l.id;
+  return `<div class="item${l.hidden?' hid':''}${feat?' feat':''}" data-id="${l.id|0}">
+    <div class="ihead"><b>${esc(l.name)}</b><span class="code">${esc(String(l.code).replace(/^(...)(...)$/,'$1-$2'))}</span><span class="hint">von ${esc(l.author)}</span></div>
+    <div class="meta num"><span>▶ ${fmt(l.plays)} gespielt</span><span>✓ ${fmt(l.clears)} geschafft (${rate})</span><span>♥ ${fmt(l.likes)}</span><span>Par ${l.par|0}</span><span>${esc(when(l.created))}</span></div>
+    <div class="chips">${l.hidden?`<span class="chip bad">Ausgeblendet ${esc(HIDBY[l.hiddenBy]||'')}</span>`:'<span class="chip good">Sichtbar</span>'}
+      ${l.reports?`<span class="chip">${fmt(l.reports)} Meldung${l.reports===1?'':'en'} · zuletzt ${esc(when(l.lastReport))}</span>`:''}${reasons}
+      ${l.reviewed?`<span class="chip">geprüft ${esc(when(l.reviewed))}</span>`:''}
+      ${(l.weeks||[]).map(w=>`<span class="chip gold">★ Woche ${esc(dShort(w))}</span>`).join('')}</div>
+    ${feat?'':`<div class="row end">
+      ${l.hidden?`<button class="alt mini" data-act="show">Wieder einblenden</button>`:`<button class="danger mini" data-act="hide">Ausblenden</button>`}
+      ${l.hidden||isFeat?'':`<button class="gold mini" data-act="feature">★ Level der Woche</button>`}</div>`}
+  </div>`;
+}
+async function loadLevels(){
+  const box=$('levels'); box.innerHTML='<p class="hint">Lade …</p>';
+  for(const b of $('lvFilter').children) b.setAttribute('aria-selected',String(b.dataset.f===lvFilter));
+  try{ lvData=await rpc('gd_admin_levels',{p_filter:lvFilter,p_q:$('lvQ').value.trim()||null}) }catch(e){ box.innerHTML=`<p class="err">${esc(errText(e))}</p>`; return }
+  const f=lvData.featured;
+  $('weekLabel').textContent='Woche ab '+dLong(lvData.week);
+  $('featured').innerHTML=f&&f.level?levelCard(f.level,true)+`<p class="hint">${f.auto?'Automatisch gewählt (meiste Likes, noch nie Level der Woche).':'Von Hand gewählt.'} Spieler bekommen beim ersten Abschluss in dieser Woche +30 ✦, der Autor einmalig 200 ✦.</p>`
+    :'<p class="empty">Für diese Woche ist noch kein Level gewählt. Wähle unten eines mit „★ Level der Woche“ (Filter „Beliebt“). Sonst wählt das Spiel beim ersten Aufruf automatisch das beliebteste.</p>';
+  const h=lvData.history||[];
+  $('history').textContent=h.length?'Bisher: '+h.map(x=>`${dShort(x.week)} ${x.name}`).join(' · '):'';
+  const items=lvData.items||[];
+  box.innerHTML=items.length?items.map(l=>levelCard(l,false)).join(''):`<p class="empty">${lvFilter==='reported'?'Keine gemeldeten Level. 🎉':'Keine Level gefunden.'}</p>`;
+}
+$('lvFilter').addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return; lvFilter=b.dataset.f; loadLevels() });
+$('lvSearch').addEventListener('submit',e=>{ e.preventDefault(); loadLevels() });
+$('levels').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const card=b.closest('[data-id]'), id=+card.dataset.id, l=(lvData.items||[]).find(x=>x.id===id); if(!l) return;
+  const act=b.dataset.act;
+  if(act==='feature'&&!confirm(`„${l.name}“ als Level der Woche wählen?${(l.weeks||[]).length?'':' Der Autor bekommt einmalig 200 ✦.'}`)) return;
+  b.disabled=true;
+  try{
+    if(act==='feature'){ const r=await rpc('gd_admin_feature',{p_id:id}); toast(r&&r.authorPaid?'Level der Woche gesetzt · Autor hat 200 ✦ bekommen':'Level der Woche gesetzt') }
+    else { await rpc('gd_admin_level_set',{p_id:id,p_hidden:act==='hide'}); toast(act==='hide'?'Level ausgeblendet':'Level wieder sichtbar') }
+    loadLevels();
+  }catch(err){ b.disabled=false; toast(errText(err)) }
+});
+
+/* ---------- Fehler ---------- */
+async function loadErrors(){
+  const box=$('errors'); box.innerHTML='<p class="hint">Lade …</p>';
+  let r; try{ r=await rpc('gd_admin_errors',{p_days:+$('errDays').value}) }catch(e){ box.innerHTML=`<p class="err">${esc(errText(e))}</p>`; return }
+  barChart($('cErr'),(r.perDay||[]).map(d=>({label:dShort(d.day),value:d.n,tip:`<b>${dLong(d.day)}</b> · ${fmt(d.n)} Meldungen`})),{color:'var(--bad)',title:'Fehlermeldungen pro Tag'});
+  const g=r.groups||[];
+  box.innerHTML=g.length?g.map(x=>{ const c=x.ctx||{};
+    return `<div class="item">
+      <div class="msg">${esc(x.msg)}</div>
+      <div class="chips"><span class="chip bad num">${fmt(x.n)}×</span><span class="chip num">${fmt(x.users)} Spieler (ca.)</span><span class="chip num">${fmt(x.recent)} in 24 h</span>
+        <span class="chip">zuletzt ${esc(when(x.last))}</span><span class="chip">zuerst ${esc(when(x.first))}</span>
+        ${c.kind?`<span class="chip">${esc(c.kind)}</span>`:''}${c.screen?`<span class="chip">Bildschirm: ${esc(c.screen)}</span>`:''}${c.ua?`<span class="chip">${esc(c.ua)}</span>`:''}</div>
+      <details><summary>Kontext${x.stack?' und Stack':''}</summary><pre>${esc(JSON.stringify(c,null,1))}</pre>${x.stack?`<pre>${esc(x.stack)}</pre>`:''}</details>
+    </div>` }).join(''):'<p class="empty">Keine Fehler in diesem Zeitraum. 🎉</p>';
+}
+$('errDays').addEventListener('change',loadErrors);
+
+/* ---------- Spieler ---------- */
+let plItems=[], plSel=null, itemList=null;
+async function loadPlayersTab(){ loadLog(); if(plSel) renderPlayer(plSel) }
+async function loadLog(){
+  try{ const l=await rpc('gd_admin_log_list',{p_limit:30});
+    $('logTable').innerHTML='<tr><th>Wann</th><th>Admin</th><th>Aktion</th><th>Ziel</th><th>Details</th></tr>'+(l.length?l.map(x=>`<tr><td>${esc(when(x.at))}</td><td>${esc(x.admin||'–')}</td><td>${esc(ACT[x.action]||x.action)}</td><td>${esc(x.player||'–')}</td><td>${esc(logDetail(x))}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">Noch keine Aktionen.</td></tr>');
+  }catch(e){ $('logTable').innerHTML=`<tr><td class="err">${esc(errText(e))}</td></tr>` }
+}
+const ACT={grant:'Belohnung',level_hide:'Level ausgeblendet',level_unhide:'Level eingeblendet',level_feature:'Level der Woche'};
+const logDetail=x=>{ const d=x.data||{};
+  if(x.action==='grant') return [d.dust?`+${d.dust} ✦`:'',d.xp?`+${d.xp} XP`:'',d.item?d.item+(d.hadItem?' (hatte es schon)':''):'',d.reason?`„${d.reason}“`:''].filter(Boolean).join(' · ');
+  return [d.name,d.code,d.week?'Woche '+dShort(d.week):'',d.paid?'Autor +200 ✦':''].filter(Boolean).join(' · ') };
+$('plSearch').addEventListener('submit',async e=>{
+  e.preventDefault(); const q=$('plQ').value.trim(), box=$('players');
+  if(q.length<2){ box.innerHTML='<p class="err">Mindestens 2 Zeichen.</p>'; return }
+  box.innerHTML='<p class="hint">Suche …</p>';
+  try{ const r=await rpc('gd_admin_players',{p_q:q}); plItems=r.items||[];
+    box.innerHTML=plItems.length?plItems.map((p,i)=>`<div class="item"><div class="ihead"><b>${esc(p.name)}</b><span class="code">${esc(p.code||'')}</span><span class="hint">${esc(p.email||(p.anonymous?'anonym':''))}</span><span class="spacer"></span><button class="alt mini" data-p="${i}">Öffnen</button></div>
+      <div class="meta num"><span>Level ${p.level|0}</span><span>${fmt(p.dust)} ✦</span><span>${fmt(p.gravitons)} Gravitonen</span><span>zuletzt ${esc(when(p.lastSeen))}</span></div></div>`).join(''):'<p class="empty">Niemand gefunden.</p>';
+    if(plItems.length===1) renderPlayer(plItems[0]);
+  }catch(err){ box.innerHTML=`<p class="err">${esc(errText(err))}</p>` }
+});
+$('players').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(b) renderPlayer(plItems[+b.dataset.p]) });
+async function renderPlayer(p){
+  plSel=p; const box=$('plDetail'); box.hidden=false;
+  const kv=(k,v)=>`<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`;
+  box.innerHTML=`<div class="ihead"><h2>${esc(p.name)}</h2>${p.title?`<span class="hint">${esc(p.title)}</span>`:''}${p.admin?'<span class="chip gold">Admin</span>':''}<span class="spacer"></span><button class="ghost mini" id="plClose">Schließen</button></div>
+    <div class="kv num">${kv('Freundescode',p.code||'–')}${kv('E-Mail',p.email||(p.anonymous?'anonym':'–'))}${kv('Spielerlevel',p.level|0)}${kv('XP',fmt(p.xp))}${kv('Sternenstaub',fmt(p.dust)+' ✦')}
+      ${kv('Gravitonen',fmt(p.gravitons))}${kv('Siege / Niederlagen',`${fmt(p.wins)} / ${fmt(p.losses)}`)}${kv('Items',fmt(p.items))}${kv('Aktive Tage',fmt(p.days))}${kv('Community-Level',fmt(p.levels))}
+      ${kv('Dabei seit',when(p.created))}${kv('Zuletzt online',when(p.lastSeen))}${kv('ID',p.id)}</div>
+    <h3>Belohnung vergeben</h3>
+    <form class="form" id="grantForm">
+      <label>Sternenstaub ✦<input type="number" id="gDust" min="0" max="100000" step="1" value="0" inputmode="numeric"></label>
+      <label>XP<input type="number" id="gXp" min="0" max="100000" step="1" value="0" inputmode="numeric"></label>
+      <label class="wide">Item (optional)<select id="gItem"><option value="">– kein Item –</option></select></label>
+      <label class="wide">Grund (Pflicht, wird protokolliert)<input id="gReason" maxlength="200" placeholder="z. B. Ausgleich für Serverfehler am 20.10."></label>
+      <div class="wide row"><button type="submit" id="gGo">Belohnung vergeben</button><span class="hint" id="gMsg" role="status"></span></div>
+    </form>
+    ${(p.log||[]).length?`<h3>Verlauf</h3><div class="tablewrap"><table>${p.log.map(x=>`<tr><td>${esc(when(x.at))}</td><td>${esc(ACT[x.action]||x.action)}</td><td>${esc(logDetail(x))}</td></tr>`).join('')}</table></div>`:''}`;
+  $('plClose').addEventListener('click',()=>{ plSel=null; box.hidden=true });
+  $('grantForm').addEventListener('submit',grant);
+  try{ if(!itemList) itemList=await rpc('gd_admin_items');
+    $('gItem').insertAdjacentHTML('beforeend',itemList.map(i=>`<option value="${esc(i.key)}">${esc(i.name)} · ${esc(i.cat)}${i.rarity?' · '+esc(i.rarity):''}</option>`).join('')) }catch(e){}
+}
+async function grant(e){
+  e.preventDefault(); const p=plSel; if(!p) return;
+  const dust=Math.max(0,Math.floor(+$('gDust').value||0)), xp=Math.max(0,Math.floor(+$('gXp').value||0)), item=$('gItem').value||null, reason=$('gReason').value.trim(), msg=$('gMsg');
+  if(!dust&&!xp&&!item){ msg.textContent='Bitte ✦, XP oder ein Item angeben.'; msg.className='err'; return }
+  if(reason.length<3){ msg.textContent='Bitte einen Grund angeben.'; msg.className='err'; return }
+  const what=[dust?`${fmt(dust)} ✦`:'',xp?`${fmt(xp)} XP`:'',item?$('gItem').selectedOptions[0].textContent:''].filter(Boolean).join(', ');
+  if(!confirm(`${p.name} bekommt: ${what}\nGrund: ${reason}\n\nVergeben?`)) return;
+  $('gGo').disabled=true; msg.textContent='Wird vergeben …'; msg.className='hint';
+  try{
+    const r=await rpc('gd_admin_grant',{p_user:p.id,p_dust:dust,p_xp:xp,p_item:item,p_reason:reason});
+    toast(`Vergeben: ${what}${r.hadItem?' (Item hatte der Spieler schon)':''}`);
+    await renderPlayer(r.player||p); $('gMsg').textContent='Vergeben ✓'; $('gMsg').className='ok'; loadLog();
+  }catch(err){ $('gGo').disabled=false; msg.textContent=errText(err); msg.className='err' }
+}
+
+if(window.GD_ADMIN_MOCK) window.__adm={tab:()=>tab,open:openTab,start};
+start();
+})();
+</script>
+</body>
+</html>

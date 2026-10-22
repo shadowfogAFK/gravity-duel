@@ -688,6 +688,80 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .pushprefs button[aria-pressed="true"]{color:var(--p2);border-color:var(--p2);background:rgba(46,230,255,.1)}
 .pushprefs button[aria-pressed="false"]{opacity:.6}
 .remind{display:block;margin:8px auto 0;font-size:.82rem}
+
+/* ---------- crew wars + Pinnwand ---------- */
+#toCrewF,#toCrewR{position:relative}
+.cwbadge{font-family:var(--body);font-style:normal;z-index:1}
+#toCrewF .cwbadge{top:-7px;right:-5px}
+#toCrewR .cwbadge{top:3px;right:4px;min-width:16px;height:16px;line-height:16px;font-size:.62rem;padding:0 4px}
+.cwlive{display:inline-block;font-family:var(--display);font-size:.62rem;letter-spacing:.08em;color:#fff;background:var(--p1);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:.15em;animation:cwPulse 1.6s ease-in-out infinite}
+@keyframes cwPulse{50%{box-shadow:0 0 10px rgba(255,79,139,.9)}}
+@media (prefers-reduced-motion:reduce){.cwlive{animation:none}}
+.cwscore{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:6px;text-align:center}
+.cwside{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.cwside canvas{width:52px;height:52px}
+.cwside b{font-family:var(--display);font-size:.82rem;line-height:1.25;overflow-wrap:break-word;hyphens:auto;max-width:100%}
+.cwside .crewtag{display:table;margin:0 auto 2px}
+@media (min-width:420px){.cwside .crewtag{display:inline-block;margin:0 5px 0 0}}
+@media (max-width:419px){.cwside b{font-size:.74rem}.cwnum{font-size:1.8rem}.cwscore{gap:4px}}
+.cwside i{font-style:normal;font-size:.7rem;color:var(--muted)}
+.cwnum{display:flex;gap:6px;align-items:baseline;font-family:var(--display);font-size:2.1rem;line-height:1}
+.cwnum span{color:var(--muted);font-size:1.4rem}
+.cwnum b.lead{color:var(--gold);text-shadow:0 0 12px rgba(255,211,79,.45)}
+.cwbye{display:flex;gap:12px;align-items:center}.cwbye canvas{width:52px;height:52px;flex:none}
+.cwbye b{font-family:var(--display);display:block}.cwbye span{font-size:.8rem;color:var(--muted)}
+.cwres{margin:0;text-align:center;font-family:var(--display);font-size:1.05rem}
+.cwres.win{color:var(--gold)}.cwres.loss{color:var(--muted)}.cwres.draw,.cwres.bye{color:var(--p2)}
+.cwtop{display:flex;flex-direction:column;gap:4px}
+.cwtop div{display:grid;grid-template-columns:20px 14px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:.82rem}
+.cwtop div>span:first-child{color:var(--muted);font-family:var(--display);font-size:.75rem}
+.cwtop .av{width:14px;height:14px;border-radius:50%}
+.cwtop b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cwtop .me b{color:var(--p2)}
+.cwrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cwpill{font-size:.75rem;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.cwpill.on{color:#5cff9d;border-color:rgba(92,255,157,.5)}
+.cwsign{display:flex;flex-direction:column;gap:8px}
+.cwsign .label{margin:2px 0 0}
+.cwdone{margin:0;color:#5cff9d;font-size:.85rem;text-align:center}
+.cwwarn{color:var(--gold)!important}
+.cfl{display:flex;flex-direction:column;gap:9px;max-height:330px;overflow-y:auto;overscroll-behavior:contain;padding-right:2px}
+.cfi{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;align-items:start}
+.cfi .av{width:24px;height:24px;border-radius:50%;margin-top:1px}
+.cfh{display:flex;gap:6px;align-items:baseline;font-size:.72rem;color:var(--muted);min-width:0}
+.cfh b{color:var(--ink);font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.cfh i{font-style:normal;flex:none}
+.cfm{display:inline-block;margin-top:3px;padding:6px 11px;border-radius:4px 12px 12px 12px;background:rgba(46,230,255,.08);border:1px solid rgba(46,230,255,.25);font-size:.88rem;overflow-wrap:anywhere}
+.cfi.me .cfm{background:rgba(196,107,255,.13);border-color:rgba(196,107,255,.38)}
+.cfm.st{padding:0;background:none;border-color:transparent}
+.cfm canvas{display:block;width:64px;height:64px}
+.cfi.sys{display:block;text-align:center;font-size:.76rem;color:var(--muted);padding:3px 6px;border-top:1px dashed rgba(167,123,255,.18)}
+.cfi.sys b{color:var(--ink);font-weight:600}
+.cfi.sys i{font-style:normal;opacity:.7;margin-left:5px;white-space:nowrap}
+.cfpick{display:flex;flex-direction:column;gap:8px}
+.cfpick .label{margin:0}
+.cfp{display:flex;flex-wrap:wrap;gap:6px}
+.cfp button{font-size:.76rem;color:var(--ink);padding:5px 9px}
+.cfs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.cfs button{padding:2px;aspect-ratio:1;background:rgba(255,255,255,.04);border:1px solid var(--line);box-shadow:none;border-radius:10px;min-width:0}
+.cfs canvas{width:100%;height:100%;display:block}
+.cfpick button:disabled{opacity:.45}
+
+/* community: Level der Woche, reports, hidden levels (schema-16) */
+.ugweek{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:10px;width:100%;padding:12px;text-align:left;font-family:var(--body);font-weight:400;font-size:.9rem;color:var(--ink);border-radius:12px;
+  background:linear-gradient(135deg,rgba(255,211,79,.16),rgba(255,79,139,.07));border:1px solid rgba(255,211,79,.6);box-shadow:0 0 18px rgba(255,211,79,.16)}
+.ugweek .ugsky{color:var(--gold);font-size:1.05rem}
+.ugweek .label{color:var(--gold);font-size:.62rem;line-height:1.3}
+.ugwb{font-family:var(--display);font-weight:700;color:var(--gold);font-size:.85rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ugwb.done{color:var(--muted);font-weight:500}
+.ugitem{position:relative}
+.ugitem.rep .ugrow{padding-right:46px}
+.ugflag{position:absolute;right:6px;top:10px;width:34px;height:36px;padding:0;border-radius:8px;background:none;box-shadow:none;color:var(--muted);font-size:.95rem;border:1px solid transparent}
+.ugflag:hover{border-color:var(--line);color:var(--ink)}
+.ugflag[disabled]{opacity:.35}
+.ughid{align-self:flex-start;margin-top:3px;font-family:var(--display);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#ff8a8a;border:1px solid rgba(255,138,138,.5);border-radius:6px;padding:1px 6px}
+.ugitem.hid .ugsky{opacity:.45}
+#ugrReasons button{text-align:left}
 </style>
 </head>
 <body>
@@ -782,6 +856,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       <span class="label">Community</span>
       <h2>Community-Level</h2>
       <p>Bau eigene Level, teile sie per Code und spiel die Level der anderen.</p>
+      <div id="ugWeek" hidden></div>
       <button id="ugBuild">✎ Level bauen</button>
       <form class="ugcode" id="ugCodeForm" autocomplete="off">
         <input id="ugCode" class="text" maxlength="7" placeholder="Code, z. B. K7Q-2MF" autocapitalize="characters" spellcheck="false" aria-label="Level-Code">
@@ -840,6 +915,21 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       <p class="reward" id="ugdReward"></p>
       <p class="levelup" id="ugdLevelUp" hidden></p>
       <div class="btns" id="ugdBtns"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ugReport" hidden>
+    <div class="card">
+      <span class="label">Level melden</span>
+      <h2 id="ugrName"></h2>
+      <p>Was stimmt mit diesem Level nicht?</p>
+      <div class="btns" id="ugrReasons">
+        <button class="alt" data-r="unfair">Unfair oder unlösbar</button>
+        <button class="alt" data-r="name">Unpassender Name</button>
+        <button class="alt" data-r="other">Sonstiges</button>
+      </div>
+      <p class="fine">Nach mehreren Meldungen wird ein Level ausgeblendet und geprüft.</p>
+      <button class="ghost" id="ugrBack">Abbrechen</button>
     </div>
   </div>
 
@@ -1148,11 +1238,18 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
           <div class="chead"><canvas id="crewEmblem" width="152" height="152" aria-hidden="true"></canvas>
             <div><h2 id="crewName">Crew</h2><span class="fine" id="crewInfo"></span></div></div>
           <p class="cmotto" id="crewMotto"></p>
+          <div class="cbox" id="cwBox" hidden></div>
           <div class="cbox">
             <h3>Wochenziel <small id="crewWeekEnds"></small></h3>
             <div class="cgoal"><div class="bar" aria-hidden="true"><i id="crewBar"></i></div><u style="left:18.75%"></u><u style="left:50%"></u></div>
             <p class="fine" id="crewWeekText"></p>
             <div id="crewTiers" class="btns" style="gap:6px"></div>
+          </div>
+          <div class="cbox" id="cfBox" hidden><h3>Pinnwand <small>nur Schnellnachrichten</small></h3>
+            <div class="cfl" id="cfList" aria-live="polite"></div>
+            <button class="ghost" id="cfOpen" aria-expanded="false" aria-controls="cfPick">Nachricht senden</button>
+            <div class="cfpick" id="cfPick" hidden><span class="label">Nachrichten</span><div class="cfp" id="cfPhrases"></div><span class="label">Deine Emotes</span><div class="cfs" id="cfStickers"></div></div>
+            <p class="fine chint" id="cfHint" aria-live="polite"></p>
           </div>
           <div class="cbox"><h3>Mitglieder <small id="crewCount"></small></h3><div class="friendlist" id="crewMembers"></div></div>
           <div class="codebox"><span class="label">Crew-Code zum Einladen</span><b id="crewCode">CR-000000</b><button class="ghost" id="crewCopy">Kopieren</button></div>
@@ -1341,6 +1438,75 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 <script>window.GD_CONFIG={"url": "https://hwkdyngctnazvdgarwqu.supabase.co", "key": "sb_publishable_65cKf_wXStwtU_92huvlhg_kzMoV334"};</script>
 <script>
 (()=>{
+/* ---------- error reports (server: gd_log_error in schema-16) ----------
+   window errors and unhandled rejections, plus a sample of failed rpc calls that are not normal user errors.
+   Same message+line only once per session, at most 10 per session, sent in batches. */
+const ERRS={seen:new Set(),n:0,max:10,q:[],t:0,wait:0,rpcRate:.2};
+const errTry=f=>{ try{ return f() }catch(e){ return undefined } };
+function errUa(){
+  const u=navigator.userAgent||'';
+  const b=/Edg\/(\d+)/.exec(u)?'Edge '+RegExp.$1:/OPR\/(\d+)/.exec(u)?'Opera '+RegExp.$1:/SamsungBrowser\/(\d+)/.exec(u)?'Samsung '+RegExp.$1:/Firefox\/(\d+)/.exec(u)?'Firefox '+RegExp.$1:
+    /CriOS\/(\d+)/.exec(u)?'Chrome iOS '+RegExp.$1:/Chrome\/(\d+)/.exec(u)?'Chrome '+RegExp.$1:/Version\/(\d+)[\d.]* .*Safari/.exec(u)?'Safari '+RegExp.$1:'?';
+  const o=/Android (\d+)/.exec(u)?'Android '+RegExp.$1:/(iPhone|iPad).*OS (\d+)/.exec(u)?'iOS '+RegExp.$2:/Windows/.test(u)?'Windows':/Mac OS X/.test(u)?'macOS':/Linux/.test(u)?'Linux':'?';
+  return (b+' · '+o+(/wv\)|; wv/.test(u)?' · App':'')+(matchMedia('(display-mode: standalone)').matches?' · PWA':'')).slice(0,60);
+}
+function errVersion(){ const m=document.querySelector('meta[name="gd-build"]'); return String(window.GD_BUILD||(m&&m.content)||document.lastModified||'').slice(0,40) }
+function errCtx(extra){
+  const c={screen:errTry(()=>current),mode:errTry(()=>mode),phase:errTry(()=>phase),online:errTry(()=>!!online),ai:errTry(()=>!!ai),
+    ug:errTry(()=>ugPlay?(ugPlay.test?'test':'play'):undefined),daily:errTry(()=>dailyMode||undefined),net:errTry(()=>Net.state),
+    path:location.pathname.slice(0,60),ua:errTry(errUa),v:errTry(errVersion),vw:innerWidth,vh:innerHeight};
+  return Object.assign(c,extra||{});
+}
+function errReport(msg,stack,extra){
+  try{
+    msg=String(msg||'').replace(/\s+/g,' ').trim().slice(0,300); if(!msg) return;
+    const key=msg+'|'+(extra&&extra.src||'')+':'+(extra&&extra.line||'');
+    if(ERRS.seen.has(key)||ERRS.n>=ERRS.max) return;
+    ERRS.seen.add(key); ERRS.n++;
+    ERRS.q.push({msg,stack:stack?String(stack).slice(0,2000):null,ctx:errCtx(extra)});
+    if(!ERRS.t) ERRS.t=setTimeout(errFlush,ERRS.q.length>=5?0:3000);
+  }catch(e){}
+}
+async function errFlush(){
+  ERRS.t=0; if(!ERRS.q.length) return;
+  const be=errTry(()=>Net.backend), cfg=window.GD_CONFIG;
+  if(!be){
+    if(!cfg&&!window.__GD_MOCK__){ ERRS.q=[]; return }                                   // offline build: nowhere to send
+    if(ERRS.wait++<3){ ERRS.t=setTimeout(errFlush,4000); return }                          // still signing in: wait a bit
+    if(!cfg){ ERRS.q=[]; return }
+  }
+  const items=ERRS.q.splice(0,10), [f,...more]=items;
+  const args={p_msg:f.msg,p_stack:f.stack,p_ctx:f.ctx,p_more:more.length?more:null};
+  try{
+    if(be) await be.rpc('gd_log_error',args);
+    else await fetch(cfg.url.replace(/\/$/,'')+'/rest/v1/rpc/gd_log_error',{method:'POST',keepalive:true,headers:{'content-type':'application/json',apikey:cfg.key},body:JSON.stringify(args)});
+  }catch(e){}
+  if(ERRS.q.length&&!ERRS.t) ERRS.t=setTimeout(errFlush,3000);
+}
+/* failed rpc calls: raise exception in our functions (P0001) are normal answers ("not enough stardust" …) and never logged */
+const ERR_RPC=/does not exist|permission denied|schema cache|syntax error|violates|null value|invalid input|ambiguous|out of range|division by zero|stack depth|statement timeout|canceling statement|failed to fetch|networkerror|network request|load failed|jwt|internal server/i;
+function errRpc(n,e){
+  try{
+    if(e&&typeof e==='object') e.__gdRpc=1;
+    const m=String(e&&(e.message||e)||''), code=String(e&&e.code||'');
+    if(n==='gd_log_error'||code==='P0001') return;
+    if(!ERR_RPC.test(m)&&!/^(42|XX|53|57|08|PGRST)/.test(code)) return;
+    if(Math.random()>=ERRS.rpcRate) return;
+    errReport('rpc '+n+': '+m.slice(0,200),null,{kind:'rpc',rpc:String(n).slice(0,40),code:code.slice(0,12)});
+  }catch(x){}
+}
+addEventListener('error',e=>{
+  if(!e||!e.message||/^Script error\.?$/.test(e.message)) return;
+  const src=String(e.filename||''); if(/^(chrome|moz|safari)(-web)?-extension:/.test(src)) return;
+  errReport(e.message,e.error&&e.error.stack,{kind:'error',src:src.replace(/^.*\//,'').slice(0,40),line:e.lineno|0,col:e.colno|0});
+});
+addEventListener('unhandledrejection',e=>{
+  const r=e&&e.reason; if(r&&r.__gdRpc) return; // a failed rpc: already looked at in errRpc
+  const m=r&&(r.message||(typeof r==='string'?r:errTry(()=>JSON.stringify(r))))||'unbekannt';
+  errReport('Unhandled: '+m,r&&r.stack,{kind:'rejection'});
+});
+addEventListener('pagehide',()=>{ if(ERRS.q.length){ clearTimeout(ERRS.t); errFlush() } });
+if(window.__GD_TEST__) window.__gdErr={state:()=>({n:ERRS.n,q:ERRS.q.length,seen:[...ERRS.seen]}),rate:r=>{ ERRS.rpcRate=r },flush:()=>{ clearTimeout(ERRS.t); return errFlush() },report:errReport};
 /* Gravity Duel – shared physics. The game inlines this file at build time and the level
    generator requires it, so a level checked by simulation behaves exactly the same in play. */
 const PHYS=(()=>{
@@ -6461,7 +6627,7 @@ async function supabaseBackend(){
     }
   };
 }
-const rpc=(n,a)=>Net.backend.rpc(n,a);
+const rpc=(n,a)=>{ const p=Net.backend.rpc(n,a); return p&&typeof p.catch==='function'?p.catch(e=>{ errRpc(n,e); throw e }):p };
 /* Gravitonen depend on the opponent: beating a stronger one is worth more, losing to a weaker one costs more (same rule as gd_settle) */
 function gravStakes(mine,theirs){
   const ew=1/(1+Math.pow(10,((theirs|0)-(mine|0))/800));
@@ -7352,7 +7518,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -9129,6 +9295,7 @@ function ugCleared(){
     if(r.level) Object.assign(u.item||{},r.level);
     if(current!=='ugdone'||ugPlay!==u) return;
     $('ugdReward').textContent=r.reward?`Erster Abschluss! ${rewardLine(r.reward)}`:r.why==='limit'?'Heute schon 5 Belohnungen für Community-Level abgeholt':r.why==='own'?'Dein eigenes Level · keine Belohnung':'Schon geschafft · keine neue Belohnung';
+    if(r.weekBonus){ $('ugdReward').textContent=(r.reward?`Erster Abschluss! ${rewardLine(r.reward)} · `:'')+`Level der Woche: +${r.weekBonus|0} ✦`; if(ugWeekData) ugWeekData.bonusDone=true }
     if(r.reward&&r.reward.up){ $('ugdLevelUp').hidden=false; $('ugdLevelUp').textContent=upLine(r.reward); Sfx.levelup() }
     ugLikeBtn();
   }).catch(e=>{ if(current==='ugdone') $('ugdReward').textContent=ugErr(e) });
@@ -9172,6 +9339,7 @@ function ugDone(kind,o){
     lk.hidden=true;
     btn('ugdAgain','alt','Nochmal',()=>{ const x=ugPlay; ugReset(); ugPlayItem(x.item) });
     btn('ugdComm','ghost','Zur Community',()=>{ ugReset(); openCommunity() });
+    if(u.item&&!u.item.mine){ const rb=btn('ugdReport','ghost','⚑ Level melden',()=>ugReportOpen(u.item,'ugdone')); if(u.item.reported){ rb.disabled=true; rb.textContent='✓ Gemeldet' } }
     show('ugdone'); return ugLikeBtn();
   }
   show('ugdone');
@@ -9204,7 +9372,7 @@ const ugErr=e=>{ const m=String(e&&(e.message||e)||'');
 function openCommunity(){
   ugReset(); phase='menu'; bodies=[]; players=[]; proj=[];
   if(!ED) edLoad();
-  show('community'); ugRenderTabs(); ugLoad(false);
+  show('community'); ugRenderTabs(); ugLoad(false); ugWeekLoad();
 }
 function ugRenderTabs(){ for(const t of ['new','top','mine']) $('ugt-'+t).setAttribute('aria-selected',String(t===ugTab)) }
 async function ugLoad(more){
@@ -9235,6 +9403,7 @@ function ugRenderList(){
       <span class="ugt"><b>${esc(it.name)}</b><small>${it.mine?'Von dir':'von '+esc(cleanName(it.author))} · Par ${it.par|0}</small></span>
       <span class="ugst"><span title="Gespielt">▶ ${it.plays|0}</span><span title="Geschafft">${rate}</span><span title="Likes" class="lk">♥ ${it.likes|0}</span></span></button>
       ${it.mine?`<div class="ugmine"><b title="Code">${esc(ugCode(it.code))}</b><button class="mini x" data-copy="${i}">Kopieren</button><button class="mini x danger" data-del="${i}">Löschen</button></div>`:''}`;
+    ugDecor(li,it,i);
     list.appendChild(li);
   });
   $('ugMore').hidden=!ugMoreOk;
@@ -9422,7 +9591,7 @@ function renderCrewList(){
   if(!GDX.list.length){ box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Keine offene Crew gefunden</b><i>Gründe doch deine eigene!</i></span></div>'; return }
   for(const c of GDX.list){
     const el=document.createElement('div'); el.className='fr';
-    el.innerHTML=`<canvas width="80" height="80" aria-hidden="true"></canvas><span class="fn"><b>${crewTagHtml(c)}${esc(c.name)}</b><i>${c.members|0}/20 · <span class="gv" aria-hidden="true"></span> ${c.total|0}${c.motto?' · „'+esc(c.motto)+'“':''}</i></span>`;
+    el.innerHTML=`<canvas width="80" height="80" aria-hidden="true"></canvas><span class="fn"><b>${crewTagHtml(c)}${esc(c.name)}</b><i>${c.members|0}/20 · ${c.trophies?`🏆 ${c.trophies|0} · `:''}<span class="gv" aria-hidden="true"></span> ${c.total|0}${c.motto?' · „'+esc(c.motto)+'“':''}</i></span>`;
     drawCrewEmblem(el.querySelector('canvas'),c.color,c.emblem);
     const b=document.createElement('button'); b.className='mini'; b.textContent=(c.members|0)>=20?'Voll':'Beitreten'; b.disabled=(c.members|0)>=20||!!GDX.cooldown;
     b.setAttribute('aria-label',`${c.name} beitreten`); b.onclick=()=>{ Sfx.init(); crewJoin(c.id,b) };
@@ -9560,6 +9729,263 @@ setInterval(()=>{ // live countdowns; reload when the tournament starts or ends
   if(current==='tourney') $('tnStatus').textContent=tnStatusText(); else if(current==='home') renderTnCard();
 },1000);
 
+/* ---------- crew wars (Crew-Kämpfe) + Pinnwand (supabase schema-crew-kampf.sql) ---------- */
+const CF_PHRASES=['Viel Glück!','Wer spielt mit?','Gut gemacht!','','Danke!','Gute Nacht 🌙','Hallo zusammen!','Auf geht’s, Crew!','Wir schaffen das!','Was für ein Sieg!','Knapp verloren …','Bin gleich online','Holt eure Belohnungen ab!','Jeder Sieg zählt!','GG!','Bin dabei!'];
+const CW={d:null,at:0,off:0,feed:null,feedCrew:null,feedAt:0,ch:null,chId:null,chT:0,sendAt:0,busy:false,pick:false,hint:'',hintUntil:0};
+const cwNow=()=>Date.now()+CW.off;
+const cwErr=e=>{ const m=String(e&&(e.message||e)||'');
+  return /too fast/.test(m)?'Nicht so schnell – warte ein paar Sekunden':/daily limit/.test(m)?'Für heute hast du genug Nachrichten geschickt':/war running/.test(m)?'Der Crew-Kampf läuft gerade'
+    :/not settled/.test(m)?'Das Ergebnis wird gerade ausgewertet – versuch es gleich nochmal':/no war/.test(m)?'Deine Crew war bei diesem Kampf nicht dabei':/bad emote/.test(m)?'Dieses Emote hast du nicht'
+    :/bad message/.test(m)?'Diese Nachricht geht nicht':/already claimed/.test(m)?'Schon abgeholt':/no contribution/.test(m)?'Du hast in diesem Crew-Kampf keinen Sieg geholt':crewErr(e) };
+const cfGoalText=a=>a&&a.all?'Alle Wochenziele geschafft! 🎉':a&&a.n?`Noch ${a.n|0} ${(a.n|0)===1?'Sieg':'Siege'} bis Stufe ${a.k|0}!`:'Auf zur nächsten Stufe!';
+function cfLocalGoal(){ const w=GDX.crew&&GDX.crew.week?GDX.crew.week.wins|0:0, k=w<15?1:w<40?2:w<80?3:0; return k?{n:[15,40,80][k-1]-w,k}:{all:true} }
+const cwPrizeText=p=>p?`${p.dust|0} ✦${p.crate?' + '+CRATE_NAME(p.crate):''}`:'';
+function cfAgo(t){ const s=Math.max(0,(cwNow()-Date.parse(t))/1000), d=Math.floor(s/86400);
+  return s<60?'gerade eben':s<3600?`vor ${Math.floor(s/60)} Min`:s<86400?`vor ${Math.floor(s/3600)} Std`:`vor ${d} ${d===1?'Tag':'Tagen'}` }
+
+/* seen state for the unread badge (only this browser) */
+const CF_SEEN='gravityDuel.crewSeen.v1';
+function cfSeenGet(id){ try{ const o=JSON.parse(localStorage.getItem(CF_SEEN)||'{}'); return typeof o[id]==='number'?o[id]:null }catch(e){ return null } }
+function cfSeenSet(id,n){ try{ localStorage.setItem(CF_SEEN,JSON.stringify({[id]:n})) }catch(e){} }
+function cfSeq(){ const c=GDX.crew; if(!c) return 0; let n=CW.d&&CW.d.crew===c.id?CW.d.feedSeq|0:0; if(CW.feed&&CW.feedCrew===c.id) n=Math.max(n,CW.feed.seq|0); return n }
+function cfUnread(){ const c=GDX.crew, n=cfSeq(); if(!c||!n) return 0; const s=cfSeenGet(c.id); if(s==null){ cfSeenSet(c.id,n); return 0 } return Math.max(0,n-s) }
+function cwClaimable(){ const w=CW.d&&CW.d.war; return !!(w&&!w.running&&w.settled&&(w.mine|0)>0&&!w.claimed&&w.prize) }
+function cwBadge(){
+  const n=current==='crew'?0:cfUnread(), cl=cwClaimable(), txt=cl?'!':n?(n>9?'9+':String(n)):'';
+  for(const id of ['toCrewF','toCrewR']){ const b=$(id); if(!b) continue; let e=b.querySelector('.cwbadge');
+    if(!txt){ if(e) e.remove(); continue }
+    if(!e){ e=document.createElement('b'); e.className='badge cwbadge'; e.setAttribute('aria-hidden','true'); b.appendChild(e) }
+    e.textContent=txt }
+  const f=$('toCrewF'); if(f) f.setAttribute('aria-label',`Crew${cl?', Belohnung bereit':n?`, ${n} neue Nachrichten`:''}`);
+}
+
+/* data */
+async function cwLoad(){ if(!econReady()) return; CW.at=Date.now(); try{ cwSet(await rpc('gd_crew_war')) }catch(e){} }
+function cwSet(r){ if(!r) return; CW.d=r; CW.at=Date.now(); if(r.now) CW.off=Date.parse(r.now)-Date.now(); cwBadge(); if(current==='crew'){ renderWar(); cwTrophies() } }
+async function cfLoad(){ const c=GDX.crew; if(!econReady()||!c) return; CW.feedAt=Date.now();
+  try{ const r=await rpc('gd_crew_feed'); if(!GDX.crew||GDX.crew.id!==c.id) return; CW.feed=r; CW.feedCrew=c.id; CW.feedAt=Date.now(); if(CW.d&&CW.d.crew===c.id) CW.d.feedSeq=r.seq;
+    if(current==='crew') renderFeed(); cwBadge() }catch(e){} }
+
+/* live updates while the crew screen is open: a broadcast "ping" tells the others to reload the Pinnwand */
+async function cwChannel(){
+  const c=GDX.crew; if(!c||!Net.backend||!Net.backend.channel){ cwChannelClose(); return } if(CW.ch&&CW.chId===c.id) return; cwChannelClose();
+  try{ const ch=Net.backend.channel('gd-crew-'+c.id); CW.ch=ch; CW.chId=c.id;
+    ch.onMsg(p=>{ if(p&&p.t==='f'&&current==='crew'){ clearTimeout(CW.chT); CW.chT=setTimeout(cfLoad,250+Math.random()*600) } });
+    await ch.subscribe() }catch(e){ cwChannelClose() }
+}
+function cwChannelClose(){ if(CW.ch){ try{ CW.ch.close() }catch(e){} } CW.ch=null; CW.chId=null }
+
+/* the war box */
+function renderWar(){
+  const box=$('cwBox'); if(!box) return; const d=CW.d, c=GDX.crew;
+  if(c){ if(box.previousElementSibling!==$('crewMotto')) $('crewMotto').after(box) }
+  else{ const host=$('crewOut').querySelector('.btns'); if(box.parentNode!==host) host.prepend(box) }
+  const w=d&&d.war, su=c&&d&&d.crew===c.id?d.signup:null;
+  if(!d||(!w&&!su)||(!c&&!cwClaimable())){ box.hidden=true; box.innerHTML=''; return }
+  box.hidden=false; let h='';
+  if(w){
+    const A=w.me, B=w.opp, lead=B?Math.sign((A.points|0)-(B.points|0)):0;
+    h+=`<h3><span>Crew-Kampf${w.running?'<span class="cwlive">LIVE</span>':' · Ergebnis'}</span>${w.running?'<small id="cwWhen"></small>':''}</h3>`;
+    if(B) h+=`<div class="cwscore"><div class="cwside"><canvas width="104" height="104" id="cwEmA" aria-hidden="true"></canvas><b>${crewTagHtml(A)}${esc(A.name)}</b><i>Eure Crew</i></div>`
+      +`<div class="cwnum" id="cwScore" role="img" aria-label="Eure Crew ${A.points|0}, Gegner ${B.points|0}"><b class="${lead>0?'lead':''}">${A.points|0}</b><span>:</span><b class="${lead<0?'lead':''}">${B.points|0}</b></div>`
+      +`<div class="cwside"><canvas width="104" height="104" id="cwEmB" aria-hidden="true"></canvas><b>${crewTagHtml(B)}${esc(B.name)}</b><i>Gegner-Crew</i></div></div>`;
+    else h+=`<div class="cwbye"><canvas width="104" height="104" id="cwEmA" aria-hidden="true"></canvas><div><b>Freilos · ${A.points|0} ${(A.points|0)===1?'Sieg':'Siege'}</b><span>Diesmal gab es keine passende Gegner-Crew. Mit mindestens einem Sieg gibt es trotzdem einen Trostpreis (150 ✦).</span></div></div>`;
+    if(!w.running&&w.result) h+=`<p class="cwres ${w.result}">${{win:'Gewonnen! 🏆',loss:'Verloren – nächstes Mal!',draw:'Unentschieden',bye:'Freilos-Wochenende'}[w.result]||''}</p>`;
+    if(w.top&&w.top.length) h+=`<div class="cwtop" aria-label="Beste Kämpfer">${w.top.map((p,i)=>`<div class="${p.me?'me':''}"><span>${i+1}.</span><span class="av" style="background:${skinFromEquip(p.skin).color}"></span><b>${badgeHtml(p.badge)}${esc(cleanName(p.name))}</b><span>${p.wins|0} ${(p.wins|0)===1?'Sieg':'Siege'}</span></div>`).join('')}</div>`;
+    else if(w.running) h+='<p class="fine">Noch keine Siege – jeder Wettkampf-Sieg zählt 1 Punkt für eure Crew.</p>';
+    if(w.running) h+=`<p class="fine">Du: <b>${w.mine|0}</b> ${(w.mine|0)===1?'Sieg':'Siege'} · ${(w.mine|0)>0?'deine Belohnung nach dem Kampf ist sicher.':'hol mindestens einen Sieg, dann bekommst du nach dem Kampf eine Belohnung.'} Sieg: 600 ✦ + Nebelkiste · Unentschieden: 400 ✦ · Niederlage: 200 ✦</p>`;
+    else if((w.mine|0)<1) h+='<p class="fine">Du hast in diesem Kampf keinen Sieg geholt – diesmal keine Belohnung für dich.</p>';
+    else if(w.claimed) h+=`<p class="cwdone">✓ Belohnung abgeholt (${esc(cwPrizeText(w.prize))})</p>`;
+    else if(!w.settled) h+='<button class="alt" id="cwClaim" disabled>Wird ausgewertet …</button>';
+    else h+=`<button id="cwClaim">Abholen · ${esc(cwPrizeText(w.prize))}</button><p class="fine">Deine ${w.mine|0} ${(w.mine|0)===1?'Sieg':'Siege'} haben gezählt. Abholbar bis ${tnFmt(w.claimUntil)} Uhr.</p>`;
+  }
+  if(su&&!(w&&w.running)){
+    h+='<div class="cwsign">';
+    if(w) h+='<span class="label">Nächster Crew-Kampf · <span id="cwWhen"></span></span>'; else h+='<h3><span>Crew-Kampf</span><small id="cwWhen"></small></h3>';
+    if(!su.open) h+='<p class="fine">Gerade läuft ein Crew-Kampf ohne eure Crew. Ab Sonntag 22 Uhr könnt ihr euch für den nächsten anmelden.</p>';
+    else{
+      if(!w) h+='<p class="fine">Jedes Wochenende (Fr 18 – So 22 Uhr) tritt eure Crew gegen eine ähnlich starke Crew an. Jeder Wettkampf-Sieg zählt 1 Punkt. Wer mindestens einen Sieg holt, bekommt: Sieg 600 ✦ + Nebelkiste · Unentschieden 400 ✦ · Niederlage 200 ✦.</p>';
+      h+=`<div class="cwrow"><span class="cwpill${su.signed?' on':''}" id="cwState">${su.signed?'✓ Angemeldet':'Nicht angemeldet'}${su.auto?' · jede Woche':''}</span><span class="fine">${tnFmt(su.starts)} – ${tnFmt(su.ends)} Uhr</span></div>`;
+      if((su.members|0)<(su.min|0)) h+=`<p class="fine cwwarn">Zum Start braucht ihr mindestens ${su.min|0} Mitglieder (jetzt ${su.members|0}).</p>`;
+      if(su.canEdit) h+=`<div class="cwrow"><button class="mini${su.signed?' x':''}" id="cwSign">${su.signed?'Abmelden':'Anmelden'}</button><button class="mini x" id="cwAuto" role="switch" aria-checked="${!!su.auto}">${su.auto?'☑':'☐'} Jede Woche automatisch</button></div>`;
+      else h+='<p class="fine">Anführer oder Vize melden die Crew an.</p>';
+    }
+    h+='</div>';
+  }
+  box.innerHTML=h;
+  if(w){ drawCrewEmblem($('cwEmA'),w.me.color,w.me.emblem); if(w.opp) drawCrewEmblem($('cwEmB'),w.opp.color,w.opp.emblem) }
+  const cb=$('cwClaim'); if(cb&&!cb.disabled) cb.onclick=()=>{ Sfx.init(); cwClaim(cb) };
+  if(su){ const sb=$('cwSign'), ab=$('cwAuto');
+    if(sb) sb.onclick=()=>{ Sfx.init(); cwSignup(!su.signed,su.signed?false:!!su.auto,sb) };
+    if(ab) ab.onclick=()=>{ Sfx.init(); cwSignup(true,!su.auto,ab) } }
+  cwCountdown();
+}
+function cwCountdown(){
+  const el=$('cwWhen'), d=CW.d; if(!el||!d) return; const w=d.war, su=d.signup, now=cwNow();
+  el.textContent=w&&w.running?`noch ${untilText(Math.max(0,Date.parse(w.ends)-now))}`:su&&su.open?`Start in ${untilText(Math.max(0,Date.parse(su.starts)-now))}`:'';
+}
+function cwTrophies(){
+  const c=GDX.crew, el=$('crewInfo'); if(!c||!el||!CW.d||CW.d.crew!==c.id) return;
+  let t=$('cwTroph'); if(!t){ el.insertAdjacentHTML('beforeend',' · <span id="cwTroph"></span>'); t=$('cwTroph') }
+  const n=CW.d.trophies|0; t.textContent=`🏆 ${n}`; t.title=`${n} ${n===1?'Crew-Kampf':'Crew-Kämpfe'} gewonnen`; t.setAttribute('aria-label',t.title);
+}
+async function cwSignup(on,auto,b){
+  if(b) b.disabled=true;
+  try{ cwSet(await rpc('gd_crew_war_signup',{p_on:!!on,p_auto:!!auto})); Sfx.select();
+    toast(!on?'Abgemeldet vom Crew-Kampf':auto?'Eure Crew ist jetzt jedes Wochenende dabei':'Angemeldet zum Crew-Kampf'); cfLoad() }
+  catch(e){ toast(cwErr(e)); if(b) b.disabled=false }
+}
+async function cwClaim(b){
+  b.disabled=true;
+  try{ const r=await rpc('gd_crew_war_claim'); applyEcon(r.state); cwSet(r.war);
+    if(r.reward&&r.reward.crate){ crateFrom='crew'; openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)); toast(`Crew-Kampf: +${r.dust|0} ✦ und eine ${CRATE_NAME(r.reward.crate)}`) }
+    else{ Sfx.buy(); toast(`Crew-Kampf: +${r.dust|0} ✦`) } }
+  catch(e){ toast(cwErr(e)); b.disabled=false }
+}
+
+/* the Pinnwand */
+function cfOwnedEmotes(){ const eq=myEmotes(), own=profile.owned||{};
+  return eq.concat(EMOTE_LIST.map(e=>e.id).filter(id=>!eq.includes(id)&&(DEFAULT_EMOTES.includes(id)||own['emote:'+id]))) }
+function cfDrawEmote(cv,id,col){ if(!EMOTE_BY[id]) return; const g=cv.getContext('2d'), s=cv.width/100;
+  g.clearRect(0,0,cv.width,cv.height); g.save(); g.translate(cv.width/2,cv.height/2); g.scale(s*.92,s*.92); try{ drawEmoteArt(g,id,1.2,col) }catch(e){} g.restore() }
+function cfSysText(f){
+  const a=f.args||{}, n=`<b>${esc(cleanName(f.user&&f.user.name||a.name||'Jemand'))}</b>`, o=`<b>${a.tag?esc(a.tag)+' ':''}${esc(a.opp||'?')}</b>`;
+  switch(f.body){
+    case 'found': return `${n} hat die Crew gegründet`;
+    case 'join': return `${n} ist der Crew beigetreten 👋`;
+    case 'leave': return `${n} hat die Crew verlassen`;
+    case 'tier': return `${n} holt den ${a.n|0}. Sieg der Woche – Stufe ${a.k|0} geschafft! 🎉`;
+    case 'signup': return `${n} hat die Crew zum Crew-Kampf angemeldet`;
+    case 'war_start': return `Der Crew-Kampf gegen ${o} beginnt! ⚔️`;
+    case 'war_bye': return 'Crew-Kampf: Diesmal habt ihr ein Freilos';
+    case 'war_end': return a.result==='win'?`Crew-Kampf gewonnen! ${a.a|0} : ${a.b|0} gegen ${o} 🏆`:a.result==='loss'?`Crew-Kampf verloren: ${a.a|0} : ${a.b|0} gegen ${o}`:`Unentschieden im Crew-Kampf: ${a.a|0} : ${a.b|0} gegen ${o}`;
+  }
+  return '';
+}
+function cfItemHtml(f){
+  if(f.kind==='sys') return `<div class="cfi sys"><span>${cfSysText(f)}</span><i>${cfAgo(f.at)}</i></div>`;
+  const u=f.user||{}, sk=skinFromEquip(u.skin), col=sk.color;
+  const body=f.kind==='emote'?`<span class="cfm st"><canvas width="128" height="128" data-e="${esc(f.body)}" role="img" aria-label="Emote ${esc((EMOTE_BY[f.body]||{}).name||'')}"></canvas></span>`
+    :`<span class="cfm">${esc(f.body==='3'?cfGoalText(f.args):CF_PHRASES[f.body|0]||'…')}</span>`;
+  return `<div class="cfi${f.me?' me':''}" data-col="${esc(col)}"><span class="av" style="background:${col}"></span><div><span class="cfh"><b>${badgeHtml(u.badge)}${esc(cleanName(u.name||'Pilot'))}</b><i>${cfAgo(f.at)}</i></span>${body}</div></div>`;
+}
+function renderFeed(){
+  const box=$('cfBox'), c=GDX.crew; if(!box) return; box.hidden=!c; if(!c) return;
+  const f=CW.feed&&CW.feedCrew===c.id?CW.feed:null, list=$('cfList');
+  if(!f) list.innerHTML='<p class="fine">Lade …</p>';
+  else if(!f.items.length) list.innerHTML='<p class="fine">Noch keine Nachrichten. Sag doch Hallo!</p>';
+  else{ const top=list.scrollTop; list.innerHTML=f.items.map(cfItemHtml).join(''); list.scrollTop=top;
+    list.querySelectorAll('canvas[data-e]').forEach(cv=>cfDrawEmote(cv,cv.dataset.e,cv.closest('.cfi').dataset.col)) }
+  if(f){ cfSeenSet(c.id,f.seq|0); cwBadge() }
+  $('cfOpen').setAttribute('aria-expanded',String(CW.pick)); $('cfOpen').textContent=CW.pick?'Schließen':'Nachricht senden'; $('cfPick').hidden=!CW.pick;
+  if(CW.pick) renderPicker();
+  cfSendHint();
+}
+function renderPicker(){
+  const p=$('cfPhrases'); p.innerHTML='';
+  CF_PHRASES.forEach((t,i)=>{ const b=document.createElement('button'); b.className='mini x'; b.id='cfP'+i; b.textContent=i===3?cfGoalText(cfLocalGoal()):t; b.onclick=()=>cfPost('msg',i); p.appendChild(b) });
+  const s=$('cfStickers'), col=mySkin().color; s.innerHTML='';
+  cfOwnedEmotes().forEach(id=>{ const b=document.createElement('button'); b.id='cfE-'+id; b.setAttribute('aria-label',`Emote „${(EMOTE_BY[id]||{}).name||id}“ senden`);
+    b.innerHTML='<canvas width="96" height="96" aria-hidden="true"></canvas>'; b.onclick=()=>cfPost('emote',id); s.appendChild(b); cfDrawEmote(b.firstChild,id,col) });
+}
+function cfHint(m){ CW.hint=m; CW.hintUntil=Date.now()+4000; cfSendHint() }
+function cfSendHint(){
+  const el=$('cfHint'); if(!el) return; const left=Math.ceil((10000-(Date.now()-CW.sendAt))/1000), wait=left>0;
+  const t=CW.hintUntil>Date.now()?CW.hint:wait?`Nächste Nachricht in ${left} s`:'';
+  if(el.textContent!==t) el.textContent=t;
+  const pk=$('cfPick'); if(pk&&!pk.hidden) pk.querySelectorAll('button').forEach(b=>{ b.disabled=wait||CW.busy });
+}
+async function cfPost(kind,body){
+  if(CW.busy) return; if(Date.now()-CW.sendAt<10000) return cfSendHint();
+  CW.busy=true; Sfx.init(); cfSendHint();
+  try{ const r=await rpc('gd_crew_post',{p_kind:kind,p_body:String(body)}); CW.sendAt=Date.now();
+    CW.feed=r; CW.feedCrew=GDX.crew&&GDX.crew.id; CW.feedAt=Date.now(); if(CW.d) CW.d.feedSeq=r.seq; CW.pick=false; Sfx.select();
+    if(CW.ch) try{ CW.ch.send({t:'f'}) }catch(e){} }
+  catch(e){ cfHint(cwErr(e)); if(/too fast/.test(String(e&&e.message||e))) CW.sendAt=Date.now() }
+  finally{ CW.busy=false; if(current==='crew') renderFeed() }
+}
+tap('cfOpen',()=>{ CW.pick=!CW.pick; Sfx.select(); renderFeed(); if(CW.pick) $('cfPick').scrollIntoView({block:'nearest',behavior:'smooth'}) });
+
+/* hooks into the crew screen */
+{ const cl=crewLoad; crewLoad=async function(){ const r=await cl.apply(this,arguments); cwLoad(); return r } }
+{ const rc=renderCrew; renderCrew=function(){ rc.apply(this,arguments); renderWar(); renderFeed(); cwTrophies(); if(current==='crew'||GDX.crew) cwChannelLater() } }
+{ const re=renderCrewEntry; renderCrewEntry=function(){ re.apply(this,arguments); cwBadge() } }
+{ const oc=openCrew; openCrew=function(){ const r=oc.apply(this,arguments); if(current==='crew'){ CW.pick=false; if(GDX.crew&&Date.now()-CW.feedAt>1500) cfLoad(); cwBadge() } return r } }
+function cwChannelLater(){ setTimeout(()=>{ if(current==='crew') cwChannel() },0) }
+setInterval(()=>{
+  const now=Date.now();
+  if(current!=='crew'){
+    if(CW.ch) cwChannelClose();
+    // keep the badge fresh on the screens that show the crew button
+    if(GDX.crew&&(current==='home'||current==='friends')&&now-CW.at>120000&&!document.hidden) cwLoad();
+    return }
+  if(document.hidden) return;
+  if(GDX.crew&&now-CW.feedAt>15000) cfLoad();
+  const d=CW.d, w=d&&d.war, su=d&&d.signup;
+  if(d&&now-CW.at>5000&&((w&&w.running&&(now-CW.at>15000||cwNow()>=Date.parse(w.ends)))||(w&&!w.running&&!w.settled&&now-CW.at>15000)||(su&&su.open&&cwNow()>=Date.parse(su.starts)))) cwLoad();
+  cwCountdown(); cfSendHint();
+},1000);
+if(window.__GD_TEST__) window.__gdCw={CW,cwLoad,cfLoad,cfUnread};
+
+/* ---------- community: Level der Woche, reports, hidden levels (server: schema-16) ---------- */
+let ugWeekData=null, ugRepItem=null, ugRepBack='community';
+async function ugWeekLoad(){
+  const box=$('ugWeek');
+  if(!SERVER_ECON||!econReady()){ box.hidden=true; return }
+  try{ const r=await rpc('gd_ulevel_week'); ugWeekData=r&&r.item?r:null }catch(e){ ugWeekData=null }
+  if(current==='community') ugWeekRender();
+}
+function ugWeekRender(){
+  const box=$('ugWeek'), w=ugWeekData;
+  if(!w||!w.item){ box.hidden=true; box.innerHTML=''; return }
+  const it=w.item, th=THEMES[it.gal]||THEMES.nova, own=!!it.mine;
+  box.innerHTML=`<button class="ugweek" id="ugWeekPlay" aria-label="Level der Woche: ${esc(it.name)} spielen">
+    <i class="ugsky" style="background:radial-gradient(circle at 32% 30%,${th.tints[1]}66,transparent 55%),linear-gradient(135deg,${th.bg[0]},${th.bg[2]})" aria-hidden="true">★</i>
+    <span class="ugt"><span class="label">Level der Woche</span><b>${esc(it.name)}</b><small>${own?'Von dir':'von '+esc(cleanName(it.author))} · Par ${it.par|0} · ♥ ${it.likes|0}</small></span>
+    <span class="ugwb${own||w.bonusDone?' done':''}">${own?'Dein Level':w.bonusDone?'✓ Bonus':'+'+(w.bonus|0)+' ✦'}</span></button>`;
+  box.hidden=false;
+}
+$('ugWeek').addEventListener('click',e=>{ if(!e.target.closest('#ugWeekPlay')||!ugWeekData) return; Sfx.init(); Sfx.select(); ugPlayItem(ugWeekData.item) });
+function ugDecor(li,it,i){
+  if(it.hidden){
+    li.classList.add('hid');
+    const t=li.querySelector('.ugt'); if(t) t.insertAdjacentHTML('beforeend','<span class="ughid" title="Nach Meldungen ausgeblendet: Nur du siehst es noch.">Ausgeblendet</span>');
+  }
+  if(!it.mine){
+    li.classList.add('rep');
+    li.insertAdjacentHTML('beforeend',`<button class="ugflag" data-flag="${i}" title="${it.reported?'Gemeldet':'Melden'}" aria-label="${esc(it.name)} ${it.reported?'gemeldet':'melden'}"${it.reported?' disabled':''}>⚑</button>`);
+  }
+}
+$('ugList').addEventListener('click',e=>{ const f=e.target.closest('[data-flag]'); if(f) ugReportOpen(ugItems[+f.dataset.flag],'community') });
+function ugReportOpen(it,back){
+  if(!it||it.mine) return;
+  if(it.reported) return toast('Du hast dieses Level schon gemeldet');
+  if(!SERVER_ECON||!econReady()) return toast('Dafür brauchst du eine Verbindung zum Server');
+  Sfx.select(); ugRepItem=it; ugRepBack=back==='ugdone'?'ugdone':'community';
+  $('ugrName').textContent=it.name;
+  for(const b of $('ugrReasons').querySelectorAll('button')) b.disabled=false;
+  show('ugReport');
+}
+function ugRepClose(){
+  const back=ugRepBack; ugRepItem=null;
+  if(back==='ugdone'&&ugPlay){
+    show('ugdone');
+    const rb=$('ugdReport'), it=ugPlay.item; if(rb&&it&&it.reported){ rb.disabled=true; rb.textContent='✓ Gemeldet' }
+  } else { show('community'); ugRenderList(); ugWeekRender() }
+}
+const ugRepErr=e=>{ const m=String(e&&(e.message||e)||''); return /already reported/.test(m)?'Du hast dieses Level schon gemeldet':/report limit/.test(m)?'Du hast heute schon sehr viele Level gemeldet':/own level/.test(m)?'Dein eigenes Level kannst du nicht melden':ugErr(e) };
+$('ugrReasons').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-r]'), it=ugRepItem; if(!b||!it) return; Sfx.init();
+  const all=$('ugrReasons').querySelectorAll('button'); for(const x of all) x.disabled=true;
+  try{
+    const r=await rpc('gd_ulevel_report',{p_id:it.id,p_reason:b.dataset.r}); it.reported=true;
+    if(r&&r.hidden){ ugItems=ugItems.filter(x=>x.id!==it.id); if(ugWeekData&&ugWeekData.item&&ugWeekData.item.id===it.id) ugWeekData=null }
+    toast('Danke! Wir schauen uns das Level an.');
+  }catch(err){ if(/already reported/.test(String(err&&err.message||err))) it.reported=true; toast(ugRepErr(err)) }
+  ugRepClose();
+});
+tap('ugrBack',ugRepClose);
+if(window.__GD_TEST__) window.__ug={week:()=>ugWeekData,items:()=>ugItems,rep:()=>ugRepItem};
 let last=performance.now();
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
