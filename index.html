@@ -2104,6 +2104,7 @@ const SHOP={
     {id:'blood', name:'Blutmond',        color:'#ff1f3d',c2:'#1a0006',anim:'beat',price:15000,rarity:'mythic',minLevel:13},
     {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1},
     {id:'polar',   name:'Polarnacht',      color:'#9fe9ff',c2:'#6a4dff',anim:'shift',price:0,rarity:'season',season:2},
+    {id:'mitternacht',name:'Mitternachtsgold',color:'#ffd34f',c2:'#3a4dff',anim:'shift',price:0,rarity:'season',season:3},
     {id:'urlicht',     name:'Urlicht',          color:'#fff1c4',c2:'#9a5a12',anim:'dawn', price:60000,rarity:'cosmic',minLevel:200},
     {id:'milchstrasse',name:'Milchstraße',      color:'#8a6bff',c2:'#090225',anim:'milky',price:55000,rarity:'cosmic',minLevel:200},
     {id:'abyss',       name:'Abgrund',   color:'#7a2cff',c2:'#000000',anim:'abyss',price:0,rarity:'void',src:'void'}
@@ -2918,6 +2919,7 @@ SHOP.title=[
   {id:'redcomet', name:'Der Rote Komet',          price:15000, rarity:'mythic',   minLevel:13},
   {id:'pioneer',  name:'Pionier · Saison 1',      price:0,    rarity:'season',   season:1},
   {id:'winter',   name:'Frostherz · Saison 2',    price:0,    rarity:'season',   season:2},
+  {id:'neujahr',  name:'Mitternachtsstern · Saison 3', price:0, rarity:'season', season:3},
   {id:'schoepfer',  name:'Weltenschöpfer',   price:25000, rarity:'cosmic',   minLevel:200},
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
   {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'},
@@ -2942,7 +2944,8 @@ SHOP.companion=[
   {id:'phoenix',   name:'Phönixküken',        price:11250, rarity:'mythic',   minLevel:11},
   {id:'zwergsonne',name:'Zwergsonne',         price:50000, rarity:'cosmic',   minLevel:200},
   {id:'sternwal',  name:'Sternenwal',         price:40000, rarity:'cosmic',   minLevel:200},
-  {id:'leerling',  name:'Leerling',           price:0,     rarity:'void',     src:'void'}
+  {id:'leerling',  name:'Leerling',           price:0,     rarity:'void',     src:'void'},
+  {id:'rakete',    name:'Neujahrsrakete',     price:0,     rarity:'season',   season:3}
 ];
 SHOP.victory=[
   {id:'none',        name:'Keine',              price:0,     rarity:'common'},
@@ -2968,6 +2971,15 @@ function orbitAt(x,y,R,a){ const ox=Math.cos(a)*R, oy=Math.sin(a)*R*.38; return 
 function sparkle(g,x,y,s){ g.beginPath(); g.moveTo(x,y-s); g.quadraticCurveTo(x,y,x+s,y); g.quadraticCurveTo(x,y,x,y+s); g.quadraticCurveTo(x,y,x-s,y); g.quadraticCurveTo(x,y,x,y-s); g.fill() }
 function dotAt(g,x,y,r){ g.beginPath(); g.arc(x,y,r,0,7); g.fill() }
 const COMP_FX={
+  rakete:{sp:1.15,draw(g,x,y,s,t,o){ const [px,py]=o.at(.05), a=Math.atan2(y-py,x-px);
+    g.globalCompositeOperation='lighter';
+    for(let k=1;k<=6;k++){ const [qx,qy]=o.at(k*.05); g.globalAlpha=(1-k/7)*.85; g.fillStyle=k%2?'#ffd34f':'#ff7a3d'; dotAt(g,qx+Math.sin(t*40+k)*s*.15,qy,s*(.6-k*.07)) }
+    g.globalCompositeOperation='source-over'; g.globalAlpha=1;
+    g.translate(x,y); g.rotate(a);
+    g.fillStyle='#ff4f6b'; g.beginPath(); g.moveTo(-s*.7,-s*.45); g.lineTo(-s*1.15,-s*.8); g.lineTo(-s*.9,0); g.lineTo(-s*1.15,s*.8); g.lineTo(-s*.7,s*.45); g.closePath(); g.fill();
+    g.fillStyle='#f3eeff'; g.beginPath(); g.ellipse(0,0,s*1.05,s*.46,0,0,7); g.fill();
+    g.fillStyle='#ff4f6b'; g.beginPath(); g.moveTo(s*.7,-s*.36); g.quadraticCurveTo(s*1.5,0,s*.7,s*.36); g.closePath(); g.fill();
+    g.fillStyle='#3a4dff'; dotAt(g,s*.15,0,s*.22); g.fillStyle='rgba(255,255,255,.7)'; dotAt(g,s*.1,-s*.07,s*.08) }},
   kiesel:{sp:.9,draw(g,x,y,s,t){ g.translate(x,y); g.rotate(t*1.3); g.fillStyle='#8f88a0'; g.beginPath();
     for(let i=0;i<7;i++){ const a=i/7*6.283, q=s*(.78+.3*h01(i+3)); g[i?'lineTo':'moveTo'](Math.cos(a)*q,Math.sin(a)*q) } g.closePath(); g.fill();
     g.fillStyle='rgba(255,255,255,.35)'; dotAt(g,-s*.28,-s*.3,s*.26); g.fillStyle='rgba(40,30,60,.45)'; dotAt(g,s*.3,s*.25,s*.2) }},
@@ -3966,7 +3978,8 @@ const EMOTE_LIST=[
   {id:'maestro',name:'Sphären-Dirigent',price:38000,rarity:'cosmic',minLevel:200},
   {id:'bigbang',name:'Urknall',      price:45000,rarity:'cosmic',minLevel:200},
   {id:'darkmatter',name:'Dunkle Materie',price:0,    rarity:'void',src:'void'},
-  {id:'snowball',name:'Schneeballschlacht',price:0,  rarity:'season',season:2}
+  {id:'snowball',name:'Schneeballschlacht',price:0,  rarity:'season',season:2},
+  {id:'countdown',name:'Countdown',price:0,  rarity:'season',season:3}
 ];
 SHOP.emote=EMOTE_LIST;
 const EMOTE_BY=Object.fromEntries(EMOTE_LIST.map(e=>[e.id,e]));
@@ -4751,6 +4764,21 @@ function drawEmoteArt(g,id,t,c){
     if(!thrown){ eCircle(g,ax+1,ay-6,5.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
     else if(k<1){ const bx=34+k*40, by=-10-Math.sin(k*Math.PI)*26; eCircle(g,bx,by,5-k*1.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
     else { g.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<6;i++){ const a=i*1.05; eCircle(g,44+Math.cos(a)*6,-8+Math.sin(a)*6,1.6); g.fill() } }
+    break; }
+  case 'countdown': {
+    // a sign counts 3 – 2 – 1, then fireworks go off and Gravi cheers
+    const p=t%3.2, n=p<1.8?3-Math.floor(p/.6):0, k=n?0:(p-1.8)/1.4;
+    if(!n){ const cols=['#ffd34f','#ff4f8b','#2ee6ff','#3dffa8'];
+      for(let j=0;j<3;j++){ const cx=-30+j*30, cy=-36+(j%2)*10, kk=Math.min(1,k*1.6+j*.08);
+        for(let i=0;i<10;i++){ const a=i/10*6.283+j; g.globalAlpha=Math.max(0,1-k*1.1); g.fillStyle=cols[(i+j)%4]; eCircle(g,cx+Math.cos(a)*kk*20,cy+Math.sin(a)*kk*20+kk*kk*6,1.8); g.fill() } }
+      g.globalAlpha=1 }
+    eBody(g,c); eBlush(g,n?.3:.8);
+    eEyes(g,n?'open':'happy',{lx:.4,ly:-.6}); eMouth(g,n?'smirk':'grin',{w:n?6:8,d:10});
+    if(n){ const by=-30+Math.sin(p*10)*1.5;
+      eArm(g,c,-20,14,-12,by+12); eArm(g,c,20,14,12,by+12);
+      g.fillStyle='#f3eeff'; g.strokeStyle=DARK; g.lineWidth=1.6; g.beginPath(); g.roundRect?g.roundRect(-16,by-14,32,26,5):g.rect(-16,by-14,32,26); g.fill(); g.stroke();
+      g.fillStyle='#ff4f6b'; g.font='700 22px "Chakra Petch", ui-monospace, monospace'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(String(n),0,by) }
+    else { eArm(g,c,-20,14,-34,-14); eArm(g,c,20,14,34,-14) }
     break; }
   default:
     eBody(g,c); eEyes(g,'open'); eMouth(g,'smile');
