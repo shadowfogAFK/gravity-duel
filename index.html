@@ -27,7 +27,7 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%;margin:0;background:var(--space);color:var(--ink);font-family:var(--body);overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none}
-#wrap{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:calc(100vh * .62);max-width:calc(100dvh * .62);overflow:hidden}
+#wrap{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:min(430px,calc(100vh * .62));max-width:min(430px,calc(100dvh * .62));overflow:hidden}
 @media (min-aspect-ratio:62/100){#wrap{border-left:1px solid var(--line);border-right:1px solid var(--line);box-shadow:0 0 60px rgba(120,60,220,.25)}}
 canvas{display:block}
 #game{width:100%;height:100%;touch-action:none}
@@ -292,6 +292,7 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .dangerbtn{background:linear-gradient(90deg,#ff3b5c,#c4163a);color:#fff}.dangerbtn[disabled]{opacity:.45}
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.trio button{padding-inline:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dailybtn{position:relative;color:var(--gold);border-color:rgba(255,211,79,.5)}.dailybtn .medot{position:absolute;top:-4px;right:-4px}
 .dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 .dres{text-align:center;font-family:var(--display);color:var(--gold);margin:4px 0 10px}
@@ -308,7 +309,7 @@ button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .lcal div.done{opacity:.55}.lcal div.done b::after{content:' ✓';color:#3dffa8}
 .lcal div.today{border-color:var(--gold);background:rgba(255,211,79,.1);box-shadow:0 0 14px rgba(255,211,79,.25)}
 .lcal div.big{grid-column:span 2;border-color:rgba(196,107,255,.6)}
-.evcard{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,rgba(196,107,255,.16),rgba(46,230,255,.08));border:1px solid rgba(196,107,255,.45);margin:6px 0}
+.evcard{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,rgba(196,107,255,.16),rgba(46,230,255,.08));border:1px solid rgba(196,107,255,.45);margin-block:6px}
 .evcard .evic{font-size:1.5rem}.evcard>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.evcard b{font-family:var(--display);font-size:.88rem}
 .evcard span{font-size:.72rem;color:var(--muted)}.evcard .bar{height:5px;margin-top:3px}.evcard button{flex:none}
 .linkbtn{display:block;margin:6px 0 0 auto;padding:4px 2px;background:none;border:0;box-shadow:none;color:var(--p2);font-size:.78rem;text-decoration:underline;text-underline-offset:3px}
@@ -349,8 +350,8 @@ button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .invempty2{grid-column:1/-1;text-align:center;font-size:.8rem;color:var(--muted);padding:6px 0}
 .herobtn{display:block;width:100%;padding:0;text-align:left;background:none;color:inherit;font:inherit;cursor:pointer;box-shadow:0 10px 40px rgba(0,0,0,.35)}
 .herobtn:active{transform:scale(.99)}
-#page-ranked .herobtn{flex:1 1 auto;min-height:190px}
-#page-ranked .herobtn canvas{width:100%;height:100%;aspect-ratio:auto;display:block}
+#page-ranked .herobtn{flex:none}
+#page-ranked .herobtn canvas{width:100%;height:auto;aspect-ratio:4/3.1;display:block}
 .heromore{position:absolute;top:10px;right:10px;font-family:var(--display);font-size:.72rem;padding:5px 10px;border-radius:99px;background:rgba(13,6,38,.7);border:1px solid var(--line);color:var(--ink)}
 .road2{display:flex;flex-direction:column-reverse;gap:6px;margin:10px 0}
 .ar{position:relative;display:grid;grid-template-columns:38px 1fr auto;gap:2px 10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);overflow:hidden}
@@ -411,7 +412,7 @@ button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .netstate .dot{width:8px;height:8px;border-radius:50%;background:#5cff9d;box-shadow:0 0 8px #5cff9d}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border-radius:12px;background:rgba(22,10,52,.72);border:1px solid var(--line)}
 .seg button{font-size:.85rem;padding:9px 6px;background:transparent;color:var(--muted);box-shadow:none}
-.diffseg{grid-template-columns:repeat(3,1fr);margin:10px 0 2px}.diffseg button{font-size:.78rem;padding:7px 4px;line-height:1.15}.diffseg button small{display:block;font-size:.62rem;opacity:.75;font-family:var(--body)}
+.diffseg{grid-template-columns:repeat(3,1fr);margin-block:10px 2px}.diffseg button{font-size:.78rem;padding:7px 4px;line-height:1.15}.diffseg button small{display:block;font-size:.62rem;opacity:.75;font-family:var(--body)}
 .diffseg button[data-d="2"][aria-checked="true"]{background:rgba(255,211,79,.14);box-shadow:inset 0 0 0 1px rgba(255,211,79,.6)}
 .diffseg button[data-d="3"][aria-checked="true"]{background:rgba(255,59,59,.16);box-shadow:inset 0 0 0 1px rgba(255,59,59,.65)}
 .gal .grw{display:block;font-size:.7rem;margin-top:3px;color:var(--muted)}.gal .grw b{font-weight:600}
@@ -731,7 +732,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
-        <div class="duo"><button class="ghost" id="toBoard" disabled>Bestenliste</button><button class="ghost" id="toReplays">▶ Replays</button></div>
+        <div class="trio"><button class="ghost" id="toBoard" disabled>Bestenliste</button><button class="ghost" id="toCrewR">Crew</button><button class="ghost" id="toReplays">Replays</button></div>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
         <div class="hero"><canvas id="duelCanvas" width="440" height="341" aria-hidden="true"></canvas>
@@ -9429,11 +9430,6 @@ async function tnClaim(){
 /* hooks into the existing game: refresh with the weekly event, crew tag next to the name */
 { const le=loadEvent; loadEvent=async function(){ const r=await le.apply(this,arguments); gdxLoad(); return r } }
 { const rm=renderMe; renderMe=function(){ rm.apply(this,arguments); const c=GDX.crew, b=$('me')&&$('me').querySelector('.who b'); if(c&&b&&!b.querySelector('.crewtag')) b.insertAdjacentHTML('afterbegin',crewTagHtml(c)) } }
-{ // Wettkampf page: "Bestenliste" and "Crew" side by side
-  const tb=$('toBoard'), duo=document.createElement('div'), cb=document.createElement('button');
-  duo.className='duo'; cb.className='ghost'; cb.id='toCrewR'; cb.textContent='Crew';
-  tb.replaceWith(duo); duo.append(tb,cb);
-}
 tap('toCrewR',()=>openCrew('ranked'));
 tap('toCrewF',()=>openCrew('friends'));
 tap('crewBack',crewBack);
