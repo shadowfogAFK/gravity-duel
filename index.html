@@ -796,6 +796,12 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .iossteps li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.22);font-size:.9rem}
 .iossteps li::before{counter-increment:st;content:counter(st);flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--p2);color:#03201c;font-family:var(--display);font-weight:700}
 .iossteps svg{flex:none;width:26px;height:26px;stroke:var(--p2);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.codebox .cbtns{display:flex;gap:6px}
+.crewcode b{grid-column:1/-1}.crewcode .cbtns{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}
+.cinv{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;margin:10px 0 16px}
+.cinv canvas{width:110px;height:110px}
+.cinv b{font-family:var(--display);font-size:1.35rem}.cinv .ctag{font-family:var(--display);font-size:.8rem;color:var(--gold)}
+.cinv .fine{margin:0}
 </style>
 </head>
 <body>
@@ -980,6 +986,15 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
         <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg><span>Tippe oben rechts auf <b>Hinzufügen</b> und starte das Spiel ab jetzt über das Symbol</span></li>
       </ol>
       <button class="ghost" id="iosInstallBack">Verstanden</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="crewInvite" hidden>
+    <div class="card">
+      <span class="label">Einladung</span><h2>Crew beitreten?</h2>
+      <div class="cinv"><canvas id="ciEmblem" width="220" height="220" aria-hidden="true"></canvas><span class="ctag" id="ciTag"></span><b id="ciName"></b><p class="fine" id="ciInfo"></p><p class="fine" id="ciMotto"></p></div>
+      <p class="fine chint" id="ciHint" aria-live="polite"></p>
+      <div class="btns"><button id="ciJoin">Beitreten</button><button class="ghost" id="ciBack">Nein danke</button></div>
     </div>
   </div>
 
@@ -1302,7 +1317,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
             <p class="fine chint" id="cfHint" aria-live="polite"></p>
           </div>
           <div class="cbox"><h3>Mitglieder <small id="crewCount"></small></h3><div class="friendlist" id="crewMembers"></div></div>
-          <div class="codebox"><span class="label">Crew-Code zum Einladen</span><b id="crewCode">CR-000000</b><button class="ghost" id="crewCopy">Kopieren</button></div>
+          <div class="codebox crewcode"><span class="label">Crew-Code zum Einladen</span><b id="crewCode">CR-000000</b><div class="cbtns"><button class="ghost" id="crewCopy">Kopieren</button><button id="crewShare">Link teilen</button></div></div>
           <form class="cbox" id="crewEdit" hidden>
             <h3>Crew bearbeiten</h3>
             <input id="crewMottoIn" class="text" maxlength="60" placeholder="Motto (max. 60 Zeichen)" autocomplete="off" aria-label="Motto" style="font-family:var(--body);font-size:.95rem">
@@ -6974,6 +6989,7 @@ async function afterReady(){
   else if(RESET_RETURN){ cleanUrl(); if(isAccount()){ await switchedAccount('Angemeldet über den Link aus der E-Mail.'); return openAccount('reset') } }
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
+  { const cl=load(CREW_LINK_KEY,null); if(cl){ cleanUrl(); return openCrewLink(cl) } }
   if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home') }
   if(LINK_CODE){
     cleanUrl();
@@ -7577,7 +7593,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -9781,6 +9797,31 @@ async function tnClaim(){
 tap('toCrewR',()=>openCrew('ranked'));
 tap('toCrewF',()=>openCrew('friends'));
 tap('crewBack',crewBack);
+/* ---------- crew invites by link: ?crew=CR-XXXXXX ---------- */
+const CREW_LINK_KEY='gravityDuel.crewLink.v1';
+const crewLinkOf=c=>`${WEB_URL}?crew=${encodeURIComponent(c)}`;
+(()=>{ try{ const c=new URLSearchParams(location.search).get('crew'); if(c&&/^CR-?[A-Z0-9]{6}$/i.test(c)) save(CREW_LINK_KEY,c.toUpperCase()) }catch(e){} })();
+let ciCode=null;
+async function openCrewLink(code){
+  ciCode=code; save(CREW_LINK_KEY,null);
+  let pv=null; try{ pv=await rpc('gd_crew_preview',{p_code:code}) }catch(e){ return toast('Einladung konnte nicht geladen werden') }
+  if(!pv) return toast('Diese Crew gibt es nicht mehr');
+  if(pv.mine){ toast(`Du bist schon in der Crew ${pv.name}`); return openCrew('home') }
+  drawCrewEmblem($('ciEmblem'),pv.color,pv.emblem);
+  $('ciTag').textContent='['+pv.tag+']'; $('ciName').textContent=pv.name;
+  $('ciInfo').textContent=`${pv.members}/20 Mitglieder · ${pv.total} ${CURRENCY}${pv.trophies?` · 🏆 ${pv.trophies}`:''}`;
+  $('ciMotto').textContent=pv.motto?`„${pv.motto}“`:''; $('ciMotto').hidden=!pv.motto;
+  $('ciHint').textContent=pv.inCrew?'Du bist schon in einer Crew. Verlasse sie zuerst, dann kannst du hier beitreten.':pv.members>=20?'Die Crew ist leider voll.':'';
+  $('ciJoin').disabled=pv.inCrew||pv.members>=20;
+  show('crewInvite');
+}
+tap('ciJoin',async()=>{ const b=$('ciJoin'); b.disabled=true; $('ciHint').textContent='';
+  try{ const r=await rpc('gd_crew_join',{p_ref:ciCode}); GDX.crew=r.crew; Sfx.buy(); toast(`Willkommen in der Crew ${r.crew.name}!`); openCrew('home') }
+  catch(e){ $('ciHint').textContent=crewErr(e); b.disabled=false } });
+tap('ciBack',()=>goHome());
+tap('crewShare',async()=>{ const c=GDX.crew; if(!c) return; const url=crewLinkOf(c.code);
+  if(navigator.share){ try{ await navigator.share({title:'Gravity Duel',text:`Komm in meine Crew „${c.name}“ [${c.tag}] bei Gravity Duel!`,url}); return }catch(e){ if(e&&e.name==='AbortError') return } }
+  try{ await navigator.clipboard.writeText(url); toast('Einladungslink kopiert') }catch(e){ prompt('Link zum Teilen:',url) } });
 tap('crewCopy',()=>{ const c=GDX.crew&&GDX.crew.code; if(!c) return; try{ navigator.clipboard.writeText(c).then(()=>toast('Crew-Code kopiert'),()=>toast(c)) }catch(e){ toast(c) } });
 tap('crewCreateOpen',openCrewNew);
 tap('cnBack',()=>openCrew());
