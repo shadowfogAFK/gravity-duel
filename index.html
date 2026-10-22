@@ -972,6 +972,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       <div class="setting vol"><div><b>Musik</b><span>Eigene Musik für jede Galaxie</span></div><output id="musicVolTxt" for="musicVol">80 %</output><button class="switch" id="setMusic" role="switch" aria-checked="true" aria-label="Musik"><i></i></button><input type="range" id="musicVol" min="0" max="100" step="5" value="80" aria-label="Lautstärke Musik"></div>
       <div class="setting vol"><div><b>Soundeffekte</b><span>Schüsse, Treffer, Flugsummen</span></div><output id="sfxVolTxt" for="sfxVol">100 %</output><button class="switch" id="setSound" role="switch" aria-checked="true" aria-label="Soundeffekte"><i></i></button><input type="range" id="sfxVol" min="0" max="100" step="5" value="100" aria-label="Lautstärke Soundeffekte"></div>
       <div class="setting"><div><b>Spielername</b><span id="setNameNow">Pilot</span></div><button class="ghost" id="setName">Ändern</button></div>
+      <div class="setting" id="installRow" hidden><div><b>Als App installieren</b><span id="installText">Startet schneller und geht auch offline</span></div><button class="ghost" id="installBtn">Installieren</button></div>
       <div class="setting" id="acctRow" hidden><div><b>Konto</b><span id="acctNow">Nur auf diesem Gerät</span></div><button class="ghost" id="acctBtn">Anmelden</button></div>
       <div class="setting" id="delRow" hidden><div><b>Konto löschen</b><span>Spielstand, Items und Daten endgültig entfernen</span></div><button class="ghost danger" id="delOpen">Löschen</button></div>
       <p class="legal"><a href="impressum.html" target="_blank" rel="noopener">Impressum</a> · <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutz</a></p>
@@ -4463,6 +4464,7 @@ function coverFor(o){
 }
 function coverReady(){ show(null); startTurn() }
 function startLevel(i){
+  if(SERVER_ECON&&!econReady()&&campDiff>1&&!dailyMode&&!ugPlay&&!window.__GD_TEST__){ toast(`${DIFFS[campDiff].name} braucht eine Verbindung. Offline geht der Rang Kadett.`); return }
   mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
   levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
   const L=curLevel();
@@ -6532,11 +6534,18 @@ async function netInit(){
     if(current==='setup') goHome();
     try{ await econRefresh(true) }catch(e){ console.warn('econ',e) }
     await netSyncProfile();
-    Net.state='ready'; schedulePing(1500); econPump(); refreshDailyDot(); loadEvent(); loadAlbum(); setTimeout(checkLogin,1200);
+    Net.state='ready'; if(isAccount()) save('gravityDuel.hadAccount.v1',true); schedulePing(1500); econPump(); refreshDailyDot(); loadEvent(); loadAlbum(); setTimeout(checkLogin,1200);
     afterReady();
-  }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e); if(NEED_ACCOUNT&&current==='setup') openSetup('wait',`Keine Verbindung: ${Net.err}`) }
+  }catch(e){ Net.state='error'; Net.err=niceErr(e); console.warn('online',e);
+    if(offlineOk()){ Net.state='offline'; if(current==='setup') goHome(); if(!offlineToast){ offlineToast=true; toast('Offline: Kampagne und lokales Duell gehen. Dein Fortschritt wird gespeichert, sobald du wieder online bist.') } }
+    else if(NEED_ACCOUNT&&current==='setup') openSetup('wait',`Keine Verbindung: ${Net.err}`) }
   renderOnline();
 }
+/* offline: allowed for players who already have an account on this device */
+let offlineToast=false;
+const offlineOk=()=>!navigator.onLine||load('gravityDuel.hadAccount.v1',false)&&/Verbindung|geladen|fetch|network|offline|timeout/i.test(String(Net.err||''));
+window.addEventListener('online',()=>{ if(Net.state==='offline'||Net.state==='error'){ offlineToast=false; netInit() } });
+window.addEventListener('offline',()=>{ if(Net.state==='ready'&&!online){ Net.state='offline'; renderOnline() } });
 async function netSyncProfile(){
   const me=await rpc('gd_me',{p_name:playerName(),p_title:titleName(profile.equip.title),p_skin:{...profile.equip}});
   Net.me=me; profile.trophies=me.gravitons|0; if(me.friend_code) profile.code=me.friend_code; saveProfile();
@@ -6580,6 +6589,7 @@ function renderOnline(){
   btn.disabled=Net.state!=='ready'; $('toBoard').disabled=Net.state!=='ready';
   if(Net.state==='nocfg') st.innerHTML=`Online-Duelle laufen in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`;
   else if(Net.state==='connecting') st.textContent='Verbinde mit dem Server …';
+  else if(Net.state==='offline') st.textContent='Offline: Kampagne und lokales Duell gehen, dein Fortschritt wird gespeichert, sobald du wieder online bist.';
   else if(Net.state==='error'){ st.innerHTML=`Keine Verbindung: ${esc(Net.err)} <button class="mini" id="netRetry">Erneut versuchen</button>`; $('netRetry').onclick=()=>netInit() }
   else st.innerHTML='';
   st.hidden=Net.state==='ready';
@@ -8626,6 +8636,22 @@ tap('rulesBack',()=>goHome(2));
   sel.innerHTML='<option value="-1">Keiner · normale Regeln</option>'+MODS.map((m,i)=>`<option value="${i}">${m.icon} ${m.name}</option>`).join('');
   sel.value=String(duelModPick); sel.title=duelModPick>=0&&MODS[duelModPick]?MODS[duelModPick].desc:'';
   sel.addEventListener('change',()=>{ duelModPick=+sel.value; save('gravityDuel.duelMod.v1',duelModPick); sel.title=duelModPick>=0?MODS[duelModPick].desc:''; if(duelModPick>=0) toast(`${MODS[duelModPick].icon} ${MODS[duelModPick].desc}`) }) })();
+/* ---------- app: offline cache and "install" ---------- */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!window.__GD_TEST__) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
+let installEvt=null;
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEvt=e; renderInstall() });
+window.addEventListener('appinstalled',()=>{ installEvt=null; renderInstall(); toast('Gravity Duel ist jetzt als App installiert') });
+function renderInstall(){
+  const row=$('installRow'); if(!row) return;
+  const ios=isIOS()&&!isStandalone();
+  row.hidden=isStandalone()||!(installEvt||ios);
+  $('installText').textContent=ios?'Tippe auf „Teilen“ und dann „Zum Home-Bildschirm“':'Startet schneller und geht auch offline';
+  $('installBtn').hidden=!installEvt;
+}
+tap('installBtn',async()=>{ if(!installEvt) return; installEvt.prompt(); try{ await installEvt.userChoice }catch(e){} installEvt=null; renderInstall() });
+renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
@@ -9484,7 +9510,7 @@ function loop(now){
   step(dt); draw(t); bgTick(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
-resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT) openSetup('wait'); requestAnimationFrame(loop); netInit();
+resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT&&!(!navigator.onLine&&load('gravityDuel.hadAccount.v1',false))) openSetup('wait'); requestAnimationFrame(loop); netInit();
 /* test hook: only present when a test harness asks for it before the page loads */
 if(window.__GD_TEST__) window.__gd={
   state:()=>({phase,turn,round,roundShot,tiebreak,lives:players.map(p=>p.lives),wins:[...wins],duelMode,current,marks:tbMarks.length,online:online?{host:online.host,k:online.k,over:online.over,q:online.queue.length,out:online.out.length}:null,net:Net.state,H,flightN,matchLeft,timeUp}),
