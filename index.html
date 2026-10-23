@@ -7635,7 +7635,7 @@ function renderMe(){
   const tt=titleName(profile.equip.title);
   el.setAttribute('aria-label',`${playerName()}${tt?', '+tt:''}, Level ${li.level}, ${li.into} von ${li.need} XP, ${profile.dust} Sternenstaub. Namen ändern`);
   el.innerHTML=`<span class="lvlbadge" aria-hidden="true">${li.level}</span>
-    <span class="who"><b>${esc(playerName())}${badgeHtml(profile.badge)}</b>${tt?'<canvas class="metitle" aria-hidden="true"></canvas>':''}</span>${achClaimable()?'<i class="medot" aria-hidden="true"></i>':''}
+    <span class="who"><b>${esc(playerName())}</b>${tt?'<canvas class="metitle" aria-hidden="true"></canvas>':''}</span>${achClaimable()?'<i class="medot" aria-hidden="true"></i>':''}
     <span class="dust">✦ ${profile.dust}</span>
     <span class="xpline" aria-hidden="true"><i style="width:${Math.round(100*li.into/li.need)}%"></i></span>`;
   meTitleCv=el.querySelector('canvas.metitle');
