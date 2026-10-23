@@ -238,6 +238,8 @@ button.me{font:inherit;color:var(--ink);text-align:left;box-shadow:none;cursor:p
 .who{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}
 .who b{font-family:var(--display);font-size:.95rem;line-height:1.2;overflow-wrap:anywhere}
 .who i{font-style:normal;font-size:.68rem;line-height:1.35;color:var(--gold);border:1px solid rgba(255,211,79,.45);border-radius:99px;padding:0 7px;overflow-wrap:anywhere}
+.who canvas.metitle{display:block;max-width:100%}
+.who b .bdg{margin-right:0;margin-left:5px}
 .me .dust{font-size:.9rem}
 .xpline{position:absolute;left:44px;right:12px;bottom:4px;height:3px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
 .xpline i{display:block;height:100%;background:linear-gradient(90deg,var(--p1),var(--gold))}
@@ -7633,9 +7635,21 @@ function renderMe(){
   const tt=titleName(profile.equip.title);
   el.setAttribute('aria-label',`${playerName()}${tt?', '+tt:''}, Level ${li.level}, ${li.into} von ${li.need} XP, ${profile.dust} Sternenstaub. Namen ändern`);
   el.innerHTML=`<span class="lvlbadge" aria-hidden="true">${li.level}</span>
-    <span class="who"><b>${badgeHtml(profile.badge)}${esc(playerName())}</b>${tt?`<i>${esc(tt)}</i>`:''}</span>${achClaimable()?'<i class="medot" aria-hidden="true"></i>':''}
+    <span class="who"><b>${esc(playerName())}${badgeHtml(profile.badge)}</b>${tt?'<canvas class="metitle" aria-hidden="true"></canvas>':''}</span>${achClaimable()?'<i class="medot" aria-hidden="true"></i>':''}
     <span class="dust">✦ ${profile.dust}</span>
     <span class="xpline" aria-hidden="true"><i style="width:${Math.round(100*li.into/li.need)}%"></i></span>`;
+  meTitleCv=el.querySelector('canvas.metitle');
+  if(meTitleCv){ const it=shopItem('title',profile.equip.title), ph=22, fs=ph*.42, m=document.createElement('canvas').getContext('2d');
+    m.font=`700 ${fs}px "Chakra Petch", ui-monospace, monospace`; const w=Math.ceil(m.measureText(it.name).width+ph*1.1+6);
+    meTitleCv._it=it; meTitleCv._w=w; meTitleCv._h=ph+2; meTitleCv.style.width=w+'px'; meTitleCv.style.height=(ph+2)+'px'; drawMeTitle(performance.now()/1000) }
+}
+/* the equipped title in the header: the same name plate as in the shop and inventory (animated for rare ones) */
+var meTitleCv=null;
+function drawMeTitle(t){
+  const cv=meTitleCv; if(!cv||!cv.isConnected||!cv._it) return;
+  const d=Math.min(2,window.devicePixelRatio||1), w=cv._w, h=cv._h;
+  if(cv.width!==Math.round(w*d)){ cv.width=Math.round(w*d); cv.height=Math.round(h*d) }
+  const g=cv.getContext('2d'); g.setTransform(d,0,0,d,0,0); g.clearRect(0,0,w,h); g.save(); g.translate(w/2,h/2); drawNamePlate(g,cv._it,t,w-2,h-2); g.restore();
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function renderHome(){ refreshAlbumDot();
@@ -7710,6 +7724,7 @@ function showcaseBody(g,type,x,y,t){
 }
 function homeTick(t){
   if(current!=='home') return;
+  drawMeTitle(t);
   const gi=activeGalaxy(), gal=GALAXIES[gi], fresh=THEMES[gal.id].fresh||'n', skin=mySkin();
   paintHero($('campCanvas'),gal.id,t,(g,w,h)=>{
     showcaseBody(g,fresh,w*.62,h*.36,t);
@@ -7908,7 +7923,7 @@ let shopTab='color', shopPreviews=[], shopFrom='home';
 function renderShop(){
   $('shopDust').textContent=`✦ ${profile.dust}`;
   for(const [t] of SHOP_TABS) $('tab-'+t).setAttribute('aria-selected',String(t===shopTab));
-  const lvl=levelInfo(profile.xp).level, box=$('items'); box.innerHTML=''; shopPreviews=[]; crateCards=[];
+  const lvl=levelInfo(profile.xp).level, box=$('items'); box.innerHTML=''; shopPreviews=[]; crateCards=[]; if(previewIO) previewIO.disconnect();
   if(shopTab==='crate') return renderCrates(box);
   for(const it of SHOP[shopTab]){
     const key=shopTab+':'+it.id, owned=!!profile.owned[key], on=shopTab==='emote'?myEmotes().includes(it.id):profile.equip[shopTab]===it.id, locked=it.minLevel&&lvl<it.minLevel;
@@ -7928,7 +7943,7 @@ function renderShop(){
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
       b.onclick=()=>{ if(profile.dust<it.price) return; if(SERVER_ECON) return econBuy(shopTab,it.id,b); profile.dust-=it.price; profile.owned[key]=1; equipLocal(shopTab,it.id); saveProfile(); Sfx.buy(); emoteBoughtHint(shopTab,it.id); renderShop() } }
     el.appendChild(b); box.appendChild(el);
-    shopPreviews.push({cv:el.querySelector('canvas'),skin,cat:shopTab,item:it,parts:[],fx:[],next:0});
+    shopPreviews.push({cv:watchPreview(el.querySelector('canvas')),skin,cat:shopTab,item:it,parts:[],fx:[],next:0});
   }
 }
 function equipLocal(cat,id){ if(cat!=='emote'){ profile.equip[cat]=id; return true } const l=myEmotes(); if(l.includes(id)) return true; if(l.length>=6) return false; profile.equip.emotes=[...l,id]; return true }
@@ -7945,7 +7960,7 @@ function renderInv(){
     b.onclick=()=>{ invTab=t; Sfx.select(); renderInv() }; tabs.appendChild(b) }
   const all=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].length,0), have=COSMETIC_CATS.reduce((a,c)=>a+SHOP[c].filter(it=>profile.owned[c+':'+it.id]).length,0);
   $('invCount').textContent=`${have} von ${all} gesammelt`;
-  const box=$('invItems'); box.innerHTML=''; invPreviews=[]; box.classList.toggle('wide',invTab==='title');
+  const box=$('invItems'); box.innerHTML=''; invPreviews=[]; if(previewIO) previewIO.disconnect(); box.classList.toggle('wide',invTab==='title');
   const emo=invTab==='emote', mine=myEmotes(); $('invNote').hidden=!emo; if(emo) $('invNote').innerHTML=`Für Duelle ausgewählt: <b>${mine.length} / 6</b> · Tippen zum Wechseln`;
   const list=SHOP[invTab].filter(it=>profile.owned[invTab+':'+it.id]);
   for(const it of list){
@@ -7959,7 +7974,7 @@ function renderInv(){
     if(emo){ b.dataset.n=on?mine.indexOf(it.id)+1:''; b.setAttribute('aria-label',`${it.name}, ${rar.name}${on?', ausgewählt':''}`); b.onclick=()=>toggleEmoteSlot(it.id,b) }
     else if(!on) b.onclick=()=>{ if(SERVER_ECON) return econEquip(invTab,it.id,b); profile.equip[invTab]=it.id; saveProfile(); Sfx.select(); renderInv() };
     box.appendChild(b);
-    invPreviews.push({cv:b.querySelector('canvas'),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
+    invPreviews.push({cv:watchPreview(b.querySelector('canvas')),skin,cat:invTab,item:it,parts:[],fx:[],next:0});
   }
   if(list.length<=1){ const e=document.createElement('div'); e.className='invempty2'; e.textContent='Mehr gibt es im Shop, in Kisten und als Belohnung für Aufgaben.'; box.appendChild(e) }
   invHero={cv:$('invHero'),parts:[],fx:[],next:0};
@@ -8012,7 +8027,7 @@ function renderAlbum(){
     const n=SHOP[t].filter(it=>albOwn(t,it)).length, m=SHOP[t].length;
     const b=document.createElement('button'); b.className='tab'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',String(t===albTab));
     b.innerHTML=`${label}<small>${n===m?'✓':n+'/'+m}</small>`; b.onclick=()=>{ albTab=t; Sfx.select(); renderAlbum() }; tabs.appendChild(b) }
-  const box=$('albItems'); box.innerHTML=''; albPreviews=[]; box.classList.toggle('wide',albTab==='title');
+  const box=$('albItems'); box.innerHTML=''; albPreviews=[]; if(previewIO) previewIO.disconnect(); box.classList.toggle('wide',albTab==='title');
   const order=Object.keys(RARITY);
   const list=[...SHOP[albTab]].sort((a,b)=>(!albOwn(albTab,a))-(!albOwn(albTab,b))||order.indexOf(a.rarity)-order.indexOf(b.rarity));
   for(const it of list){
@@ -8022,7 +8037,7 @@ function renderAlbum(){
     d.setAttribute('aria-label',`${it.name}, ${rar.name}, ${own?'gesammelt':'fehlt · '+itemSource(albTab,it)}`);
     d.innerHTML=`<canvas width="${albTab==='title'?240:192}" height="${albTab==='title'?110:192}" aria-hidden="true"></canvas><span class="iname">${esc(it.name)}</span><small>${own?rar.name:esc(itemSource(albTab,it))}</small><i class="rar" style="background:${rar.color}"></i>`;
     box.appendChild(d);
-    albPreviews.push({cv:d.querySelector('canvas'),skin,cat:albTab,item:it,parts:[],fx:[],next:0,still:!own,drawn:false});
+    albPreviews.push({cv:watchPreview(d.querySelector('canvas')),skin,cat:albTab,item:it,parts:[],fx:[],next:0,still:!own,drawn:false});
   }
 }
 async function claimAlbum(i,b){
@@ -8037,11 +8052,11 @@ async function claimAlbum(i,b){
 }
 function albTick(t){
   if(current!=='album') return;
-  for(const p of albPreviews){ if(p.still&&p.drawn) continue; drawItemIcon(p.cv,p.skin,p.still?1.3:t,p); p.drawn=true }
+  const half=previewFrame(); for(const p of albPreviews){ if(p.still&&p.drawn||!p.cv._vis||half&&p.drawn) continue; drawItemIcon(p.cv,p.skin,p.still?1.3:t,p); p.drawn=true }
 }
 function invTick(t){
   if(current!=='inventory') return;
-  for(const p of invPreviews) drawItemIcon(p.cv,p.skin,t,p);
+  const half=previewFrame(); for(const p of invPreviews){ if(!p.cv._vis||half&&p.drawn) continue; drawItemIcon(p.cv,p.skin,t,p); p.drawn=true }
   if(invHero){ const cv=invHero.cv, g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return; g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
     if(invTab==='emote'){ const l=myEmotes(), c=skinColor(mySkin(),t), n=Math.max(3,Math.ceil(l.length/2)), cs=Math.min(w/n,h/2)*.98;
       l.forEach((id,i)=>{ const r=Math.floor(i/n), k=i%n, cnt=Math.min(n,l.length-r*n); g.save(); g.translate(w/2+(k-(cnt-1)/2)*cs,h/2+(r-.5)*cs*(l.length>n?1:0)); g.scale(cs/100,cs/100); drawEmoteArt(g,id,t+i*.37,c); g.restore() }); return }
@@ -8100,7 +8115,14 @@ function drawItemIcon(cv,skin,t,P){
   }
   drawSkinPreview(cv,skin,t,P);
 }
-function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return crateCardsTick(t); for(const p of shopPreviews) drawSkinPreview(p.cv,p.skin,t,p) }
+/* item previews (shop, inventory, album): only the ones on screen are drawn, at half the frame rate,
+   so scrolling through long lists stays smooth */
+var previewIO='IntersectionObserver' in window?new IntersectionObserver(es=>{ for(const e of es) e.target._vis=e.isIntersecting },{rootMargin:'60px'}):null;
+function watchPreview(cv){ if(!cv) return cv; if(previewIO){ cv._vis=false; previewIO.observe(cv) } else cv._vis=true; return cv }
+let previewTick=0;
+const previewFrame=()=>(previewTick++)%2===1;
+function shopTick(t){ if(current!=='shop') return; if(shopTab==='crate') return crateCardsTick(t);
+  const half=previewFrame(); for(const p of shopPreviews){ if(!p.cv._vis||half&&p.drawn) continue; drawSkinPreview(p.cv,p.skin,t,p); p.drawn=true } }
 
 /* ---------- Void: a small game corner in the shop ----------
    Played only with Sternenstaub ✦ (earned by playing, never sold). The server (gd_void_play in void.sql)
@@ -10381,10 +10403,13 @@ function specInfo(){
 }
 tap('specLeave',()=>specExit(true));
 let last=performance.now();
+let loopN=0;
 function loop(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const t=now/1000;
-  step(dt); draw(t); bgTick(t); homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
+  // behind list screens (shop, inventory, album …) the sky only needs half the frame rate
+  const menuBg=current&&current!=='home'&&current!=='intro'&&current!=='clear'&&current!=='over'&&current!=='cover', skip=menuBg&&(loopN++&1);
+  step(dt); if(!skip){ draw(t); bgTick(t) } homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT&&!(!navigator.onLine&&load('gravityDuel.hadAccount.v1',false))) openSetup('wait'); requestAnimationFrame(loop); netInit();
