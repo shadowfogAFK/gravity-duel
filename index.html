@@ -858,6 +858,15 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .refbox ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
 .refbox li{display:flex;justify-content:space-between;gap:8px}.refbox li em{font-style:normal;color:#5cff9d}
 .scope{margin:0 0 2px}
+/* Fernduelle */
+.fernbtn{position:relative;width:100%}
+.fernbtn .badge{position:absolute;top:-6px;right:-6px}
+#fernList .fr,#fernPick .fr{grid-template-columns:34px minmax(0,1fr) auto}
+#fernList .fr .btnrow{display:flex;gap:5px}
+#fernList .fr.turn{border-color:rgba(46,230,255,.7);background:rgba(46,230,255,.07)}
+#fernList .fr .hearts{letter-spacing:.05em}
+.fernhead{font-family:var(--display);font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 -6px}
+.fernpick{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -917,6 +926,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
         </div>
         <button id="findMatch" disabled>Gegner suchen</button>
+        <button class="ghost fernbtn" id="toFern">🪐 Fernduelle · ohne gleichzeitig online zu sein<b class="badge" id="fernBadge" hidden></b></button>
         <div class="trio"><button class="ghost" id="toBoard" disabled>Bestenliste</button><button class="ghost" id="toCrewR">Crew</button><button class="ghost" id="toReplays">Replays</button></div>
       </section>
       <section class="page" id="page-duel" aria-label="Lokales Duell">
@@ -1070,6 +1080,17 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
     </div>
   </div>
 
+  <div class="overlay" id="fern" hidden>
+    <div class="card">
+      <span class="label">Wettkampf</span><h2>Fernduelle</h2>
+      <p class="fine">Klassisches Duell ohne Zeitdruck: Jeder schießt, wann er Zeit hat, und sieht vorher den Schuss des anderen. Du bekommst Bescheid, wenn du dran bist. Für jeden Zug sind 48 Stunden Zeit.</p>
+      <button id="fernNew">Neues Fernduell</button>
+      <div class="fernpick" id="fernPick" hidden><span class="fine" id="fernPickNote">Gegen wen?</span><div class="friendlist" id="fernPickList"></div></div>
+      <div class="friendlist" id="fernList"></div>
+      <button class="ghost" id="fernBack">Zurück</button>
+    </div>
+  </div>
+
   <div class="overlay" id="galaxies" hidden>
     <div class="card">
       <span class="label">Kampagne</span>
@@ -1205,7 +1226,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <div class="setting vol"><div><b>Soundeffekte</b><span>Schüsse, Treffer, Flugsummen</span></div><output id="sfxVolTxt" for="sfxVol">100 %</output><button class="switch" id="setSound" role="switch" aria-checked="true" aria-label="Soundeffekte"><i></i></button><input type="range" id="sfxVol" min="0" max="100" step="5" value="100" aria-label="Lautstärke Soundeffekte"></div>
       <div class="setting"><div><b>Spielername</b><span id="setNameNow">Pilot</span></div><button class="ghost" id="setName">Ändern</button></div>
       <div class="setting" id="pushRow" hidden><div><b>Benachrichtigungen</b><span id="pushText">Tageslevel, Turnier und Crew</span></div><button class="switch" id="pushSwitch" role="switch" aria-checked="false" aria-label="Benachrichtigungen"><i></i></button></div>
-      <div class="pushprefs" id="pushPrefs" hidden><button class="ghost" data-k="daily" aria-pressed="true">☀ Tageslevel</button><button class="ghost" data-k="tourney" aria-pressed="true">🏆 Turnier</button><button class="ghost" data-k="crew" aria-pressed="true">👥 Crew</button></div>
+      <div class="pushprefs" id="pushPrefs" hidden><button class="ghost" data-k="daily" aria-pressed="true">☀ Tageslevel</button><button class="ghost" data-k="tourney" aria-pressed="true">🏆 Turnier</button><button class="ghost" data-k="crew" aria-pressed="true">👥 Crew</button><button class="ghost" data-k="fern" aria-pressed="true">🪐 Fernduell</button><button class="ghost" data-k="friend" aria-pressed="true">👋 Anfragen</button></div>
       <div class="setting" id="installRow" hidden><div><b>Als App installieren</b><span id="installText">Startet schneller und geht auch offline</span></div><button class="ghost" id="installBtn">Installieren</button></div>
       <div class="setting" id="acctRow" hidden><div><b>Konto</b><span id="acctNow">Nur auf diesem Gerät</span></div><button class="ghost" id="acctBtn">Anmelden</button></div>
       <div class="setting" id="delRow" hidden><div><b>Konto löschen</b><span>Spielstand, Items und Daten endgültig entfernen</span></div><button class="ghost danger" id="delOpen">Löschen</button></div>
@@ -4408,7 +4429,7 @@ function resize(){
   document.documentElement.classList.toggle('wide',r.width<window.innerWidth-4);
   dpr=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
-  if(online||replay){ const fh=replay?replay.r.H:ONLINE_H; scale=Math.min(r.width/400,r.height/fh); W=400; H=fh; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
+  if(online||replay||fern&&mode==='duel'){ const fh=replay?replay.r.H:ONLINE_H; scale=Math.min(r.width/400,r.height/fh); W=400; H=fh; offX=(r.width/scale-W)/2; offY=(r.height/scale-H)/2 }
   else if(mode==='edit'){ scale=r.width/400; W=400; H=560; offX=0; offY=Math.max(0,(r.height/scale-H)/2) }
   else { scale=r.width/400; W=400; H=Math.max(560,r.height/scale); offX=0; offY=0 }
   safeTop=probe.getBoundingClientRect().height||0;
@@ -4680,7 +4701,7 @@ function rearrange(why,given){
   layoutWhy=why||'neu'; // no banner: the bodies just fade in at their new places
 }
 function newDuelMap(o){ // o: online match settings {arena,seed,specs,ammo,ev,opp:{name,skin}}
-  curEvent=o&&o.ev!=null?MODS[o.ev|0]||null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:(online&&!online.host)?null:duelModPick>=0?MODS[duelModPick]||null:null;
+  curEvent=o&&o.ev!=null?MODS[o.ev|0]||null:fern?null:(online&&online.ranked)||(ai&&ai.ranked)?WEEK_EVENTS[eventIdx()]:(online&&!online.host)?null:duelModPick>=0?MODS[duelModPick]||null:null;
   DUEL_AMMO=o&&o.ammo?cleanAmmo(o.ammo):curEvent&&curEvent.ammo?{...curEvent.ammo}:pickDuelAmmo();
   duelArena=o?o.arena:duelArenaPick>=0&&duelArenaPick<ARENAS.length?duelArenaPick:Math.floor(Math.random()*ARENAS.length);
   const sd=o?o.seed:Math.floor(Math.random()*1e5); applyMod(sd); scene=makeScene(ARENAS[duelArena].theme,sd); bodies=[];
@@ -4719,7 +4740,7 @@ function launchFrom(vec,o=turn){
 /* ---------- weapon bar ---------- */
 function renderWeapons(){
   const bar=$('weapons'), pl=players[turn];
-  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&(turn!==meIdx()||online.spec))&&!(ai&&turn===1);
+  const showBar=phase==='aim'&&pl&&(mode==='duel'||Object.keys(pl.ammo).length>0)&&!(online&&(turn!==meIdx()||online.spec))&&!(ai&&turn===1)&&!(fern&&turn!==fern.me);
   bar.hidden=!showBar; if(!showBar) return;
   bar.classList.toggle('flip',mode==='duel'&&!online&&turn===1);
   const c=skinColor(pl.skin,performance.now()/1000);
@@ -4747,9 +4768,9 @@ let roundShot=0, round=1, tiebreak=false, tbMarks=[], blitzQueue=[null,null], bl
 const otherOf=o=>1-o;
 /* text for player 2 is turned upside down in the local duel; online everybody sees their own side at the bottom */
 /* the guest of an online match plays from the top planet and sees the field turned around */
-const meIdx=()=>online?(online.spec?online.view:online.host?0:1):0;
-const viewRot=()=>!!(online&&meIdx()===1)||!!(replay&&replay.rot);
-const flipFor=o=>mode==='duel'&&(online?viewRot():!ai&&o===1);
+const meIdx=()=>online?(online.spec?online.view:online.host?0:1):fern?fern.me:0;
+const viewRot=()=>!!(online&&meIdx()===1)||!!(replay&&replay.rot)||!!(fern&&fern.me===1&&mode==='duel');
+const flipFor=o=>mode==='duel'&&(online||fern?viewRot():!ai&&o===1);
 
 const TURN_TIME=10; // seconds per shot in duels, against stalling
 /* ---------- weekly PvP events: a special rule for every Wettkampf match of the week (wins counted by gd_event) ---------- */
@@ -4782,6 +4803,7 @@ function startTurn(){
     else if(online&&online.spec&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Beide zielen gleichzeitig',t:1.8,player:meIdx()};
     else if((online||ai)&&duelMode==='blitz') banner={text:`Blitzrunde ${round}`,sub:'Ihr zielt gleichzeitig · Ziehen und loslassen',t:1.8,player:meIdx()};
     else if((online&&!online.spec||ai)&&turn===meIdx()) banner={text:'Du bist dran',sub:`Runde ${round} · Ziehen und loslassen`,t:1.6,player:turn};
+    else if(fern&&turn===fern.me) banner={text:'Du bist dran',sub:`Fernduell · Runde ${round} · ohne Zeitlimit`,t:1.8,player:turn};
     else if(ai) banner={text:pl.name+' zielt …',sub:`Runde ${round}`,t:1.6,player:0};
     else banner={text:pl.name+' ist dran',sub:`Runde ${round}${online?' · warte auf den Schuss':' · Ziehen und loslassen'}`,t:1.6,player:turn};
   }
@@ -4915,7 +4937,7 @@ const newPer=(power,type)=>({power,type,targets:0,planetHits:new Set(),moon:fals
 function makeShot(o,v){
   const pl=players[o], l=launchFrom(v,o), w=pl.weapon;
   if(w!=='std') pl.ammo[w]--;
-  if(!online||o===meIdx()){ track('shot'); if(w!=='std') track('special') }
+  if(!online&&!fern||o===meIdx()){ track('shot'); if(w!=='std') track('special') }
   return gxMakeShot({s:{o,x:l.x,y:l.y,vx:l.vx,vy:l.vy,t:0,lastPt:0,trail:[[l.x,l.y]],type:w,armed:w==='split'||w==='boost'||w==='boomerang'||w==='gbomb'||w==='tele',drills:w==='drill'?1:0,inMoon:null,primary:true},per:newPer(l.power,w)});
 }
 /* the flight runs in whole physics steps (flightN), so the same shot plays out identically on every device */
@@ -4941,6 +4963,7 @@ function turnTimeout(){
 }
 function fire(v){
   if(mode==='campaign') shotCount++;
+  if(fern&&!fern.replay&&mode==='duel'){ fern.shot={v:v||null,w:players[turn].weapon,trig:null}; fern.before={specs:JSON.parse(JSON.stringify(duelSpecs)),lives:players.map(p=>p.lives),ammo:players.map(p=>({...p.ammo}))} }
   if(online) return online.spec?undefined:onlineFire(v);
   if(mode==='duel'&&(duelMode==='blitz'||tiebreak)){
     blitzQueue[turn]=v||'skip'; phase='wait'; renderWeapons();
@@ -6095,6 +6118,7 @@ function duelVolleyBanner(){
 const distText=dc=>{ const r=27 /* planet radius plus the hit margin */, s=Math.round(dc-r); return dc===Infinity?'kein Treffer':s<=0?`Treffer · ${Math.round(dc)} von der Mitte`:`Abstand ${s}` };
 
 function afterBoom(){
+  if(fern&&mode==='duel') return fernAfterBoom();
   if(mode==='campaign'){
     if(targetsLeft()===0) return levelCleared();
     const lim=shotLimit(curLevel()); if(lim&&shotCount>=lim) return levelFailed();
@@ -6263,13 +6287,13 @@ function step(dt){
   if(appearT>0) appearT=Math.max(0,appearT-dt);
   // the match clock runs while someone aims or a shot is flying, not on the hand-over screen
   if(ai&&mode==='duel'&&phase==='aim'&&turn===1&&ai.at&&performance.now()>=ai.at){ ai.at=0; fire(ai.v) }
-  if(mode==='duel'&&phase==='aim'){
+  if(mode==='duel'&&phase==='aim'&&!fern){
     turnLeft-=dt;
     const sec=Math.ceil(turnLeft);
     if(sec<=3&&sec>0&&sec!==lastTick){ lastTick=sec; Sfx.tick(.2+.2*(3-sec)) }
     if(turnLeft<=0){ if(online&&(turn!==meIdx()||online.spec)) turnLeft=0; else turnTimeout() } // online the shooter's phone keeps its own clock
   }
-  if(mode==='duel'&&!tiebreak&&!timeUp&&(phase==='aim'||phase==='fly'||phase==='boom'||phase==='wait'||phase==='syncRes'||phase==='syncState')){
+  if(mode==='duel'&&!fern&&!tiebreak&&!timeUp&&(phase==='aim'||phase==='fly'||phase==='boom'||phase==='wait'||phase==='syncRes'||phase==='syncState')){
     matchLeft-=dt;
     if(matchLeft<=0){ matchLeft=0; if(!online||online.host){ timeUp=true; Sfx.miss(); toast('Zeit abgelaufen: Nach dieser Runde gewinnt, wer mehr Leben hat'); if(online) onlineSend('tu',{}) } }
   }
@@ -6297,8 +6321,9 @@ cv.addEventListener('pointerdown',e=>{
   Sfx.init();
   if(online&&online.spec) return;
   if(phase==='fly'&&online){ onlineTap(); return }
+  if(phase==='fly'&&fern){ fernTap(); return }
   if(phase==='fly'){ const p=toWorld(e); trigger(ai?0:mode==='duel'&&(duelMode==='blitz'||tiebreak)?(p.y>H/2?0:1):undefined); return }
-  if(phase!=='aim'||(online&&turn!==meIdx())||(ai&&turn===1)) return;
+  if(phase!=='aim'||(online&&turn!==meIdx())||(ai&&turn===1)||(fern&&turn!==fern.me)) return;
   cv.setPointerCapture(e.pointerId);
   const p=toWorld(e); aim={sx:p.x,sy:p.y,x:p.x,y:p.y,id:e.pointerId,step:0};
 });
@@ -6526,7 +6551,7 @@ function draw(t){
   if(tut) tutDraw(t);
   ctx.restore();
   if(mode==='campaign') drawCampaignHud();
-  if(mode==='duel'&&!replay) drawDuelClock(t);
+  if(mode==='duel'&&!replay&&!fern) drawDuelClock(t);
   if(flash>0){ctx.fillStyle=`rgba(255,255,255,${flash*.35})`;ctx.fillRect(0,0,W,H)}
   // edge markers while projectiles are off screen
   for(const s of proj) if(s.x<0||s.x>W||s.y<0||s.y>H){
@@ -7000,6 +7025,7 @@ async function netPing(){
   try{
     const r=await rpc('gd_ping');
     if(typeof r.gravitons==='number'&&r.gravitons!==profile.trophies&&!online){ profile.trophies=r.gravitons; saveProfile(); if(current==='home') renderHome() }
+    if(typeof r.fern==='number'){ if(r.fern>(Net.fernTurn|0)&&Net.fernTurn!=null&&!online&&!fern&&phase==='menu') toast('🪐 Du bist dran in einem Fernduell'); Net.fernTurn=r.fern; renderFernBadge() }
     if(typeof r.freq==='number'&&r.freq!==Net.freq){ Net.freq=r.freq; renderFrBadge(); if(current==='friends') loadRequests() }
     const inv=(r.invites||[]).find(i=>!Net.declined.has(i.id));
     const s=search;
@@ -7227,7 +7253,7 @@ async function afterReady(){
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
   { const cl=load(CREW_LINK_KEY,null); if(cl){ cleanUrl(); return openCrewLink(cl) } }
-  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home') }
+  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home'); if(GO_PARAM==='fern') return openFern(); if(GO_PARAM==='friends') return openFriends(null) }
   const fl=LINK_CODE||load(FRIEND_LINK_KEY,null);
   if(fl){
     cleanUrl(); save(FRIEND_LINK_KEY,null);
@@ -7627,6 +7653,171 @@ function renderArenas(){
   requestAnimationFrame(()=>{ const h=box.querySelector('.here'); if(h) h.scrollIntoView({block:'center'}) });
 }
 
+/* ---------- Fernduelle: classic duels move by move (gd_fern_*) ----------
+   Whoever moves runs the physics and sends the new board: the layout before the shot, the shot (vector, weapon,
+   tap step) and the board after it. The other player first watches that shot played out from the same start
+   (fixed field height like online, deterministic steps), then the saved board takes over and it is their turn.
+   Rules: rounds of two shots; after a hit the bodies are rearranged; when a round ends with a planet at 0 lives the
+   match is over (both at 0: draw). No clocks; the server gives 48 h per move. */
+var fern=null, fernRows=[], fernPicking=false;
+const FERN_HEART=n=>'❤'.repeat(Math.max(0,n|0))+'♡'.repeat(Math.max(0,3-(n|0)));
+const fernErr=e=>{ const m=String(e&&e.message||e);
+  return /too many fern/.test(m)?'Höchstens 12 laufende Fernduelle':/fern exists/.test(m)?'Mit diesem Spieler läuft schon ein Fernduell':/not your turn|fern moved/.test(m)?'Das Fernduell hat sich inzwischen geändert'
+    :/not a friend/.test(m)?'Fernduelle gehen mit Freunden und Crew-Mitgliedern':/not yet/.test(m)?'Noch keine 48 Stunden vergangen':/fern over/.test(m)?'Dieses Fernduell ist schon vorbei':niceErr(e) };
+const fernActive=id=>fernRows.find(r=>r.status==='active'&&r.opp&&r.opp.id===id);
+function renderFernBadge(){ const b=$('fernBadge'); if(!b) return; const n=Net.fernTurn|0; b.hidden=!n; b.textContent=n?String(n):'' }
+async function openFern(){
+  if(fern){ fern=null; phase='menu'; bodies=[]; players=[]; proj=[]; resize() }
+  fernPicking=false; $('fernPick').hidden=true; show('fern'); renderFern(true);
+  if(Net.state!=='ready'){ $('fernList').innerHTML='<div class="fr"><span></span><span class="fn"><b>Fernduelle brauchen eine Verbindung</b></span></div>'; return }
+  try{ fernRows=await rpc('gd_fern_list'); Net.fernTurn=fernRows.filter(r=>r.myTurn).length; renderFernBadge(); if(current==='fern') renderFern() }catch(e){ if(current==='fern') toast(fernErr(e)) }
+}
+function fernAgo(ts){ const s=Math.max(0,(Date.now()-Date.parse(ts))/1000); return s<3600?`${Math.max(1,Math.round(s/60))} Min.`:s<86400?`${Math.round(s/3600)} Std.`:`${Math.round(s/86400)} Tagen` }
+function renderFern(loading){
+  const box=$('fernList'); box.innerHTML='';
+  if(loading&&!fernRows.length){ box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Lade …</b></span></div>'; return }
+  if(!fernRows.length){ box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Noch kein Fernduell</b><i>Fordere einen Freund heraus, auch wenn er gerade offline ist.</i></span></div>'; return }
+  const groups=[['Du bist dran',r=>r.myTurn],['Warten auf den Gegner',r=>r.status==='active'&&!r.myTurn],['Beendet',r=>r.status!=='active']];
+  for(const [title,fn] of groups){
+    const list=fernRows.filter(fn); if(!list.length) continue;
+    const h=document.createElement('div'); h.className='fernhead'; h.textContent=title; box.appendChild(h);
+    for(const r of list){
+      const o=r.opp||{}, nm=cleanName(o.name), st=r.state||{}, me=r.me, L=st.lives||[3,3], el=document.createElement('div');
+      el.className='fr'+(r.myTurn?' turn':'');
+      let info;
+      if(r.status!=='active') info=(r.winner===2?'Unentschieden':r.winner===me?'Gewonnen':'Verloren')+(r.how==='resign'?(r.winner===me?' · Gegner hat aufgegeben':' · aufgegeben'):r.how==='timeout'?' · Zeit abgelaufen':'');
+      else info=`Runde ${st.round||1} · <span class="hearts">${FERN_HEART(L[me])} : ${FERN_HEART(L[1-me])}</span>`+(r.myTurn?'':` · seit ${fernAgo(r.turnSince)}`);
+      el.innerHTML=`<span class="av${o.online?' on':''}" style="background:${skinFromEquip(o.skin).color}"></span><span class="fn"><b>${pTagHtml(o)}${esc(nm)}${lvlChip(o.level)}</b><i>${info}</i></span>`;
+      const row=document.createElement('span'); row.className='btnrow';
+      const b=document.createElement('button'); b.className='mini'+(r.myTurn?'':' ghost');
+      const late=r.status==='active'&&!r.myTurn&&Date.now()-Date.parse(r.turnSince)>48*3600e3;
+      b.textContent=r.myTurn?(r.seen<r.k?'Ansehen & schießen':'Schießen'):late?'Sieg holen':r.status==='active'?'Ansehen':(r.seen<r.k?'Ende ansehen':'Ansehen');
+      b.onclick=async()=>{ Sfx.init(); Sfx.select();
+        if(late){ b.disabled=true; try{ const x=await rpc('gd_fern_claim',{p_id:r.id}); toast('Gewonnen: Die 48 Stunden sind abgelaufen'); econRefresh().catch(()=>{}); openFern() }catch(e){ b.disabled=false; toast(fernErr(e)) } return }
+        fernPlay(r) };
+      row.appendChild(b);
+      if(r.status==='active'){ const x=document.createElement('button'); x.className='mini x'; x.textContent='Aufgeben'; x.setAttribute('aria-label',`Fernduell gegen ${nm} aufgeben`);
+        x.onclick=async()=>{ Sfx.init(); if(x.dataset.sure!=='1'){ x.dataset.sure='1'; x.textContent='Sicher?'; return } x.disabled=true;
+          try{ await rpc('gd_fern_resign',{p_id:r.id}); econRefresh().catch(()=>{}); openFern() }catch(e){ x.disabled=false; toast(fernErr(e)) } };
+        row.appendChild(x) }
+      el.appendChild(row); box.appendChild(el);
+    }
+  }
+}
+async function renderFernPick(){
+  const box=$('fernPickList'); box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Lade …</b></span></div>';
+  try{ if(!Net.friends.length) Net.friends=await friendsLive() }catch(e){}
+  const seen=new Set(), list=[];
+  for(const f of Net.friends||[]) if(!seen.has(f.id)){ seen.add(f.id); list.push(f) }
+  if(GDX.crew) for(const m of GDX.crew.members) if(!m.me&&!seen.has(m.id)){ seen.add(m.id); list.push(m) }
+  box.innerHTML='';
+  if(!list.length){ box.innerHTML='<div class="fr"><span></span><span class="fn"><b>Noch keine Freunde</b><i>Füge zuerst Freunde hinzu oder tritt einer Crew bei.</i></span></div>'; return }
+  for(const f of list){
+    const el=document.createElement('div'), act=fernActive(f.id); el.className='fr';
+    el.innerHTML=`<span class="av${f.online?' on':''}" style="background:${skinFromEquip(f.skin).color}"></span><span class="fn"><b>${pTagHtml(f)}${esc(cleanName(f.name))}${lvlChip(f.level)}</b><i>${act?'Fernduell läuft schon':f.online?'Online':'offline'}</i></span>`;
+    const b=document.createElement('button'); b.className='mini'+(act?' ghost':''); b.textContent=act?'Öffnen':'Herausfordern';
+    b.onclick=()=>{ Sfx.init(); Sfx.select(); fernStartWith(f) }; el.appendChild(b); box.appendChild(el);
+  }
+}
+async function fernStartWith(p){
+  if(Net.state!=='ready') return toast('Fernduelle brauchen eine Verbindung');
+  if(!fernRows.length) try{ fernRows=await rpc('gd_fern_list') }catch(e){}
+  const ex=fernActive(p.id); if(ex) return fernPlay(ex);
+  // the board is made on this phone: arena, seed, layout and the special shots of both players
+  const sc0=scene; fern={me:0,setup:true}; ai=null; mode='duel'; duelMode='classic';
+  const arena=Math.floor(Math.random()*ARENAS.length), seed=Math.floor(Math.random()*1e5);
+  resize(); newDuelMap({arena,seed,opp:{name:cleanName(p.name),skin:skinFromEquip(p.skin)}}); rec=null;
+  const starter=Math.random()<.5?0:1;
+  const state={specs:duelSpecs,lives:[3,3],turn:starter,round:1,roundShot:0,starter,ammo:players.map(x=>({...x.ammo})),last:null};
+  fern=null; scene=sc0; bodies=[]; players=[]; phase='menu'; resize();
+  try{ const r=await rpc('gd_fern_new',{p_friend:p.id,p_init:{arena,seed,ev:'',state}});
+    fernRows=[r,...fernRows.filter(x=>x.id!==r.id)];
+    if(starter===0){ toast(`Fernduell gegen ${cleanName(p.name)}: Du beginnst!`); fernPlay(r) }
+    else { toast(`Fernduell gegen ${cleanName(p.name)}: ${cleanName(p.name)} beginnt, du bekommst Bescheid`); openFern() } }
+  catch(e){ toast(fernErr(e)) }
+}
+function fernPlay(r){
+  endAi(); search=null;
+  const st=r.state, L=st.last, me=r.me, watch=!!(L&&L.o!==me&&(r.seen|0)<r.k);
+  fern={id:r.id,me,k:r.k,st,row:r,opp:r.opp,replay:false,over:false,shot:null,before:null};
+  mode='duel'; duelMode='classic'; resize();
+  newDuelMap({arena:r.arena,seed:r.seed,ev:r.ev,specs:watch?L.specs:st.specs,opp:{name:cleanName(r.opp&&r.opp.name),skin:skinFromEquip(r.opp&&r.opp.skin)}}); rec=null;
+  const ammo=watch?L.ammo:st.ammo, lives=watch?L.lives:st.lives;
+  players.forEach((p,i)=>{ p.ammo={...(ammo&&ammo[i]||{})}; p.lives=lives[i]|0 });
+  round=st.round|0||1; roundShot=st.roundShot|0; starter=st.starter|0; tiebreak=false; tbMarks=[]; timeUp=false; missRounds=0; roundHit=false;
+  show(null); $('back').textContent='Menü'; renderWeapons();
+  if(watch){
+    fern.replay=true; phase='wait'; turn=L.o;
+    banner={text:`${players[L.o].name} schießt`,sub:r.status==='active'?'Der letzte Zug deines Gegners':'Der letzte Zug',t:1.6,player:me,small:true};
+    setTimeout(()=>{ if(!fern||!fern.replay) return; const pl=players[L.o]; pl.weapon=L.w&&(L.w==='std'||pl.ammo[L.w]>0)?L.w:'std';
+      launch(L.v?[makeShot(L.o,L.v)]:[]); if(L.trig!=null) trigs.push({n:L.trig|0,o:L.o}); if(!L.v){ phase='boom'; waitT=.4 } },1100);
+    return;
+  }
+  fernNext();
+}
+function fernNext(){
+  const r=fern.row, st=fern.st;
+  if(r.status!=='active') return fernResult();
+  if(st.turn===fern.me){ turn=fern.me; startTurn() }
+  else { phase='wait'; turn=st.turn; banner={text:`${players[st.turn].name} ist dran`,sub:'Du bekommst Bescheid, sobald geschossen wurde',t:2.6,player:fern.me,small:true}; setTimeout(()=>{ if(fern&&!fern.over&&phase==='wait'&&current===null) openFern() },2600) }
+}
+function fernTap(){
+  if(!fern||fern.replay) return;
+  const me=fern.me, s=proj.find(q=>q.armed&&q.o===me&&!q.sched); if(!s) return;
+  s.sched=true; const n=flightN+TRIG_STEPS; trigs.push({n,o:me}); if(fern.shot) fern.shot.trig=n; banner.t=0;
+}
+function fernAfterBoom(){
+  const f=fern;
+  if(f.replay){ // the opponent's shot has been watched: the saved board takes over
+    f.replay=false; rpc('gd_fern_seen',{p_id:f.id,p_k:f.k}).catch(()=>{});
+    const st=f.st, L=st.last||{};
+    { const sim=players.map(p=>p.lives).join(); if(sim!==(st.lives||[]).join()) console.warn('fern desync',sim,st.lives) }
+    if(L.re) rearrange('neu',st.specs); else if(JSON.stringify(duelSpecs)!==JSON.stringify(st.specs)) layoutDuel(st.specs);
+    players.forEach((p,i)=>{ p.lives=st.lives[i]|0; p.ammo={...(st.ammo&&st.ammo[i]||{})} });
+    round=st.round|0||1; roundShot=st.roundShot|0; starter=st.starter|0;
+    return fernNext();
+  }
+  const me=f.me, o=1-me, per=volley.per[me], hit=!!(per&&per.planetHits.size>0), b=f.before||{specs:duelSpecs,lives:players.map(p=>p.lives),ammo:players.map(p=>({...p.ammo}))};
+  if(hit) rearrange();
+  let winner=null, nturn=o, rd=round, rs=roundShot, stt=starter;
+  if(rs===0){ rs=1; if(players[me].lives<=0&&players[o].lives>0) winner=o } // a shot into the own planet's last life ends it at once
+  else {
+    const a=players[0].lives, c=players[1].lives;
+    if(a<=0||c<=0) winner=a<=0&&c<=0?2:a<=0?1:0;
+    else { rd++; rs=0; nturn=stt } // every round opens with the same player, the other one always gets the answer
+  }
+  const state={specs:duelSpecs,lives:players.map(p=>p.lives),turn:winner==null?nturn:me,round:rd,roundShot:rs,starter:stt,ammo:players.map(p=>({...p.ammo})),
+    last:{o:me,v:f.shot&&f.shot.v,w:f.shot&&f.shot.w||'std',trig:f.shot&&f.shot.trig,specs:b.specs,lives:b.lives,ammo:b.ammo,re:hit}};
+  phase='wait'; banner={text:'Zug wird gesendet …',sub:'',t:30,player:me,small:true};
+  const send=()=>rpc('gd_fern_move',{p_id:f.id,p_k:f.k,p_state:state,p_winner:winner}).then(r=>{
+    if(fern!==f) return; f.row=r; f.k=r.k; f.st=r.state; round=rd; roundShot=rs; starter=stt;
+    if(winner!=null){ econRefresh().catch(()=>{}); return fernResult() }
+    banner={text:'Zug gesendet',sub:`${players[o].name} ist dran · du bekommst Bescheid`,t:2.4,player:me,small:true};
+    setTimeout(()=>{ if(fern===f&&current===null) openFern() },2400);
+  }).catch(e=>{ if(fern!==f) return; const m=String(e&&e.message||e);
+    if(/Failed to fetch|network|timeout/i.test(m)){ banner={text:'Keine Verbindung',sub:'Versuche es gleich nochmal …',t:30,player:me,small:true}; setTimeout(()=>{ if(fern===f) send() },4000); return }
+    toast(fernErr(e)); setTimeout(openFern,1200) });
+  setTimeout(send, hit?500:0);
+}
+function fernResult(){
+  const f=fern, r=f.row, me=f.me, w=r.winner, opp=cleanName(r.opp&&r.opp.name);
+  f.over=true; phase='over';
+  $('winner').textContent=(w===2?'Unentschieden':w===me?'Du gewinnst':`${opp} gewinnt`)+(r.how==='resign'?(w===me?` – ${opp} hat aufgegeben`:' – aufgegeben'):r.how==='timeout'?' – Zeit abgelaufen':'');
+  $('winner').style.color=w===2?COL.ink:(players[w]||players[0]).color; $('tally').dataset.title='';
+  $('tally').textContent=`Fernduell · gegen ${opp} · ${(r.state&&r.state.round)||1} ${((r.state&&r.state.round)||1)===1?'Runde':'Runden'}`;
+  $('overReward').textContent=(w===me?'+30 XP · +20 ✦':w===2?'+20 XP · +12 ✦':'+12 XP · +6 ✦')+' (bis zu 10 Fernduelle pro Tag)';
+  $('overLevelUp').hidden=true; $('overGrav').hidden=true;
+  $('again').textContent=`Neues Fernduell gegen ${opp}`; $('overBack').textContent='Zu den Fernduellen';
+  const duo=$('overReplay').parentElement; if(duo) duo.hidden=true;
+  rpc('gd_fern_seen',{p_id:f.id,p_k:r.k}).catch(()=>{});
+  show('over'); if(w===0||w===1) vicStart(w); if(w===me) Sfx.win();
+}
+function fernExit(keep){
+  const duo=$('overReplay').parentElement; if(duo) duo.hidden=false; $('overBack').textContent='Hauptmenü';
+  fern=null; phase='menu'; bodies=[]; players=[]; proj=[]; aim=null; banner.t=0; resize();
+  if(!keep) openFern();
+}
+
 /* ---------- player profiles (gd_player): look, showcase, crew, stats, challenge ---------- */
 var plData=null, plFrom='home', plPick=false, plSkin=null;
 async function openPlayer(id,hint){
@@ -7669,7 +7860,7 @@ function renderPlayer(){
         b.onclick=()=>{ plPick=false; setOnlineMode(md); challengeFriend(p) }; pk.appendChild(b) }
       a.appendChild(pk) }
   }
-  else if(can){ const b=btn('Herausfordern','ghost',()=>toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`)); b.classList.add('off') }
+  if(can) btn(fernActive(p.id)?'Zum Fernduell':'Fernduell starten',p.online?'ghost':'',()=>{ Sfx.select(); fernStartWith(p) });
   else { const n=document.createElement('p'); n.className='fine'; n.style.textAlign='center'; n.textContent='Herausfordern kannst du Freunde und Mitglieder deiner Crew.'; a.appendChild(n) }
 }
 function plTick(t){
@@ -7928,7 +8119,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -8025,7 +8216,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'&&page<2) $('nav-'+(page+1)).click();
   if(e.key==='ArrowLeft'&&page>0) $('nav-'+(page-1)).click();
 });
-function goHome(p){ ugReset(); if(tut){ tut=null; tutShow(null) }
+function goHome(p){ ugReset(); if(fern){ fern=null; resize() } if(tut){ tut=null; tutShow(null) }
   dailyMode=false; if(p===1) setTimeout(loadEvent,300);
   if(online) onlineCleanup();
   endAi();
@@ -9309,7 +9500,7 @@ for(const b of document.querySelectorAll('#pushPrefs button')) b.addEventListene
 tap('dailyRemind',()=>pushEnable());
 renderPush();
 /* links from a notification: ?go=daily | tourney | crew */
-const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew)$/.test(g||'')?g:null }catch(e){ return null } })();
+const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew|fern|friends)$/.test(g||'')?g:null }catch(e){ return null } })();
 /* the banner on the home screen: until installed; "✕" hides it for 14 days */
 const IB_KEY='gravityDuel.installBar.v1';
 function renderInstallBar(){
@@ -9333,6 +9524,9 @@ renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
+tap('toFern',()=>{ Sfx.select(); openFern() });
+tap('fernBack',()=>{ fern=null; goHome(1) });
+tap('fernNew',()=>{ Sfx.select(); fernPicking=!fernPicking; $('fernPick').hidden=!fernPicking; if(fernPicking) renderFernPick() });
 tap('bs-all',()=>{ Sfx.select(); openBoard('all') }); tap('bs-fr',()=>{ Sfx.select(); openBoard('fr') });
 tap('ds-all',()=>{ Sfx.select(); dailyScope='all'; renderDaily() }); tap('ds-fr',()=>{ Sfx.select(); dailyScope='fr'; renderDaily() });
 tap('pPublic',()=>{ Sfx.select(); const id=Net.backend&&Net.backend.uid; if(id) openPlayer(id) });
@@ -9412,8 +9606,8 @@ tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item
 $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.revealed) revealCrate() });
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
-tap('again',()=>{ if(online&&online.spec) return specExit(); if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
-tap('overBack',()=>goHome(ai||online&&!online.fromDuel?1:2));
+tap('again',()=>{ if(fern&&fern.over){ const op=fern.opp; fernExit(true); return fernStartWith(op) } if(online&&online.spec) return specExit(); if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
+tap('overBack',()=>{ if(fern) return fernExit(); goHome(ai||online&&!online.fromDuel?1:2) });
 tap('next',()=>{
   const g=curGalaxy();
   if(levelIdx<g.levels.length-1) startLevel(levelIdx+1);
@@ -9423,7 +9617,7 @@ tap('next',()=>{
 tap('retry',()=>startLevel(levelIdx));
 tap('clearBack',()=>goLevels());
 tap('introOk',nextIntro);
-tap('back',()=>{ if(ugPlay&&!online&&!ai) return ugBack(); if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
+tap('back',()=>{ if(fern&&mode==='duel') return fernExit(); if(ugPlay&&!online&&!ai) return ugBack(); if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
 /* sound settings: the volume sliders, the on/off switches and the in-game chips all show one state (kept in Sfx) */
 function syncAudioUI(){
   const m=Sfx.volume('music'), s=Sfx.volume('sfx');
@@ -10014,7 +10208,8 @@ function renderCrew(){
     if(!m.me){
       const d=document.createElement('button'); d.className='mini'+(m.online?'':' ghost off')+(GDX.dpick===m.id?' open':''); d.textContent='Duell';
       d.setAttribute('aria-label',`${nm} herausfordern`);
-      d.onclick=()=>{ Sfx.init(); if(!m.online) return toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`);
+      if(!m.online){ d.textContent='Fernduell'; d.setAttribute('aria-label',`${nm} ist offline: Fernduell starten`) }
+      d.onclick=()=>{ Sfx.init(); if(!m.online){ Sfx.select(); return fernStartWith(m) }
         Sfx.select(); GDX.dpick=GDX.dpick===m.id?null:m.id; GDX.open=-1; renderCrew() };
       row.appendChild(d);
     }
@@ -10534,7 +10729,7 @@ function renderFriends(){
         if(friendCtx) return challengeFriend(f); // from the local duel: its mode and arena are used
         Sfx.select(); frPick=frPick===f.id?null:f.id; renderFriends() };
     } else { btn=document.createElement('button'); btn.className='mini ghost off'; btn.textContent='Duell';
-      btn.setAttribute('aria-label',`${nm} ist offline`); btn.onclick=()=>{ Sfx.init(); toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`) } }
+      btn.textContent='Fernduell'; btn.className='mini ghost'; btn.setAttribute('aria-label',`${nm} ist offline: Fernduell starten`); btn.onclick=()=>{ Sfx.init(); Sfx.select(); fernStartWith(f) } }
     rowOpensPlayer(el,f);
     const rm=document.createElement('button'); rm.className='mini x'; rm.textContent='×'; rm.setAttribute('aria-label',`${nm} entfernen`);
     rm.onclick=async()=>{ if(rm.dataset.sure!=='1'){ rm.dataset.sure='1'; rm.textContent='Sicher?'; return }
