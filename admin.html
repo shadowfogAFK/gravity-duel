@@ -138,6 +138,7 @@ pre{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem;
     <button class="tab" role="tab" id="t-levels" aria-selected="false">Level</button>
     <button class="tab" role="tab" id="t-errors" aria-selected="false">Fehler</button>
     <button class="tab" role="tab" id="t-players" aria-selected="false">Spieler</button>
+    <button class="tab" role="tab" id="t-insight" aria-selected="false">Auswertung</button>
   </nav>
 </header>
 
@@ -235,6 +236,27 @@ pre{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem;
       <div class="card"><h2>Letzte Admin-Aktionen</h2><div class="tablewrap"><table id="logTable"></table></div></div>
     </div>
   </section>
+
+  <!-- Auswertung -->
+  <section id="p-insight" role="tabpanel" aria-labelledby="t-insight" hidden>
+    <div class="list">
+      <div class="grid2">
+        <div class="card"><h2>Wie weit Spieler kommen</h2><p class="hint">Anteil aller Spieler (auch ohne Konto), die einen Schritt erreicht haben</p><div class="hbars" id="funnel"></div></div>
+        <div class="card"><h2>Galaxien</h2><p class="hint">Begonnen und bis zum Boss geschafft (Rang Kadett)</p><div class="tablewrap"><table id="galTable"></table></div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h2>Hier bleiben Spieler hängen</h2><p class="hint">Level, die viele erreicht, aber noch nicht geschafft haben (Rang Kadett)</p><div class="tablewrap"><table id="stuckTable"></table></div></div>
+        <div class="card"><h2>Schwerste Level</h2><p class="hint">Niedrigste Abschlussquote, ab 3 Spielern; dazu wenige Sterne</p><div class="tablewrap"><table id="hardTable"></table></div></div>
+      </div>
+      <div class="card">
+        <div class="row"><h2>Auffälligkeiten</h2><span class="spacer"></span><label class="hint"><input type="checkbox" id="flAll"> auch erledigte</label></div>
+        <p class="hint">Automatische Hinweise auf mögliches Schummeln. Nichts wird gesperrt: prüfe den Spieler und markiere den Hinweis als erledigt.</p>
+        <div class="list" id="flags"></div>
+        <h3 style="margin:12px 0 4px">Ungewöhnliche Wettkampf-Bilanz</h3>
+        <div class="tablewrap"><table id="recTable"></table></div>
+      </div>
+    </div>
+  </section>
 </main>
 <div class="tip" id="tip" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
@@ -307,12 +329,12 @@ $('retry').addEventListener('click',start);
 $('reload').addEventListener('click',()=>openTab(tab));
 
 /* ---------- tabs ---------- */
-const TABS=['overview','levels','errors','players'];
+const TABS=['overview','levels','errors','players','insight'];
 let tab=(()=>{ try{ const t=localStorage.getItem('gdAdmin.tab'); return TABS.includes(t)?t:'overview' }catch(e){ return 'overview' } })();
 function openTab(t){
   tab=t; try{ localStorage.setItem('gdAdmin.tab',t) }catch(e){}
   for(const x of TABS){ $('t-'+x).setAttribute('aria-selected',String(x===t)); $('p-'+x).hidden=x!==t }
-  ({overview:loadOverview,levels:loadLevels,errors:loadErrors,players:loadPlayersTab})[t]();
+  ({overview:loadOverview,levels:loadLevels,errors:loadErrors,players:loadPlayersTab,insight:loadInsight})[t]();
 }
 for(const x of TABS) $('t-'+x).addEventListener('click',()=>openTab(x));
 
@@ -429,6 +451,40 @@ $('levels').addEventListener('click',async e=>{
     loadLevels();
   }catch(err){ b.disabled=false; toast(errText(err)) }
 });
+
+/* ---------- Auswertung ---------- */
+const GAL_NAME={nova:'Nova-Nebel',ice:'Eisgürtel',glut:'Glutkern',spiral:'Spiralarm',dunkel:'Dunkelwolke',prisma:'Prismenfeld',rand:'Galaktischer Rand',nebel:'Nebelsee',
+  wind:'Sonnensturm',kristall:'Kristallhöhlen',asteroid:'Asteroidengürtel',zwilling:'Zwillingssonnen',magnetar:'Magnetarfeld',linse:'Linsennebel',netz:'Wurmlochnetz',komet:'Kometenbahn'};
+const galN=id=>GAL_NAME[id]||id;
+const FLAG_TXT={daily_shots:d=>`Tageslevel mit ${d.shots} Schüssen (Lösung: ${d.par})`,wboss_shots:d=>`Wochenboss mit ${d.shots} Schüssen besiegt`,level_rate:d=>`Über ${d.perHour} Kampagnen-Level in einer Stunde`};
+async function loadInsight(){
+  $('funnel').innerHTML='<p class="hint">Lade …</p>';
+  let a; try{ a=await rpc('gd_admin_analytics') }catch(e){ $('funnel').innerHTML=`<p class="err">${esc(errText(e))}</p>`; return }
+  const f=a.funnel||[], base=Math.max(1,(f[0]||{}).n|0);
+  $('funnel').innerHTML=f.map(x=>`<div class="hbar"><span>${esc(x.label)}</span><i style="width:${Math.max(1,100*x.n/base)}%"></i><em>${fmt(x.n)}</em></div>`).join('')+
+    `<p class="hint">${f[1]?`${Math.round(100*f[1].n/base)} % schaffen das erste Level.`:''}</p>`;
+  $('galTable').innerHTML='<tr><th>Galaxie</th><th class="n">begonnen</th><th class="n">geschafft</th></tr>'+(a.galaxies||[]).map(g=>`<tr><td>${esc(galN(g.gal))}</td><td class="n">${fmt(g.started|0)}</td><td class="n">${fmt(g.finished|0)}</td></tr>`).join('');
+  const st=a.stuck||[];
+  $('stuckTable').innerHTML=st.length?'<tr><th>Level</th><th class="n">erreicht</th><th class="n">geschafft</th><th class="n">hängen</th></tr>'+st.map(x=>`<tr><td>${esc(galN(x.gal))} ${x.level}</td><td class="n">${fmt(x.reached)}</td><td class="n">${fmt(x.done)}</td><td class="n"><b>${fmt(x.stuck)}</b></td></tr>`).join(''):'<tr><td class="hint">Noch keine Daten</td></tr>';
+  const hd=a.hardest||[], ls=a.lowStars||[];
+  $('hardTable').innerHTML=hd.length?'<tr><th>Level</th><th class="n">Quote</th><th class="n">Ø Sterne</th></tr>'+hd.slice(0,10).map(x=>`<tr><td>${esc(galN(x.gal))} ${x.level}</td><td class="n">${x.rate} %</td><td class="n">${x.stars}</td></tr>`).join('')
+    +(ls.length?`<tr><th colspan="3">Wenig Sterne (geschafft, aber knapp)</th></tr>`+ls.slice(0,5).map(x=>`<tr><td>${esc(galN(x.gal))} ${x.level}</td><td class="n">${fmt(x.done)} Spieler</td><td class="n">${x.stars}</td></tr>`).join(''):''):'<tr><td class="hint">Noch keine Daten</td></tr>';
+  loadFlags();
+}
+async function loadFlags(){
+  const box=$('flags'); box.innerHTML='<p class="hint">Lade …</p>';
+  let r; try{ r=await rpc('gd_admin_flags',{p_all:$('flAll').checked}) }catch(e){ box.innerHTML=`<p class="err">${esc(errText(e))}</p>`; return }
+  const l=r.flags||[];
+  box.innerHTML=l.length?l.map(x=>`<div class="item"><div class="ihead"><b>${esc(x.name||'Pilot')}</b><span class="code">${esc(x.code||'')}</span><span class="spacer"></span><span class="hint">${esc(when(x.at))}</span></div>
+      <div class="meta">${esc((FLAG_TXT[x.kind]||(d=>x.kind))(x.detail||{}))}</div>
+      <div class="row">${x.resolved?'<span class="chip">erledigt</span>':`<button class="mini ghost" data-done="${x.id}">Erledigt</button>`}<button class="mini ghost" data-find="${esc(x.code||x.user)}">Spieler ansehen</button></div></div>`).join('')
+    :'<p class="empty">Keine offenen Hinweise. 👍</p>';
+  box.querySelectorAll('[data-done]').forEach(b=>b.addEventListener('click',async()=>{ b.disabled=true; try{ await rpc('gd_admin_flag_resolve',{p_id:+b.dataset.done}); loadFlags() }catch(e){ b.disabled=false; toast(errText(e)) } }));
+  box.querySelectorAll('[data-find]').forEach(b=>b.addEventListener('click',()=>{ openTab('players'); $('plQ').value=b.dataset.find; $('plSearch').requestSubmit() }));
+  const rc=r.records||[];
+  $('recTable').innerHTML=rc.length?'<tr><th>Spieler</th><th class="n">Siege</th><th class="n">Niederlagen</th><th class="n">Gravitonen</th></tr>'+rc.map(x=>`<tr><td>${esc(x.name)} <span class="hint">${esc(x.code||'')}</span></td><td class="n">${fmt(x.wins)}</td><td class="n">${fmt(x.losses)}</td><td class="n">${fmt(x.gravitons)}</td></tr>`).join(''):'<tr><td class="hint">Niemand mit auffällig vielen Siegen ohne Niederlagen.</td></tr>';
+}
+$('flAll').addEventListener('change',loadFlags);
 
 /* ---------- Fehler ---------- */
 async function loadErrors(){
