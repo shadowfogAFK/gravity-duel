@@ -870,6 +870,20 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .dkind{margin-bottom:2px}
 .ach .at .tt{color:var(--gold)}
 #dailyRemind.kindhide{display:none}
+/* leagues from the top arena on */
+#lgCard{padding:6px 10px;cursor:pointer;background:linear-gradient(90deg,rgba(167,123,255,.16),rgba(46,230,255,.1));border-color:rgba(167,123,255,.55)}
+#lgCard.locked{opacity:.8}
+#lgCard .evic{font-size:1.25rem}#lgCard #lgCardText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgladder{display:flex;flex-direction:column;gap:6px}
+.lgtier{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(167,123,255,.2)}
+.lgtier .ic{font-size:1.3rem;text-align:center}
+.lgtier b{font-family:var(--display);color:var(--c)}.lgtier span{font-size:.72rem;color:var(--muted);display:block}
+.lgtier .rw{font-size:.72rem;color:var(--muted);text-align:right}
+.lgtier.cur{border-color:var(--c);background:rgba(255,255,255,.07);box-shadow:0 0 14px rgba(255,255,255,.06)}
+.lgtier.done{opacity:.55}
+.lgclaim{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px solid var(--gold);background:rgba(255,211,79,.08)}
+.lgclaim b{font-family:var(--display);color:var(--gold)}
+.lgprog{height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.lgprog i{display:block;height:100%;background:linear-gradient(90deg,var(--p2),var(--gold))}
 </style>
 </head>
 <body>
@@ -923,6 +937,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
           <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
         <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
         <div class="evcard" id="evCard" hidden><span class="evic" id="evIcon">🎪</span><div><b id="evName">Wochen-Event</b><span id="evText"></span><div class="bar" aria-hidden="true"><i id="evBar"></i></div></div><button class="mini" id="evClaim" hidden>Abholen</button></div>
+        <div class="evcard" id="lgCard" role="button" tabindex="0" hidden><span class="evic" id="lgCardIc" aria-hidden="true">🏅</span><div><b id="lgCardName">Ligen</b><span id="lgCardText"></span></div><button class="mini" id="lgCardBtn">Ansehen</button></div>
         <div class="evcard" id="tnCard" role="button" tabindex="0" hidden><span class="evic" aria-hidden="true">🏆</span><div><b id="tnCardName">Wochenend-Turnier</b><span id="tnCardText"></span></div><button class="mini" id="tnCardBtn">Ansehen</button></div>
         <p class="netstate" id="netState" hidden>Verbinde …</p>
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
@@ -1091,6 +1106,19 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <div class="fernpick" id="fernPick" hidden><span class="fine" id="fernPickNote">Gegen wen?</span><div class="friendlist" id="fernPickList"></div></div>
       <div class="friendlist" id="fernList"></div>
       <button class="ghost" id="fernBack">Zurück</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="league" hidden>
+    <div class="card">
+      <span class="label" id="lgSeason">Liga</span><h2 id="lgName">Ligen</h2>
+      <p class="fine" id="lgInfo"></p>
+      <div class="lgprog" id="lgProgBar" hidden><i id="lgProg"></i></div>
+      <div class="lgclaim" id="lgClaim" hidden><b id="lgClaimTitle">Belohnung bereit</b><span class="fine" id="lgClaimText"></span><button id="lgClaimBtn">Abholen</button></div>
+      <div class="lgladder" id="lgLadder"></div>
+      <h3 class="dhead">Rangliste der Ligen</h3>
+      <div class="friendlist" id="lgList"></div>
+      <button class="ghost" id="leagueBack">Zurück</button>
     </div>
   </div>
 
@@ -3916,7 +3944,8 @@ SHOP.title=[
   {id:'fernmeister',name:'Fernduell-Meister',price:0,     rarity:'epic',     src:'ach'},
   {id:'kunstschuetze',name:'Kunstschütze',   price:0,     rarity:'legendary',src:'ach'},
   {id:'bossbezwinger',name:'Bossbezwinger',  price:0,     rarity:'legendary',src:'ach'},
-  {id:'legendenpilot',name:'Legendenpilot',  price:0,     rarity:'mythic',   src:'ach'}
+  {id:'legendenpilot',name:'Legendenpilot',  price:0,     rarity:'mythic',   src:'ach'},
+  {id:'ligameister', name:'Ligameister',      price:0,     rarity:'mythic',   src:'league'}
 ];
 /* ---------- Begleiter (companion) + Sieg-Animation (victory) ---------- */
 SHOP.companion=[
@@ -7051,7 +7080,64 @@ async function netPing(){
 }
 
 /* ---------- status on the Wettkampf page ---------- */
+/* ---------- leagues (gd_league): from 16.300 Gravitonen, the league at the end of each season counts ---------- */
+var LEAGUES=[{n:'Bronze',min:16300,c:'#d89a62',ic:'🥉',rw:'300 ✦ + Sternenkiste'},{n:'Silber',min:17000,c:'#c8d4e6',ic:'🥈',rw:'500 ✦ + Nebelkiste'},
+  {n:'Gold',min:18000,c:'#ffd34f',ic:'🥇',rw:'800 ✦ + Nebelkiste'},{n:'Platin',min:19500,c:'#7ff0e0',ic:'💠',rw:'1.200 ✦ + Supernova-Kiste'},
+  {n:'Diamant',min:21000,c:'#8fc4ff',ic:'💎',rw:'1.800 ✦ + Supernova-Kiste'},{n:'Meister',min:23000,c:'#ff7ad9',ic:'👑',rw:'2.500 ✦ + Supernova-Kiste + Titel „Ligameister“'}];
+var LEAGUE_MIN=16300;
+var leagueOf=g=>{ let k=0; LEAGUES.forEach((L,i)=>{ if(g>=L.min) k=i+1 }); return k };
+var lgData=null, lgAt=-1e9;
+var fmtN=n=>(n|0).toLocaleString('de-DE');
+function renderLgCard(){
+  const card=$('lgCard'); if(!card) return;
+  const g=profile.trophies|0, k=leagueOf(g), pend=lgData&&lgData.pending&&lgData.pending.length;
+  card.hidden=Net.state!=='ready'&&!k; card.classList.toggle('locked',!k);
+  $('lgCardIc').textContent=k?LEAGUES[k-1].ic:'🏅';
+  $('lgCardName').textContent=k?`Liga ${LEAGUES[k-1].n}`:'Ligen';
+  const nx=LEAGUES[k];
+  $('lgCardText').textContent=pend?'Saison-Belohnung bereit!':k?`${fmtN(g)} ${CURRENCY}${nx?` · ${fmtN(nx.min-g)} bis ${nx.n}`:' · höchste Liga'}${lgData&&lgData.ends?` · Saisonende in ${tnShort(Math.max(0,Date.parse(lgData.ends)-Date.now()))}`:''}`
+    :`Ab Arena 21 · noch ${fmtN(LEAGUE_MIN-g)} ${CURRENCY}`;
+  $('lgCardBtn').textContent=pend?'Abholen':'Ansehen';
+  if(k&&Net.state==='ready'&&performance.now()-lgAt>120000){ lgAt=performance.now(); rpc('gd_league').then(d=>{ lgData=d; renderLgCard(); if(current==='league') renderLeague() }).catch(()=>{}) }
+}
+async function openLeague(){
+  show('league'); $('league').scrollTop=0; renderLeague();
+  if(Net.state!=='ready') return;
+  try{ lgData=await rpc('gd_league'); lgAt=performance.now(); if(typeof lgData.gravitons==='number'&&!online){ profile.trophies=lgData.gravitons } renderLeague(); renderLgCard() }catch(e){ toast(niceErr(e)) }
+}
+function renderLeague(){
+  const d=lgData, g=d?d.gravitons|0:profile.trophies|0, k=leagueOf(g);
+  $('lgSeason').textContent=d&&d.seasonName?`Saison „${d.seasonName}“`:'Liga';
+  $('lgName').textContent=k?`${LEAGUES[k-1].ic} Liga ${LEAGUES[k-1].n}`:'Ligen';
+  $('lgName').style.color=k?LEAGUES[k-1].c:'';
+  const ends=d&&d.ends?tnShort(Math.max(0,Date.parse(d.ends)-Date.now())):'';
+  $('lgInfo').textContent=k?`${fmtN(g)} ${CURRENCY}${d&&d.rank?` · Platz ${d.rank} von ${d.players}`:''}${ends?` · Saisonende in ${ends}`:''}. Am Saisonende zählt deine Liga: Du bekommst ihre Belohnung, danach wird alles über ${fmtN(LEAGUE_MIN)} ${CURRENCY} halbiert.`
+    :`Ligen beginnen in der höchsten Arena bei ${fmtN(LEAGUE_MIN)} ${CURRENCY}. Dir fehlen noch ${fmtN(LEAGUE_MIN-g)}. Ab dann bekommst du am Ende jeder Saison eine Belohnung für deine Liga.`;
+  $('lgProgBar').hidden=!!k; $('lgProg').style.width=`${Math.min(100,Math.round(100*g/LEAGUE_MIN))}%`;
+  const pend=d&&d.pending&&d.pending[0];
+  $('lgClaim').hidden=!pend;
+  if(pend){ const L=LEAGUES[pend.league-1]||LEAGUES[0]; $('lgClaimTitle').textContent=`Saisonende: Liga ${L.n}`; $('lgClaimText').textContent=`Du hast die Saison mit ${fmtN(pend.gravitons)} ${CURRENCY} beendet. Belohnung: ${L.rw}.`; $('lgClaimBtn').disabled=false }
+  const lad=$('lgLadder'); lad.innerHTML='';
+  for(let i=LEAGUES.length-1;i>=0;i--){ const L=LEAGUES[i], el=document.createElement('div');
+    el.className='lgtier'+(k===i+1?' cur':k>i+1?' done':''); el.style.setProperty('--c',L.c);
+    el.innerHTML=`<span class="ic" aria-hidden="true">${L.ic}</span><div><b>${L.n}</b><span>ab ${fmtN(L.min)} ${CURRENCY}</span></div><span class="rw">${esc(L.rw)}</span>`; lad.appendChild(el) }
+  const box=$('lgList'); box.innerHTML='';
+  const top=d&&d.top||[];
+  if(!top.length){ box.innerHTML=`<div class="fr"><span></span><span class="fn"><b>${d?'Noch niemand in den Ligen':'Lade …'}</b><i>${d?'Wer zuerst 16.300 Gravitonen erreicht, steht hier ganz oben.':''}</i></span></div>`; return }
+  top.forEach((p,i)=>{ const el=document.createElement('div'), L=LEAGUES[(p.league||1)-1]; el.className='fr'+(p.me?' me':'');
+    el.innerHTML=`<span class="rank">${i+1}</span><span class="fn"><b>${pTagHtml(p)}${esc(cleanName(p.name))}${lvlChip(p.level)}</b><i style="color:${L.c}">${L.ic} ${L.n}</i></span><span class="st"><span class="gv" aria-hidden="true"></span> ${fmtN(p.gravitons)}</span>`;
+    if(!p.me) rowOpensPlayer(el,p); box.appendChild(el) });
+}
+async function lgClaim(){
+  const d=lgData, pend=d&&d.pending&&d.pending[0]; if(!pend) return; const b=$('lgClaimBtn'); b.disabled=true;
+  try{ const r=await rpc('gd_league_claim',{p_season:pend.season}); applyEcon(r.state); d.pending.shift();
+    toast(`Liga-Belohnung: +${r.dust} ✦${r.title?' · Titel „Ligameister“':''}`);
+    if(r.reward&&r.reward.crate){ crateFrom='league'; openCrate(CRATES.find(c=>c.id===r.reward.crate),true,crateReward(r.reward)) } else { Sfx.buy(); renderLeague() }
+    renderLgCard() }
+  catch(e){ b.disabled=false; toast(niceErr(e)) }
+}
 function renderOnline(){
+  renderLgCard();
   const st=$('netState'), btn=$('findMatch'); if(!st) return;
   btn.disabled=Net.state!=='ready'; $('toBoard').disabled=Net.state!=='ready';
   if(Net.state==='nocfg') st.innerHTML=`Online-Duelle laufen in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`;
@@ -7263,7 +7349,7 @@ async function afterReady(){
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
   { const cl=load(CREW_LINK_KEY,null); if(cl){ cleanUrl(); return openCrewLink(cl) } }
-  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home'); if(GO_PARAM==='fern') return openFern(); if(GO_PARAM==='wboss') return openWboss(); if(GO_PARAM==='friends') return openFriends(null) }
+  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home'); if(GO_PARAM==='fern') return openFern(); if(GO_PARAM==='wboss') return openWboss(); if(GO_PARAM==='league') return openLeague(); if(GO_PARAM==='friends') return openFriends(null) }
   const fl=LINK_CODE||load(FRIEND_LINK_KEY,null);
   if(fl){
     cleanUrl(); save(FRIEND_LINK_KEY,null);
@@ -8131,7 +8217,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['league','fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -8513,6 +8599,7 @@ function renderShop(){
     else if(it.src==='album'){ b.textContent='Sammelalbum-Meilenstein'; b.disabled=true; b.className='src' }
     else if(it.src==='invite'){ b.textContent='Freunde einladen'; b.disabled=true; b.className='src' }
     else if(it.src==='ach'){ b.textContent='Erfolg im Profil'; b.disabled=true; b.className='src' }
+    else if(it.src==='league'){ b.textContent='Liga Meister'; b.disabled=true; b.className='src' }
     else if(it.src==='void'){ b.textContent='Nur im Void'; b.disabled=true; b.className='src void' }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
@@ -8579,6 +8666,7 @@ function itemSource(cat,it){
   if(it.src==='album') return 'Sammelalbum';
   if(it.src==='invite') return 'Freund eingeladen, der 5 Level spielt';
   if(it.src==='ach') return 'Erfolg im Profil';
+  if(it.src==='league') return 'Saisonende in der Liga Meister';
   if(!it.price) return 'Startausrüstung';
   return `Shop · Kisten${it.minLevel?` · ab Stufe ${it.minLevel}`:''}`;
 }
@@ -9548,7 +9636,7 @@ for(const b of document.querySelectorAll('#pushPrefs button')) b.addEventListene
 tap('dailyRemind',()=>pushEnable());
 renderPush();
 /* links from a notification: ?go=daily | tourney | crew */
-const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew|fern|friends|wboss)$/.test(g||'')?g:null }catch(e){ return null } })();
+const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew|fern|friends|wboss|league)$/.test(g||'')?g:null }catch(e){ return null } })();
 /* the banner on the home screen: until installed; "✕" hides it for 14 days */
 const IB_KEY='gravityDuel.installBar.v1';
 function renderInstallBar(){
@@ -9572,6 +9660,7 @@ renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
+tap('lgCard',()=>{ Sfx.select(); openLeague() }); tap('lgClaimBtn',()=>lgClaim()); tap('leagueBack',()=>goHome(1));
 tap('toFern',()=>{ Sfx.select(); openFern() });
 tap('fernBack',()=>{ fern=null; goHome(1) });
 tap('fernNew',()=>{ Sfx.select(); fernPicking=!fernPicking; $('fernPick').hidden=!fernPicking; if(fernPicking) renderFernPick() });
@@ -9610,7 +9699,7 @@ tap('albBack',()=>openInventory());
 tap('invToShop',()=>{ shopFrom='home'; renderShop(); show('shop') });
 tap('shopBack',()=>goHome());
 for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
-tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='crew') return openCrew(); if(crateFrom==='tourney') return openTourney(); if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
+tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='league') return openLeague(); if(crateFrom==='crew') return openCrew(); if(crateFrom==='tourney') return openTourney(); if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
 tap('qtab-tasks',()=>setQTab('tasks'));
 tap('qtab-season',()=>setQTab('season'));
 tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
