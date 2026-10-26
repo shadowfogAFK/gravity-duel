@@ -844,6 +844,20 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .plsub{font-family:var(--display);font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:2px 0 -6px}
 .placts{display:flex;flex-direction:column;gap:8px}.placts .frpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mysc{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+/* first level: a coach that shows how to aim and shoot */
+.tuttip{position:absolute;left:50%;top:44%;transform:translateX(-50%);width:min(340px,calc(100% - 32px));z-index:2;pointer-events:none;
+  padding:12px 14px;border-radius:14px;background:rgba(22,10,52,.9);border:1px solid rgba(46,230,255,.55);box-shadow:0 0 24px rgba(46,230,255,.18),0 8px 24px rgba(0,0,0,.4);
+  color:var(--ink);font-size:.92rem;line-height:1.4;text-align:center;animation:tutIn .35s ease-out}
+.tuttip b{color:var(--p2);font-family:var(--display);display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+@keyframes tutIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+/* friend requests, invites, friends-only lists */
+.frreq{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:14px;background:rgba(255,211,79,.06);border:1px solid rgba(255,211,79,.4)}
+.frreq>span{font-family:var(--display);font-size:.78rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+.refbox{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(255,79,139,.12),rgba(46,230,255,.08));border:1px solid rgba(167,123,255,.45)}
+.refbox b{font-family:var(--display);color:var(--ink)}.refbox p{margin:0;font-size:.8rem}
+.refbox ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
+.refbox li{display:flex;justify-content:space-between;gap:8px}.refbox li em{font-style:normal;color:#5cff9d}
+.scope{margin:0 0 2px}
 </style>
 </head>
 <body>
@@ -855,6 +869,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
   <div id="emotes" hidden role="menu" aria-label="Emotes"></div>
   <button id="mute" class="chip" aria-pressed="false" hidden>Ton an</button>
   <button id="music" class="chip" aria-pressed="false" hidden>Musik an</button>
+  <div class="tuttip" id="tutTip" role="status" aria-live="polite" hidden></div>
   <div id="weapons" hidden aria-label="Geschoss wählen"></div>
   <div id="toast" role="status" hidden></div>
   <div id="specBar" hidden><span><b>👁 Zuschauer-Modus</b><i id="specWho"></i></span><button class="ghost" id="specLeave">Verlassen</button></div>
@@ -869,7 +884,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       </div>
       <nav class="tiles" aria-label="Menü">
         <button class="tile" id="toQuests" aria-label="Aufgaben"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg><span>Aufgaben</span><b class="badge dot" id="questBadge" hidden></b></button>
-        <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span></button>
+        <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span><b class="badge dot" id="frBadge" hidden></b></button>
         <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span><b class="badge dot" id="invBadge" hidden></b></button>
         <button class="tile shop" id="toShop" aria-label="Shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Shop</span></button>
       </nav>
@@ -1238,7 +1253,9 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <div class="seg" id="fmodes" role="radiogroup" aria-label="Modus für Herausforderungen">
         <button id="fm-classic" role="radio">Klassisch</button><button id="fm-blitz" role="radio">Blitzduell</button>
       </div>
+      <div class="frreq" id="frReq" hidden><span>Freundschaftsanfragen</span><div class="friendlist" id="frReqList"></div></div>
       <div class="friendlist" id="friendList" aria-label="Freundesliste"></div>
+      <div class="refbox" id="refBox" hidden></div>
       <button class="ghost" id="friendsBack">Zurück</button>
     </div>
   </div>
@@ -1336,6 +1353,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <div class="btns"><button id="dailyPlay">Spielen</button></div>
       <button class="ghost mini remind" id="dailyRemind" hidden>🔔 Erinnere mich jeden Tag um 18 Uhr</button>
       <h3 class="dhead">Bestenliste heute</h3>
+      <div class="seg scope" role="radiogroup" aria-label="Bestenliste Tageslevel"><button id="ds-all" role="radio">Alle</button><button id="ds-fr" role="radio">Freunde</button></div>
       <ol class="dboard" id="dailyBoard"></ol>
       <button class="ghost" id="dailyBack">Zurück</button>
     </div>
@@ -1432,6 +1450,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
     <div class="card">
       <span class="label">Wettkampf</span>
       <h2>Bestenliste</h2>
+      <div class="seg scope" role="radiogroup" aria-label="Bestenliste"><button id="bs-all" role="radio">Weltweit</button><button id="bs-fr" role="radio">Freunde</button></div>
       <p class="fine" id="boardMe"></p>
       <div class="friendlist" id="boardList"></div>
       <button class="ghost" id="boardBack">Zurück</button>
@@ -1956,7 +1975,37 @@ const Sfx=(()=>{
       lead2:{w:'square',v:.024,cut:2400,oct:12,dens:.7,pan:.55,len:.6},
       drums:{a:{k:'x.......x.......',s:'....x.......x...',h:'..x...x...x...x.'}},
       dv:{k:.4,s:.15,h:.04},
-      sec:'4:pad bass|8:pad bass lead dr|8:pad bass lead2 dr|8:pad bass lead lead2 dr|8:pad bass lead:1 lead2 dr|4:pad lead lead2'}
+      sec:'4:pad bass|8:pad bass lead dr|8:pad bass lead2 dr|8:pad bass lead lead2 dr|8:pad bass lead:1 lead2 dr|4:pad lead lead2'},
+    magnetar:{lvl:1.2,name:'Magnetarfeld',bpm:120,root:49,sc:'phryg',prog:[0,1,0,'4M'],cb:1,     // charged and pulsing: a ticking magnetar, buzzing square bass, electric arp
+      pad:{w:'sawtooth',v:.02,cut:750,att:.2,rel:.5,det:1.009},
+      bass:{w:'square',v:.1,cut:520,oct:-24,pat:'x.xox.xox.xox.xo',len:.8},
+      arp:{w:'square',v:.026,cut:3200,oct:12,pat:[0,2,1,3,0,2,1,4],every:1,len:.55,echo:4,pan:'spin'},
+      lead:{w:'sawtooth',v:.03,cut:2200,oct:12,dens:.42,grid:2,echo:2},
+      drums:{a:{k:'x...x...x...x...',s:'....x.......x...',h:'xx.xxx.xxx.xxx.x'},b:{k:'x.......x.......',h:'..x...x...x...x.'}},
+      dv:{k:.5,s:.18,h:.035},fx:['pulsar','clank'],
+      sec:'4:bass dr:b fx|8:pad bass arp dr fx|8:pad bass dr lead fx|8:pad bass arp dr lead:1 fx|4:pad arp fx'},
+    linse:{lvl:1.8,name:'Linsennebel',bpm:88,root:61,sc:'lydian',prog:[0,4,1,5],cb:2,echo:4,   // bent light: a glassy arp doubled an octave up, bells, soft haze
+      pad:{w:'triangle',v:.04,cut:1700,att:1,rel:1.4,det:1.01},
+      bass:{w:'sine',v:.13,oct:-24,pat:'x.......x.....x.',len:4},
+      arp:{w:'triangle',v:.028,cut:4200,oct:12,pat:[0,3,1,4,2,5],every:1,len:.8,echo:3,pan:'alt',shimmer:true},
+      lead:{bell:true,v:.045,oct:24,dens:.25,grid:4,echo:1},
+      drums:{a:{k:'x.........x.....',h:'....x.......x.x.'}},dv:{k:.3,h:.03},fx:['sparkle','fog'],
+      sec:'4:pad fx|8:pad bass arp fx|8:pad bass arp dr lead|8:pad bass dr lead:1 fx|4:pad arp fx'},
+    netz:{lvl:2.1,name:'Wurmlochnetz',bpm:98,root:52,sc:'dorian',prog:[0,6,3,4],cb:2,echo:6,   // folded space: a 7-step arp that never lines up, a deep drone, echoes thrown far
+      pad:{w:'sawtooth',v:.028,cut:620,att:1.2,rel:1.6,det:1.012},
+      bass:{w:'triangle',v:.13,oct:-24,pat:'x.....x.....x...',len:3.5},
+      arp:{w:'sine',v:.035,oct:12,pat:[0,2,4,1,3,5,2],every:1,len:1.1,echo:6,pan:'spin'},
+      lead:{w:'triangle',v:.04,cut:2000,oct:12,dens:.3,grid:2,echo:3,len:1.3},
+      drums:{a:{k:'x.....x...x.....',s:'....x.......x...',h:'..x..x..x..x..x.'}},dv:{k:.38,s:.14,h:.03},fx:['drone','pulsar'],
+      sec:'4:pad fx|8:pad bass arp fx|8:pad bass arp dr fx|8:pad bass dr lead fx|8:pad bass arp dr lead:1|4:pad fx'},
+    komet:{lvl:1.2,name:'Kometenbahn',bpm:134,root:54,sc:'mixo',prog:[0,6,3,4],cb:1,           // racing along the comet: bright saw lead, galloping bass, gusts and sparks
+      pad:{w:'sawtooth',v:.02,cut:1300,att:.1,rel:.35,det:1.008},
+      bass:{w:'sawtooth',v:.12,cut:640,oct:-24,pat:'x.xx.xx.x.xx.xx.',len:.7},
+      arp:{w:'square',v:.024,cut:3400,oct:12,pat:[0,1,2,4,2,1],every:1,len:.5,echo:4},
+      lead:{w:'sawtooth',v:.032,cut:3000,oct:12,dens:.55,grid:2,echo:2},
+      drums:{a:{k:'x...x...x...x...',s:'....x.......x...',h:'xoxxxoxxxoxxxoxx'},b:{k:'x...x...x...x...',s:'....x.......x.xx',h:'x.x.x.x.x.x.x.x.'}},
+      dv:{k:.52,s:.2,h:.04},fx:['wind','sparkle'],
+      sec:'4:bass dr:b fx|8:pad bass arp dr|8:pad bass dr lead fx|8:pad bass arp dr:b lead:1 fx|4:pad arp fx'}
   };
   /* galaxies without their own track (new ones) get a recipe made from their id (or index) */
   function genGalaxy(seed,name){
@@ -3004,6 +3053,7 @@ const SHOP={
     {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1},
     {id:'polar',   name:'Polarnacht',      color:'#9fe9ff',c2:'#6a4dff',anim:'shift',price:0,rarity:'season',season:2},
     {id:'mitternacht',name:'Mitternachtsgold',color:'#ffd34f',c2:'#3a4dff',anim:'shift',price:0,rarity:'season',season:3},
+    {id:'nordlicht',name:'Nordlicht',color:'#3dffa8',c2:'#b45cff',anim:'shift',price:0,rarity:'season',season:4},
     {id:'urlicht',     name:'Urlicht',          color:'#fff1c4',c2:'#9a5a12',anim:'dawn', price:60000,rarity:'cosmic',minLevel:200},
     {id:'milchstrasse',name:'Milchstraße',      color:'#8a6bff',c2:'#090225',anim:'milky',price:55000,rarity:'cosmic',minLevel:200},
     {id:'abyss',       name:'Abgrund',   color:'#7a2cff',c2:'#000000',anim:'abyss',price:0,rarity:'void',src:'void'}
@@ -3057,6 +3107,7 @@ const SHOP={
     {id:'dragon',  name:'Drachenschweif',price:12500, rarity:'mythic',   minLevel:12},
     {id:'pioneer', name:'Pionierspur',   price:0,    rarity:'season',   season:1},
     {id:'frost',   name:'Frostspur',     price:0,    rarity:'season',   season:2},
+    {id:'aurora',  name:'Polarschleier', price:0, rarity:'season',  season:4},
     {id:'goldfaden',  name:'Goldfaden',        price:45000, rarity:'cosmic',   minLevel:200},
     {id:'spektral',   name:'Spektralschleier', price:40000, rarity:'cosmic',   minLevel:200},
     {id:'nichts',     name:'Spur des Nichts',  price:0,     rarity:'void',     src:'void'},
@@ -3255,6 +3306,13 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'thin': line(()=>0,1,c); break;
       case 'pioneer': line(i=>4.5*Math.sin(i*.32-t*7),2,'#3dffd0'); line(i=>-4.5*Math.sin(i*.32-t*7),2,'#ff4f8b'); line(()=>0,1,'#ffffff');
         for(let i=n-1;i>0;i-=7){ const a=.4+.6*Math.abs(Math.sin(t*4+i)); ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fillRect(seg[i][0]-1,seg[i][1]-1,2,2) } break;
+      case 'aurora': { // waving curtains in green, teal and violet, drifting along the path
+        const cols=['#3dffa8','#2ee6ff','#b45cff'];
+        cols.forEach((col,j)=>{ ctx.shadowColor=col; line(i=>(j-1)*3.2+2.6*Math.sin(i*.22-t*(3+j)+j*2),2.2-j*.4,rgba(col,.85-j*.15)) });
+        ctx.shadowBlur=0;
+        for(let i=n-1, k=0;i>4;i-=6, k++){ const p=seg[i], q=nrm(i), h=5+4*Math.abs(Math.sin(t*2+k*.9));
+          ctx.strokeStyle=rgba(cols[k%3],.28*alpha); ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(p[0]-q[0]*h,p[1]-q[1]*h); ctx.stroke() }
+        break }
       case 'frost': { line(()=>0,2.6,'#bfefff'); line(i=>2.2*Math.sin(i*.6-t*6),1,'rgba(255,255,255,.8)');
         ctx.strokeStyle='#e8fbff'; ctx.lineWidth=1.1; ctx.shadowColor='#7fdcff';
         for(let i=n-1, k=0;i>0;i-=9, k++){ const p=seg[i], q=nrm(i), drift=((t*14+k*7)%22), sz=3.2+1.6*Math.abs(Math.sin(k*1.7));
@@ -3821,12 +3879,14 @@ SHOP.title=[
   {id:'pioneer',  name:'Pionier · Saison 1',      price:0,    rarity:'season',   season:1},
   {id:'winter',   name:'Frostherz · Saison 2',    price:0,    rarity:'season',   season:2},
   {id:'neujahr',  name:'Mitternachtsstern · Saison 3', price:0, rarity:'season', season:3},
+  {id:'polarlicht',name:'Nordlichtjäger · Saison 4', price:0, rarity:'season', season:4},
   {id:'schoepfer',  name:'Weltenschöpfer',   price:25000, rarity:'cosmic',   minLevel:200},
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
   {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'},
   {id:'sammler',    name:'Sammler',          price:0,     rarity:'epic',     src:'album'},
   {id:'kurator',    name:'Kurator',          price:0,     rarity:'legendary',src:'album'},
-  {id:'archivar',   name:'Archivar des Alls',price:0,     rarity:'mythic',   src:'album'}
+  {id:'archivar',   name:'Archivar des Alls',price:0,     rarity:'mythic',   src:'album'},
+  {id:'botschafter',name:'Botschafter',      price:0,     rarity:'epic',     src:'invite'}
 ];
 /* ---------- Begleiter (companion) + Sieg-Animation (victory) ---------- */
 SHOP.companion=[
@@ -4774,7 +4834,53 @@ function startLevel(i){
   if(L.boss&&!seen.boss){ seen.boss=true; introQueue.push({label:'Bosskampf',title:'Die Wächter der Galaxien',text:'Am Ende jeder Galaxie wartet ein Wächter. Er kreist auf seiner Bahn und hält drei Treffer aus. Nach jedem Treffer springt er an eine andere Stelle und wird schneller. Die roten Punkte zeigen, wie viele Treffer er noch braucht.'}) }
   for(const t of new Set(L.moons.map(m=>m.t).filter(t=>t&&t!=='n'))) if(!seen['moon_'+t]&&BODY_INFO[t]){ seen['moon_'+t]=true; introQueue.push({label:'Neuer Himmelskörper',...BODY_INFO[t]}) }
   save(KEYS.seen,seen);
+  { const tk=load(TUT_KEY,false); tut=!dailyMode&&!ugPlay&&galIdx===0&&campDiff===1&&(i===0&&!tk||i===1&&tk!==2&&L.moons.length)?{step:-1,t0:0,targets:targetsLeft(),lv:i}:null }
   nextIntro();
+}
+/* ---------- the coach on the first level: drag back like a slingshot, release, watch gravity bend the shot ---------- */
+var tut=null; const TUT_KEY='gravityDuel.tutorial.v1';
+const TUT_TXT=[
+  ['So zielst du','Zieh mit dem Finger nach hinten, weg vom Ziel, wie bei einer Steinschleuder. Du kannst überall auf dem Bildschirm ziehen.'],
+  ['Stärke','Je weiter du ziehst, desto stärker der Schuss. Lass los, um zu schießen.'],
+  ['Schwerkraft','Die Monde ziehen deinen Schuss an und lenken ihn ab. Nutze das für Bogenschüsse.'],
+  ['Nochmal','Die gestrichelte Linie zeigt deinen letzten Schuss. Zieh etwas anders und versuch es noch einmal.'],
+  ['Treffer!','Zerstöre alle goldenen Ziele. Mit wenigen Schüssen bekommst du bis zu 3 Sterne.'],
+  ['Dein Schuss','Er fliegt so lange, bis er etwas trifft oder den Bildschirm weit verlässt.'],
+  ['Monde','Monde ziehen deinen Schuss an. Ziel ein Stück am Mond vorbei und lass dich von ihm zum Ziel lenken.']];
+function tutShow(k){
+  const el=$('tutTip'); if(!el) return;
+  if(k==null){ el.hidden=true; el.dataset.k=''; return }
+  if(el.dataset.k===String(k)&&!el.hidden) return;
+  el.dataset.k=String(k); el.innerHTML=`<b>${TUT_TXT[k][0]}</b>${TUT_TXT[k][1]}`; el.hidden=false;
+  el.style.animation='none'; void el.offsetWidth; el.style.animation='';
+}
+function tutDraw(t){
+  if(mode!=='campaign'||current!==null){ tutShow(null); return }
+  let k;
+  const moons=bodies.some(b=>b.kind==='moon');
+  if(tut.lv===1){ if(phase==='aim'&&shotCount===0) k=6; else if(phase==='fly') k=2; else { tutShow(null); return } }
+  else if(phase==='fly') k=moons?2:5;
+  else if(phase==='aim'){ k=aim?1:shotCount===0?0:targetsLeft()<tut.targets?4:3 }
+  else { tutShow(null); return }
+  if(k!==tut.step){ tut.step=k; tut.t0=t }
+  tutShow(k);
+  if(k!==0&&k!==3) return;
+  // a finger that presses near the planet and pulls back, away from the nearest target; a dotted line points to that target
+  const pl=bodies.find(b=>b.kind==='planet'), tg=bodies.filter(b=>b.kind==='target').sort((a,b)=>Math.hypot(a.x-pl.x,a.y-pl.y)-Math.hypot(b.x-pl.x,b.y-pl.y))[0];
+  if(!pl||!tg) return;
+  const dx=tg.x-pl.x, dy=tg.y-pl.y, L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L;
+  const c=(t-tut.t0)%2.2, press=Math.min(1,c/.25), mv=Math.max(0,Math.min(1,(c-.3)/1.1)), e=mv*mv*(3-2*mv), rel=c>1.65;
+  const sx=pl.x+ux*46, sy=pl.y+uy*46, fx=sx-ux*95*e, fy=sy-uy*95*e;
+  ctx.save();
+  ctx.setLineDash([3,7]); ctx.lineCap='round'; ctx.strokeStyle='rgba(255,211,79,.55)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pl.x+ux*34,pl.y+uy*34); ctx.lineTo(pl.x+ux*Math.min(L-20,150),pl.y+uy*Math.min(L-20,150)); ctx.stroke(); ctx.setLineDash([]);
+  if(!rel){
+    if(e>0){ ctx.strokeStyle='rgba(46,230,255,.5)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(fx,fy); ctx.stroke() }
+    ctx.globalAlpha=press; ctx.fillStyle='rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(fx,fy,20,0,7); ctx.fill();
+    ctx.strokeStyle='#ffffff'; ctx.lineWidth=2.4; ctx.shadowColor='#2ee6ff'; ctx.shadowBlur=12; ctx.beginPath(); ctx.arc(fx,fy,12+2*Math.sin(t*6),0,7); ctx.stroke();
+    ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.arc(fx,fy,4.5,0,7); ctx.fill();
+  } else { const k2=(c-1.65)/.55; ctx.globalAlpha=Math.max(0,1-k2); ctx.strokeStyle='#ffffff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(sx-ux*95,sy-uy*95,12+k2*18,0,7); ctx.stroke() }
+  ctx.restore();
 }
 function nextIntro(){
   const it=introQueue.shift();
@@ -4917,7 +5023,8 @@ const EMOTE_LIST=[
   {id:'bigbang',name:'Urknall',      price:45000,rarity:'cosmic',minLevel:200},
   {id:'darkmatter',name:'Dunkle Materie',price:0,    rarity:'void',src:'void'},
   {id:'snowball',name:'Schneeballschlacht',price:0,  rarity:'season',season:2},
-  {id:'countdown',name:'Countdown',price:0,  rarity:'season',season:3}
+  {id:'countdown',name:'Countdown',price:0,  rarity:'season',season:3},
+  {id:'nordlicht',name:'Polarlicht',price:0,  rarity:'season',season:4}
 ];
 SHOP.emote=EMOTE_LIST;
 const EMOTE_BY=Object.fromEntries(EMOTE_LIST.map(e=>[e.id,e]));
@@ -5703,6 +5810,18 @@ function drawEmoteArt(g,id,t,c){
     else if(k<1){ const bx=34+k*40, by=-10-Math.sin(k*Math.PI)*26; eCircle(g,bx,by,5-k*1.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
     else { g.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<6;i++){ const a=i*1.05; eCircle(g,44+Math.cos(a)*6,-8+Math.sin(a)*6,1.6); g.fill() } }
     break; }
+  case 'nordlicht': {
+    // curtains of northern light wave over Gravi, who looks up in wonder
+    const cols=['#3dffa8','#2ee6ff','#b45cff'];
+    g.lineCap='round';
+    for(let j=0;j<3;j++){ for(let i=0;i<=18;i++){ const x=-48+i*5.4, y=-44+j*6+Math.sin(i*.5+t*(1.6+j*.4)+j)*5, h=10+6*Math.abs(Math.sin(i*.7+t*1.3+j));
+      const gr=g.createLinearGradient(x,y,x,y+h); gr.addColorStop(0,rgba(cols[j],.0)); gr.addColorStop(.3,rgba(cols[j],.55)); gr.addColorStop(1,rgba(cols[j],0));
+      g.strokeStyle=gr; g.lineWidth=4.2; g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+h); g.stroke() } }
+    for(let i=0;i<8;i++){ const tw=.5+.5*Math.sin(t*3+i*2.1); g.fillStyle=`rgba(255,255,255,${.3+.6*tw})`; eCircle(g,-44+i*12.5,-16+((i*37)%9),.9+tw*.6); g.fill() }
+    eBody(g,c); eBlush(g,.5);
+    eEyes(g,'open',{lx:.2,ly:-1}); eMouth(g,'o',{w:5,d:9});
+    const wv=Math.sin(t*2.4)*4; eArm(g,c,-20,14,-30,-6+wv); eArm(g,c,20,14,30,-6-wv);
+    break; }
   case 'countdown': {
     // a sign counts 3 – 2 – 1, then fireworks go off and Gravi cheers
     const p=t%3.2, n=p<1.8?3-Math.floor(p/.6):0, k=n?0:(p-1.8)/1.4;
@@ -6060,7 +6179,7 @@ function levelFailed(){
   $('next').hidden=true; $('retry').hidden=false; $('retry').textContent='Nochmal versuchen';
   show('clear');
 }
-function levelCleared(){ if(ugPlay) return ugCleared();
+function levelCleared(){ if(tut){ save(TUT_KEY,tut.lv===1?2:Math.max(1,load(TUT_KEY,0)|0)); tut=null; tutShow(null) } if(ugPlay) return ugCleared();
   if(dailyMode) return dailyCleared();
   phase='over';
   const g=curGalaxy(), L=curLevel(), prog=progress[pkey(g)]||(progress[pkey(g)]=[]);
@@ -6404,6 +6523,7 @@ function draw(t){
   if(phase==='edit') edDraw(t);
   drawAim();
   if(phase==='aim') drawLastPower();
+  if(tut) tutDraw(t);
   ctx.restore();
   if(mode==='campaign') drawCampaignHud();
   if(mode==='duel'&&!replay) drawDuelClock(t);
@@ -6880,6 +7000,7 @@ async function netPing(){
   try{
     const r=await rpc('gd_ping');
     if(typeof r.gravitons==='number'&&r.gravitons!==profile.trophies&&!online){ profile.trophies=r.gravitons; saveProfile(); if(current==='home') renderHome() }
+    if(typeof r.freq==='number'&&r.freq!==Net.freq){ Net.freq=r.freq; renderFrBadge(); if(current==='friends') loadRequests() }
     const inv=(r.invites||[]).find(i=>!Net.declined.has(i.id));
     const s=search;
     if(inv&&s&&s.kind==='challenge'&&s.friend&&inv.from.id===s.friend.id&&Net.backend.uid<inv.from.id){ // both asked at once: take theirs
@@ -7006,7 +7127,53 @@ function openFriends(ctx){
     :Net.state==='nocfg'?`Freunde gibt es in der Web-Version: <a href="${WEB_URL}" target="_blank" rel="noopener">${WEB_URL.replace('https://','')}</a>`:'Gerade keine Verbindung zum Server.';
   $('addForm').hidden=Net.state!=='ready'; $('fmodes').hidden=true; frPick=null; $('shareLink').hidden=Net.state!=='ready';
   renderFriends(); show('friends'); renderOnline();
-  if(Net.state==='ready'){ loadFriends(); schedulePing(3000) }
+  renderRequests(); renderReferrals();
+  if(Net.state==='ready'){ loadFriends(); loadRequests(); loadReferrals(); schedulePing(3000) }
+}
+/* ---------- friend requests (sent from a profile), invite rewards ---------- */
+function renderFrBadge(){ const b=$('frBadge'); if(b){ b.hidden=!(Net.freq>0); b.textContent='' } }
+async function loadRequests(){
+  if(Net.state!=='ready') return;
+  try{ Net.req=await rpc('gd_friend_requests'); Net.freq=(Net.req.incoming||[]).length; renderFrBadge(); if(current==='friends') renderRequests() }catch(e){}
+}
+function renderRequests(){
+  const l=(Net.req&&Net.req.incoming)||[], box=$('frReqList'); $('frReq').hidden=!l.length; box.innerHTML='';
+  for(const f of l){
+    const el=document.createElement('div'); el.className='fr'; const col=skinFromEquip(f.skin).color, nm=cleanName(f.name);
+    el.innerHTML=`<span class="av${f.online?' on':''}" style="background:${col}"></span><span class="fn"><b>${pTagHtml(f)}${esc(nm)}${lvlChip(f.level)}</b><i>möchte dein Freund sein</i></span>`;
+    const ok=document.createElement('button'); ok.className='mini'; ok.textContent='Annehmen'; ok.setAttribute('aria-label',`Anfrage von ${nm} annehmen`);
+    const no=document.createElement('button'); no.className='mini x'; no.textContent='×'; no.setAttribute('aria-label',`Anfrage von ${nm} ablehnen`);
+    ok.onclick=()=>{ Sfx.init(); answerRequest(f,true,ok) }; no.onclick=()=>{ Sfx.init(); answerRequest(f,false,no) };
+    el.append(ok,no); rowOpensPlayer(el,f); box.appendChild(el);
+  }
+}
+async function answerRequest(f,yes,btn){
+  if(btn) btn.disabled=true;
+  try{ const r=await rpc('gd_friend_answer',{p_from:f.id,p_yes:yes});
+    if(yes&&r.status==='friends'){ Sfx.buy(); toast(`${cleanName(f.name)} ist jetzt dein Freund`) }
+    if(Net.req) Net.req.incoming=Net.req.incoming.filter(x=>x.id!==f.id); Net.freq=Math.max(0,(Net.freq|0)-1); renderFrBadge();
+    if(current==='friends'){ renderRequests(); loadFriends(true) } if(current==='player'&&plData&&plData.id===f.id) openPlayer(f.id) }
+  catch(e){ if(btn) btn.disabled=false; toast(socialErr(e)) }
+}
+const socialErr=e=>{ const m=String(e&&e.message||e); return /too many friends/.test(m)?'Höchstens 100 Freunde':/request limit/.test(m)?'Heute hast du schon genug Anfragen verschickt':niceErr(e) };
+async function sendRequest(p,btn){
+  if(btn) btn.disabled=true;
+  try{ const r=await rpc('gd_friend_request',{p_id:p.id});
+    if(r.status==='friends'){ Sfx.buy(); toast(`${cleanName(p.name)} ist jetzt dein Freund`); loadFriends(true) } else { Sfx.select(); toast(`Anfrage an ${cleanName(p.name)} gesendet`) }
+    if(current==='player'&&plData&&plData.id===p.id) openPlayer(p.id) }
+  catch(e){ if(btn) btn.disabled=false; toast(socialErr(e)) }
+}
+async function loadReferrals(){
+  if(Net.state!=='ready') return;
+  try{ Net.ref=await rpc('gd_referrals'); if(current==='friends') renderReferrals() }catch(e){}
+}
+function renderReferrals(){
+  const r=Net.ref, box=$('refBox'); if(!r||Net.state!=='ready'){ box.hidden=true; return }
+  let h='';
+  if(r.me&&!r.me.paid) h+=`<b>Willkommensbonus</b><p>${esc(cleanName(r.me.by))} hat dich eingeladen. Schaff 5 Level in der Kampagne und ihr bekommt beide Sternenstaub: <b>${r.me.levels}/5</b></p>`;
+  h+=`<b>Freunde einladen</b><p>Teile deinen Einladungslink. Spielt ein neuer Freund 5 Level, bekommst du <b>500 ✦</b> und den Titel „Botschafter“, dein Freund <b>300 ✦</b>.</p>`;
+  if(r.list.length) h+='<ul>'+r.list.slice(0,20).map(x=>`<li><span>${esc(cleanName(x.name))}</span>${x.paid?'<em>✓ +500 ✦</em>':`<span>${x.levels}/5 Level</span>`}</li>`).join('')+'</ul>';
+  box.innerHTML=h; box.hidden=false;
 }
 async function loadFriends(quiet){
   try{ Net.friends=await friendsLive(); if(current==='friends') renderFriends() }catch(e){ if(!quiet) $('addHint').textContent=niceErr(e) }
@@ -7042,7 +7209,8 @@ async function addFriend(code){
 }
 
 /* ---------- friend links: opening ?f=GD-XXXX-XXXX adds that player as a friend ---------- */
-const LINK_CODE=(()=>{ try{ const c=new URLSearchParams(location.search).get('f'); return c&&/^GD-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(c)?c.toUpperCase():null }catch(e){ return null } })();
+const FRIEND_LINK_KEY='gravityDuel.friendLink.v1';
+const LINK_CODE=(()=>{ try{ const c=new URLSearchParams(location.search).get('f'); if(c&&/^GD-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(c)){ save(FRIEND_LINK_KEY,c.toUpperCase()); return c.toUpperCase() } return null }catch(e){ return null } })();
 const friendLink=()=>{ const c=Net.me&&Net.me.friend_code; return c?`${WEB_URL}?f=${c}`:'' };
 async function shareFriendLink(){
   const url=friendLink(), btn=$('shareLink'); if(!url) return;
@@ -7060,11 +7228,13 @@ async function afterReady(){
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
   { const cl=load(CREW_LINK_KEY,null); if(cl){ cleanUrl(); return openCrewLink(cl) } }
   if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home') }
-  if(LINK_CODE){
-    cleanUrl();
-    if(LINK_CODE===(Net.me&&Net.me.friend_code)) return;
-    try{ const r=await rpc('gd_add_friend',{p_code:LINK_CODE});
-      if(r.ok){ Sfx.buy(); toast(`${cleanName(r.friend.name)} ist jetzt dein Freund`); if(current==='home'&&!online) openFriends(null) } else toast(r.error||'Freund konnte nicht hinzugefügt werden')
+  const fl=LINK_CODE||load(FRIEND_LINK_KEY,null);
+  if(fl){
+    cleanUrl(); save(FRIEND_LINK_KEY,null);
+    if(fl===(Net.me&&Net.me.friend_code)) return;
+    try{ let r; try{ r=await rpc('gd_add_friend_link',{p_code:fl}) }catch(e){ if(!/gd_add_friend_link|function|schema/i.test(String(e&&e.message||e))) throw e; r=await rpc('gd_add_friend',{p_code:fl}) }
+      if(r.ok){ Sfx.buy(); toast(r.recruited?`${cleanName(r.friend.name)} hat dich eingeladen: Schaff 5 Level und ihr bekommt beide einen Bonus!`:`${cleanName(r.friend.name)} ist jetzt dein Freund`); if(current==='home'&&!online) openFriends(null) }
+      else toast(r.error||'Freund konnte nicht hinzugefügt werden')
     }catch(e){ toast(niceErr(e)) }
   }
 }
@@ -7122,6 +7292,7 @@ async function econPump(){
     pendingLevels.shift(); save(PENDING_LVL,pendingLevels);
     const cb=lvlCb.get(x.id); lvlCb.delete(x.id);
     applyEcon(r.state); if(r.reward&&r.reward.up) Sfx.levelup(); achAt=-1e9; loadAch();
+    if(r.reward&&r.reward.ref>0) setTimeout(()=>toast(`Einladungsbonus: +${r.reward.ref} ✦ für dich, dein Freund bekommt 500 ✦`),900);
     if(cb) cb(r.reward||{xp:0,dust:0});
   }catch(e){
     const m=String(e&&e.message||'');
@@ -7485,6 +7656,11 @@ function renderPlayer(){
   if(p._part&&!st) return;
   if(p.me){ btn('Vitrine bearbeiten','alt',()=>{ Sfx.select(); openProfile() }); return }
   const can=p.friend||p.crewmate;
+  if(!p.friend){
+    if(p.incoming){ btn('Freundschaftsanfrage annehmen','alt',b=>answerRequest(p,true,b)); btn('Anfrage ablehnen','ghost',b=>answerRequest(p,false,b)) }
+    else if(p.requested){ const b=btn('Anfrage gesendet · zurückziehen','ghost',async b=>{ b.disabled=true; try{ await rpc('gd_friend_cancel',{p_id:p.id}); openPlayer(p.id) }catch(e){ b.disabled=false; toast(socialErr(e)) } }) }
+    else btn('Als Freund hinzufügen','alt',b=>sendRequest(p,b));
+  }
   if(p.duel&&p.online&&p.friend) btn('Beim Duell zuschauen','',()=>{ Sfx.select(); watchFriend(p) });
   else if(p.online&&can){
     btn(plPick?'Modus wählen …':'Herausfordern',plPick?'ghost':'',()=>{ Sfx.select(); plPick=!plPick; renderPlayer() });
@@ -7494,7 +7670,7 @@ function renderPlayer(){
       a.appendChild(pk) }
   }
   else if(can){ const b=btn('Herausfordern','ghost',()=>toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`)); b.classList.add('off') }
-  else { const n=document.createElement('p'); n.className='fine'; n.style.textAlign='center'; n.textContent='Herausfordern kannst du Freunde und Mitglieder deiner Crew. Füge Spieler mit ihrem Freundescode hinzu.'; a.appendChild(n) }
+  else { const n=document.createElement('p'); n.className='fine'; n.style.textAlign='center'; n.textContent='Herausfordern kannst du Freunde und Mitglieder deiner Crew.'; a.appendChild(n) }
 }
 function plTick(t){
   if(current!=='player'||!plSkin) return;
@@ -7510,11 +7686,14 @@ function plTick(t){
 }
 
 /* ---------- leaderboard ---------- */
-async function openBoard(){
+var boardScope='all';
+function boardSeg(){ $('bs-all').setAttribute('aria-checked',String(boardScope==='all')); $('bs-fr').setAttribute('aria-checked',String(boardScope==='fr')) }
+async function openBoard(sc){
+  if(sc) boardScope=sc; boardSeg();
   $('boardList').innerHTML='<div class="fr"><span class="fn"><b>Lade …</b></span></div>'; $('boardMe').textContent=''; show('board');
   try{
-    const r=await rpc('gd_leaderboard');
-    $('boardMe').textContent=`Dein Platz: ${r.rank} von ${r.players} · ${profile.trophies} ${CURRENCY} · Tippe auf einen Spieler für sein Profil`;
+    const r=await rpc(boardScope==='fr'?'gd_leaderboard_friends':'gd_leaderboard');
+    $('boardMe').textContent=(boardScope==='fr'&&r.players<=1)?'Noch keine Freunde: füge welche hinzu, dann vergleicht ihr euch hier.':`Dein Platz: ${r.rank} von ${r.players}${boardScope==='fr'?' unter deinen Freunden':''} · ${profile.trophies} ${CURRENCY} · Tippe auf einen Spieler für sein Profil`;
     $('boardList').innerHTML=r.top.map((p,i)=>{ const col=skinFromEquip(p.skin).color, tt=titleName(p.skin&&p.skin.title);
       return `<div class="fr${p.me?' me':''}" data-i="${i}"><span class="rank">${i+1}</span><span class="av" style="background:${col}"></span><span class="fn"><b>${pTagHtml(p)}${esc(cleanName(p.name))}${lvlChip(p.level)}</b><i>${p.wins|0} ${(p.wins|0)===1?'Sieg':'Siege'}</i>${tt?`<span class="frtt">${titleChip(p.skin.title)}</span>`:''}</span><span class="st"><span class="gv" aria-hidden="true"></span> ${p.gravitons|0}</span></div>` }).join('')||'<div class="fr"><span class="fn"><b>Noch niemand gewertet</b></span></div>';
     $('boardList').querySelectorAll('.fr[data-i]').forEach(el=>rowOpensPlayer(el,r.top[+el.dataset.i]));
@@ -7846,7 +8025,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'&&page<2) $('nav-'+(page+1)).click();
   if(e.key==='ArrowLeft'&&page>0) $('nav-'+(page-1)).click();
 });
-function goHome(p){ ugReset();
+function goHome(p){ ugReset(); if(tut){ tut=null; tutShow(null) }
   dailyMode=false; if(p===1) setTimeout(loadEvent,300);
   if(online) onlineCleanup();
   endAi();
@@ -7921,8 +8100,10 @@ async function openDaily(result){
   if(!SERVER_ECON||!econReady()){ $('dailyInfo').textContent='Das Tageslevel braucht eine Verbindung zum Server.'; return }
   try{ dailyData=await rpc('gd_daily'); renderDaily() }catch(e){ $('dailyInfo').textContent='Konnte das Tageslevel nicht laden: '+niceErr(e) }
 }
+var dailyScope='all';
 function renderDaily(){
   const d=dailyData, box=$('dailyBoard'); box.innerHTML='';
+  $('ds-all').setAttribute('aria-checked',String(dailyScope==='all')); $('ds-fr').setAttribute('aria-checked',String(dailyScope==='fr')); $('ds-all').parentNode.hidden=!(d&&Array.isArray(d.friends));
   $('dailyDot').hidden=!(d&&d.active&&!d.playedToday);
   if(!d){ $('dailyTitle').textContent='Tageslevel'; $('dailyInfo').textContent='Lade …'; $('dailyPlay').disabled=true; return }
   if(!d.active){ $('dailyInfo').textContent='Heute gibt es kein Tageslevel.'; $('dailyPlay').disabled=true; return }
@@ -7934,10 +8115,11 @@ function renderDaily(){
   $('dailyRank').textContent=d.rank?`${d.rank} / ${d.players}`:'–';
   $('dailyStreak').textContent=`${d.streak} 🔥`;
   $('dailyPlay').disabled=false; $('dailyPlay').textContent=d.playedToday?'Nochmal versuchen':'Spielen';
-  if(!d.top.length){ const li=document.createElement('li'); li.className='empty'; li.textContent='Noch niemand hat es heute geschafft. Sei die oder der Erste!'; box.appendChild(li) }
-  for(const t of d.top){ const li=document.createElement('li'); li.className=t.me?'me':'';
+  const fr=dailyScope==='fr'&&Array.isArray(d.friends), top=fr?d.friends:d.top;
+  if(!top.length){ const li=document.createElement('li'); li.className='empty'; li.textContent=fr?'Heute hat noch keiner deiner Freunde das Tageslevel geschafft.':'Noch niemand hat es heute geschafft. Sei die oder der Erste!'; box.appendChild(li) }
+  for(const t of top){ const li=document.createElement('li'); li.className=t.me?'me':'';
     li.innerHTML=`<span class="r">${t.r}.</span><i style="background:${skinFromEquip(t.skin).color}"></i><span>${badgeHtml(t.badge)}${esc(cleanName(t.name))}</span><b>${t.shots}</b>`; box.appendChild(li) }
-  if(d.rank&&d.rank>20){ const li=document.createElement('li'); li.className='me'; li.innerHTML=`<span class="r">${d.rank}.</span><i style="background:${mySkin().color}"></i><span>${esc(playerName())}</span><b>${d.best}</b>`; box.appendChild(li) }
+  if(!fr&&d.rank&&d.rank>20){ const li=document.createElement('li'); li.className='me'; li.innerHTML=`<span class="r">${d.rank}.</span><i style="background:${mySkin().color}"></i><span>${esc(playerName())}</span><b>${d.best}</b>`; box.appendChild(li) }
 }
 function playDaily(){
   const d=dailyData; if(!d||!d.active) return;
@@ -8092,6 +8274,8 @@ function renderShop(){
     else if(it.season){ b.textContent=`Saison ${it.season}`; b.disabled=true }
     else if(it.src==='campaign'){ const gi=GALAXIES.findIndex(g=>g.id===it.gal); b.textContent=`Kampagne · ${gi>=0?GALAXIES[gi].name:''} · ${DIFFS[it.diff].name}`; b.disabled=true; b.className='src' }
     else if(it.src==='tourney'){ b.textContent='Wochenend-Turnier'; b.disabled=true; b.className='src' }
+    else if(it.src==='album'){ b.textContent='Sammelalbum-Meilenstein'; b.disabled=true; b.className='src' }
+    else if(it.src==='invite'){ b.textContent='Freunde einladen'; b.disabled=true; b.className='src' }
     else if(it.src==='void'){ b.textContent='Nur im Void'; b.disabled=true; b.className='src void' }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
@@ -8156,6 +8340,7 @@ function itemSource(cat,it){
   if(it.src==='campaign'){ const g=GALAXIES.find(x=>x.id===it.gal); return `Kampagne · ${g?g.name:it.gal} · ${DIFFS[it.diff||1].name}` }
   if(it.src==='tourney') return 'Wochenend-Turnier';
   if(it.src==='album') return 'Sammelalbum';
+  if(it.src==='invite') return 'Freund eingeladen, der 5 Level spielt';
   if(!it.price) return 'Startausrüstung';
   return `Shop · Kisten${it.minLevel?` · ab Stufe ${it.minLevel}`:''}`;
 }
@@ -9148,6 +9333,8 @@ renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
+tap('bs-all',()=>{ Sfx.select(); openBoard('all') }); tap('bs-fr',()=>{ Sfx.select(); openBoard('fr') });
+tap('ds-all',()=>{ Sfx.select(); dailyScope='all'; renderDaily() }); tap('ds-fr',()=>{ Sfx.select(); dailyScope='fr'; renderDaily() });
 tap('pPublic',()=>{ Sfx.select(); const id=Net.backend&&Net.backend.uid; if(id) openPlayer(id) });
 tap('playerBack',()=>{ const f=plFrom; plData=null;
   if(f==='friends') return openFriends(); if(f==='crew'){ show('crew'); return renderCrew() } if(f==='board') return openBoard(); if(f==='profile') return openProfile();
