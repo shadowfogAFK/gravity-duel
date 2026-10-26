@@ -867,6 +867,9 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 #fernList .fr .hearts{letter-spacing:.05em}
 .fernhead{font-family:var(--display);font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:6px 0 -6px}
 .fernpick{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.dkind{margin-bottom:2px}
+.ach .at .tt{color:var(--gold)}
+#dailyRemind.kindhide{display:none}
 </style>
 </head>
 <body>
@@ -1362,6 +1365,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 
   <div class="overlay" id="daily" hidden>
     <div class="card">
+      <div class="seg dkind" role="radiogroup" aria-label="Herausforderung"><button id="dk-daily" role="radio">☀ Tageslevel</button><button id="dk-wboss" role="radio">👑 Wochenboss</button></div>
       <span class="label" id="dailyLabel">Tageslevel</span>
       <h2 id="dailyTitle">Tageslevel</h2>
       <p class="fine" id="dailyInfo"></p>
@@ -3907,7 +3911,12 @@ SHOP.title=[
   {id:'sammler',    name:'Sammler',          price:0,     rarity:'epic',     src:'album'},
   {id:'kurator',    name:'Kurator',          price:0,     rarity:'legendary',src:'album'},
   {id:'archivar',   name:'Archivar des Alls',price:0,     rarity:'mythic',   src:'album'},
-  {id:'botschafter',name:'Botschafter',      price:0,     rarity:'epic',     src:'invite'}
+  {id:'botschafter',name:'Botschafter',      price:0,     rarity:'epic',     src:'invite'},
+  {id:'purist',     name:'Purist',           price:0,     rarity:'epic',     src:'ach'},
+  {id:'fernmeister',name:'Fernduell-Meister',price:0,     rarity:'epic',     src:'ach'},
+  {id:'kunstschuetze',name:'Kunstschütze',   price:0,     rarity:'legendary',src:'ach'},
+  {id:'bossbezwinger',name:'Bossbezwinger',  price:0,     rarity:'legendary',src:'ach'},
+  {id:'legendenpilot',name:'Legendenpilot',  price:0,     rarity:'mythic',   src:'ach'}
 ];
 /* ---------- Begleiter (companion) + Sieg-Animation (victory) ---------- */
 SHOP.companion=[
@@ -4846,8 +4855,8 @@ function coverFor(o){
 function coverReady(){ show(null); startTurn() }
 function startLevel(i){
   if(SERVER_ECON&&!econReady()&&campDiff>1&&!dailyMode&&!ugPlay&&!window.__GD_TEST__){ toast(`${DIFFS[campDiff].name} braucht eine Verbindung. Offline geht der Rang Kadett.`); return }
-  mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
-  levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) lvlStartP.set(curGalaxy().id+':'+i+':'+campDiff,rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>null));
+  mode='campaign'; levelIdx=i; shotCount=0; levelSpecials=0; turn=0; newLevelMap();
+  levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc(dailyKind==='wboss'?'gd_wboss_start':'gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) lvlStartP.set(curGalaxy().id+':'+i+':'+campDiff,rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>null));
   const L=curLevel();
   banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:ugPlay?(ugPlay.test?'Testflug':'Community-Level'):dailyMode?'Tageslevel':`Level ${i+1}`,sub:L.name,t:1.8,player:0};
   // explain new weapons and new kinds of bodies the first time they show up
@@ -4936,12 +4945,12 @@ function missed(s,h){
 const newPer=(power,type)=>({power,type,targets:0,planetHits:new Set(),moon:false,closest:Infinity,closestPt:null});
 function makeShot(o,v){
   const pl=players[o], l=launchFrom(v,o), w=pl.weapon;
-  if(w!=='std') pl.ammo[w]--;
+  if(w!=='std'){ pl.ammo[w]--; if(mode==='campaign') levelSpecials++ }
   if(!online&&!fern||o===meIdx()){ track('shot'); if(w!=='std') track('special') }
   return gxMakeShot({s:{o,x:l.x,y:l.y,vx:l.vx,vy:l.vy,t:0,lastPt:0,trail:[[l.x,l.y]],type:w,armed:w==='split'||w==='boost'||w==='boomerang'||w==='gbomb'||w==='tele',drills:w==='drill'?1:0,inMoon:null,primary:true},per:newPer(l.power,w)});
 }
 /* the flight runs in whole physics steps (flightN), so the same shot plays out identically on every device */
-let flightN=0, flyAcc=0, trigs=[], launchSnap=null, replaying=false;
+let flightN=0, flyAcc=0, trigs=[], launchSnap=null, replaying=false; var levelSpecials=0;
 function launch(shots){
   flightT=0; visT=0; flightN=0; flyAcc=0; trigs=[]; PHYS.advance(bodies,0,H);
   proj=[]; volley={owners:[],per:[null,null]};
@@ -6211,6 +6220,7 @@ function levelCleared(){ if(tut){ save(TUT_KEY,tut.lv===1?2:Math.max(1,load(TUT_
   $('next').hidden=false; $('retry').textContent='Nochmal für mehr Sterne';
   prog[levelIdx]=Math.max(st,prev); save(KEYS.progress,progress);
   track('level'); if(st===3) track('stars3'); track('newstars',Math.max(0,st-prev));
+  if(shotCount===1&&L.par>=2) track('oneshot'); if(st===3&&Object.keys(L.ammo||{}).length&&!levelSpecials) track('purist');
   // rewards only for stars you did not have yet, so replaying is never a grind
   const newStars=Math.max(0,st-prev), first=prev===0;
   const r=SERVER_ECON?{line:'Belohnung wird gutgeschrieben …',up:null}:grant(newStars?10+15*newStars:3, 10*newStars+(first?5:0));
@@ -6776,7 +6786,7 @@ function ensureQuests(){
 }
 const questDef=id=>QUEST_POOL.daily.find(t=>t.id===id)||QUEST_POOL.weekly.find(t=>t.id===id);
 /* the game reports events here; finished tasks show a short note */
-const CLIENT_EVENTS=['shot','special','target','longshot','portal']; // everything else the server counts itself
+const CLIENT_EVENTS=['shot','special','target','longshot','portal','oneshot','purist']; // everything else the server counts itself
 function track(ev,n=1){
   if(!n||(online&&online.spec)) return;
   if(SERVER_ECON){ if(CLIENT_EVENTS.includes(ev)) econEvent(ev,n); return }
@@ -7253,7 +7263,7 @@ async function afterReady(){
   if(Net.user&&!Net.user.is_anonymous&&load(PENDING_PW,null)===(Net.user.email||'').toLowerCase()) return openAccount('setpw');
   if(REPLAY_CODE){ cleanUrl(); return openSharedReplay(REPLAY_CODE) }
   { const cl=load(CREW_LINK_KEY,null); if(cl){ cleanUrl(); return openCrewLink(cl) } }
-  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home'); if(GO_PARAM==='fern') return openFern(); if(GO_PARAM==='friends') return openFriends(null) }
+  if(GO_PARAM){ cleanUrl(); if(GO_PARAM==='daily') return openDaily(); if(GO_PARAM==='tourney') return openTourney('home'); if(GO_PARAM==='crew') return openCrew('home'); if(GO_PARAM==='fern') return openFern(); if(GO_PARAM==='wboss') return openWboss(); if(GO_PARAM==='friends') return openFriends(null) }
   const fl=LINK_CODE||load(FRIEND_LINK_KEY,null);
   if(fl){
     cleanUrl(); save(FRIEND_LINK_KEY,null);
@@ -7493,7 +7503,8 @@ const ACH_FAM={shooter:['🎯','Treffsicher','Ziele zerstört'],stars:['⭐','St
   longshot:['☄️','Weitflieger','Treffer nach über 3 s Flug'],eventer:['🎪','Eventjäger','Wochen-Events geschafft'],daily:['☀️','Tagesheld','Tageslevel geschafft'],portal:['🌀','Wurmlochreisender','Flüge durch Wurmlöcher'],special:['💥','Spezialist','Spezialgeschosse eingesetzt'],
   collector:['💎','Sammler','Items im Besitz'],climber:['📈','Aufsteiger','Spielerlevel'],crates:['🎁','Kistenöffner','Kisten geöffnet'],
   commander:['🛡️','Kommandant','Galaxien im Rang Kommandant'],legend:['💠','Legende','Galaxien im Rang Legende'],winner:['🥇','Siegertyp','Duelle gewonnen'],
-  gunner:['🚀','Dauerfeuer','Schüsse abgefeuert'],architect:['🛠️','Architekt','Eigene Level veröffentlicht'],pathfinder:['🧩','Pfadfinder','Community-Level geschafft']};
+  gunner:['🚀','Dauerfeuer','Schüsse abgefeuert'],architect:['🛠️','Architekt','Eigene Level veröffentlicht'],pathfinder:['🧩','Pfadfinder','Community-Level geschafft'],
+  kunst:['🪄','Kunstschütze','Level mit 1 Schuss gelöst, die mehr brauchen'],purist:['🧘','Purist','3 Sterne ohne Spezialgeschoss'],wboss:['🐉','Wochenboss-Jäger','Wochenbosse besiegt'],fern:['🪐','Fernduellant','Fernduelle gewonnen']};
 const TIER_COL=['#d08a4f','#c8d4e6','#ffd34f'], TIER_NAME=['I','II','III'];
 let achData=null, achAt=-1e9;
 function badgeOf(id){ const d=typeof id==='string'&&/^([a-z]+)(\d)$/.exec(id); if(!d||!ACH_FAM[d[1]]||!TIER_COL[d[2]-1]) return null; return {e:ACH_FAM[d[1]][0],c:TIER_COL[d[2]-1],name:`${ACH_FAM[d[1]][1]} ${TIER_NAME[d[2]-1]}`} }
@@ -7549,7 +7560,8 @@ function renderAch(){
     const cur=tiers.find(a=>!a.claimed), [ico,title,desc]=ACH_FAM[fam], ready=cur&&cur.value>=cur.goal;
     const el=document.createElement('div'); el.className='ach'+(ready?' ready':'');
     const show=cur||tiers[tiers.length-1];
-    el.innerHTML=`<span class="ico" aria-hidden="true">${ico}</span><span class="at"><b>${title}${cur?' '+TIER_NAME[cur.tier-1]:''}</b><span>${desc}: ${show.goal}</span></span>
+    const tw=tiers.find(a=>a.title), twc=tw&&tw.claimed;
+    el.innerHTML=`<span class="ico" aria-hidden="true">${ico}</span><span class="at"><b>${title}${cur?' '+TIER_NAME[cur.tier-1]:''}</b><span>${desc}: ${show.goal}${tw?` · <span class="tt">${twc?'✓ ':''}Titel „${esc(titleName(tw.title))}“ bei Stufe ${TIER_NAME[tw.tier-1]}</span>`:''}</span></span>
       <span class="medals"></span><span class="bar" aria-hidden="true"><i style="width:${Math.round(100*Math.min(1,show.value/show.goal))}%"></i></span>`;
     const med=el.querySelector('.medals');
     for(const a of tiers){
@@ -7567,7 +7579,7 @@ function renderAch(){
 }
 async function claimAch(id,btn){
   btn.disabled=true;
-  try{ const r=await rpc('gd_ach_claim',{p_id:id}); achData=r.achievements; applyEcon(r.state); Sfx.buy(); renderAch(); renderMe() }
+  try{ const r=await rpc('gd_ach_claim',{p_id:id}); achData=r.achievements; applyEcon(r.state); Sfx.buy(); renderAch(); renderMe(); if(r.title) setTimeout(()=>toast(`Neuer Titel: „${titleName(r.title)}“ · im Inventar ausrüsten`),600) }
   catch(e){ btn.disabled=false; toast(econErr(e)); loadAch(true) }
 }
 async function pinBadge(id){
@@ -8289,10 +8301,34 @@ async function openDaily(result){
   if(!result) $('dailyResult').hidden=true;
   show('daily'); renderDaily();
   if(!SERVER_ECON||!econReady()){ $('dailyInfo').textContent='Das Tageslevel braucht eine Verbindung zum Server.'; return }
-  try{ dailyData=await rpc('gd_daily'); renderDaily() }catch(e){ $('dailyInfo').textContent='Konnte das Tageslevel nicht laden: '+niceErr(e) }
+  try{ if(dailyKind==='wboss') wbossData=await rpc('gd_wboss'); else dailyData=await rpc('gd_daily'); renderDaily() }catch(e){ $('dailyInfo').textContent='Konnte das Level nicht laden: '+niceErr(e) }
 }
-var dailyScope='all';
+async function openWboss(){ dailyKind='wboss'; return openDaily() }
+var dailyScope='all', dailyKind='daily', wbossData=null;
+function wbossLevel(d){ const base=GALAXIES.find(g=>g.id===d.gal)||GALAXIES[0], L=JSON.parse(JSON.stringify(base.levels[base.levels.length-1]));
+  if(L.boss){ L.boss.hp=d.hp||5; L.boss.P=L.boss.P/(d.speed||1.3) } L.name=L.boss?L.boss.name:L.name; return {base,L} }
+function renderWboss(){
+  const d=wbossData, box=$('dailyBoard'); box.innerHTML='';
+  $('dailyStreak').nextElementSibling.textContent='Endet in'; document.querySelector('#daily .dhead').textContent='Bestenliste diese Woche';
+  if(!d){ $('dailyLabel').textContent='Wochenboss'; $('dailyTitle').textContent='Wochenboss'; $('dailyInfo').textContent='Lade …'; $('dailyPlay').disabled=true; return }
+  const {base,L}=wbossLevel(d), days=Math.max(0,Math.ceil((new Date(d.ends)-new Date())/864e5));
+  $('dailyLabel').textContent=`Wochenboss · ${base.name}`;
+  $('dailyTitle').textContent=L.name;
+  $('dailyInfo').textContent=`Der Wächter von ${base.name}, aber stärker als in der Kampagne: ${d.hp||5} Treffer und schneller. Wer ihn mit den wenigsten Schüssen besiegt, führt die Wochenliste an. Erster Sieg der Woche: +80 XP und +150 ✦. Jeden Montag kommt ein neuer Boss.`;
+  $('dailyBest').textContent=d.best?`${d.best} ${d.best===1?'Schuss':'Schüsse'}`:'–';
+  $('dailyRank').textContent=d.rank?`${d.rank} / ${d.players}`:'–';
+  $('dailyStreak').textContent=days<=1?'heute':`${days} Tagen`;
+  $('dailyPlay').disabled=false; $('dailyPlay').textContent=d.played?'Nochmal versuchen':'Boss herausfordern';
+  const fr=dailyScope==='fr', top=fr?d.friends||[]:d.top||[];
+  if(!top.length){ const li=document.createElement('li'); li.className='empty'; li.textContent=fr?'Diese Woche hat noch keiner deiner Freunde den Boss besiegt.':'Noch niemand hat den Boss diese Woche besiegt. Sei die oder der Erste!'; box.appendChild(li) }
+  for(const t of top){ const li=document.createElement('li'); li.className=t.me?'me':'';
+    li.innerHTML=`<span class="r">${t.r}.</span><i style="background:${skinFromEquip(t.skin).color}"></i><span>${esc(cleanName(t.name))}</span><b>${t.shots}</b>`; box.appendChild(li) }
+}
 function renderDaily(){
+  $('dk-daily').setAttribute('aria-checked',String(dailyKind==='daily')); $('dk-wboss').setAttribute('aria-checked',String(dailyKind==='wboss'));
+  $('dailyRemind').classList.toggle('kindhide',dailyKind!=='daily');
+  if(dailyKind==='wboss'){ $('ds-all').setAttribute('aria-checked',String(dailyScope==='all')); $('ds-fr').setAttribute('aria-checked',String(dailyScope==='fr')); $('ds-all').parentNode.hidden=false; return renderWboss() }
+  $('dailyStreak').nextElementSibling.textContent='Serie'; document.querySelector('#daily .dhead').textContent='Bestenliste heute';
   const d=dailyData, box=$('dailyBoard'); box.innerHTML='';
   $('ds-all').setAttribute('aria-checked',String(dailyScope==='all')); $('ds-fr').setAttribute('aria-checked',String(dailyScope==='fr')); $('ds-all').parentNode.hidden=!(d&&Array.isArray(d.friends));
   $('dailyDot').hidden=!(d&&d.active&&!d.playedToday);
@@ -8313,6 +8349,8 @@ function renderDaily(){
   if(!fr&&d.rank&&d.rank>20){ const li=document.createElement('li'); li.className='me'; li.innerHTML=`<span class="r">${d.rank}.</span><i style="background:${mySkin().color}"></i><span>${esc(playerName())}</span><b>${d.best}</b>`; box.appendChild(li) }
 }
 function playDaily(){
+  if(dailyKind==='wboss'){ const w=wbossData; if(!w) return; const {base,L}=wbossLevel(w);
+    dailyGal={id:base.id,name:'Wochenboss',levels:[L]}; dailyMode=true; galIdx=Math.max(0,GALAXIES.indexOf(base)); return startLevel(0) }
   const d=dailyData; if(!d||!d.active) return;
   const base=GALAXIES.find(g=>g.id===d.gal)||GALAXIES[0];
   dailyGal={id:base.id,name:'Tageslevel',levels:[d.level]}; dailyMode=true;
@@ -8326,6 +8364,13 @@ async function dailyCleared(){
   $('dailyResult').hidden=false; $('dailyResult').textContent=line+' Wird gewertet …';
   openDaily(true);
   if(!SERVER_ECON||!econReady()){ $('dailyResult').textContent=line+' (ohne Verbindung nicht gewertet)'; return }
+  if(dailyKind==='wboss'){
+    try{ const r=await rpc('gd_wboss_submit',{p_shots:n}); applyEcon(r.state); wbossData=r.wboss; renderDaily();
+      if(r.reward){ line+=` Boss besiegt! ${rewardLine(r.reward)}`; if(r.reward.up) Sfx.levelup() } else if(r.improved) line+=' Neuer Bestwert!'; else line+=` Dein Bestwert bleibt ${wbossData.best}.`;
+      if(wbossData.rank) line+=` · Platz ${wbossData.rank}`; $('dailyResult').textContent=line }
+    catch(e){ $('dailyResult').textContent=line+' '+(/not started/.test(String(e&&e.message))?'Nicht gewertet: Starte den Kampf bitte neu.':niceErr(e)) }
+    return;
+  }
   try{
     const r=await rpc('gd_daily_submit',{p_shots:n});
     applyEcon(r.state); dailyData=r.daily; renderDaily();
@@ -8467,6 +8512,7 @@ function renderShop(){
     else if(it.src==='tourney'){ b.textContent='Wochenend-Turnier'; b.disabled=true; b.className='src' }
     else if(it.src==='album'){ b.textContent='Sammelalbum-Meilenstein'; b.disabled=true; b.className='src' }
     else if(it.src==='invite'){ b.textContent='Freunde einladen'; b.disabled=true; b.className='src' }
+    else if(it.src==='ach'){ b.textContent='Erfolg im Profil'; b.disabled=true; b.className='src' }
     else if(it.src==='void'){ b.textContent='Nur im Void'; b.disabled=true; b.className='src void' }
     else if(locked){ b.textContent=`Ab Spielerlevel ${it.minLevel}`; b.disabled=true }
     else { b.textContent=`Kaufen · ✦ ${it.price}`; b.disabled=profile.dust<it.price;
@@ -8532,6 +8578,7 @@ function itemSource(cat,it){
   if(it.src==='tourney') return 'Wochenend-Turnier';
   if(it.src==='album') return 'Sammelalbum';
   if(it.src==='invite') return 'Freund eingeladen, der 5 Level spielt';
+  if(it.src==='ach') return 'Erfolg im Profil';
   if(!it.price) return 'Startausrüstung';
   return `Shop · Kisten${it.minLevel?` · ab Stufe ${it.minLevel}`:''}`;
 }
@@ -9421,6 +9468,7 @@ if(window.__GD_TEST__) window.__void={state:()=>({game:VS.game,busy:VS.busy,dust
 const tap=(id,fn)=>$(id).addEventListener('click',()=>{Sfx.init();fn()});
 tap('campPlay',()=>{ const gi=activeGalaxy(), g=GALAXIES[gi], n=nextLevelIn(g); galIdx=gi; n===null?goLevels(gi):startLevel(n) });
 tap('campAll',goGalaxies);
+tap('toDaily',()=>{ dailyKind='daily' });
 tap('toDaily',()=>openDaily());
 tap('evClaim',claimEvent);
 tap('loginClaim',claimLogin); tap('loginBack',()=>goHome());
@@ -9500,7 +9548,7 @@ for(const b of document.querySelectorAll('#pushPrefs button')) b.addEventListene
 tap('dailyRemind',()=>pushEnable());
 renderPush();
 /* links from a notification: ?go=daily | tourney | crew */
-const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew|fern|friends)$/.test(g||'')?g:null }catch(e){ return null } })();
+const GO_PARAM=(()=>{ try{ const g=new URLSearchParams(location.search).get('go'); return /^(daily|tourney|crew|fern|friends|wboss)$/.test(g||'')?g:null }catch(e){ return null } })();
 /* the banner on the home screen: until installed; "✕" hides it for 14 days */
 const IB_KEY='gravityDuel.installBar.v1';
 function renderInstallBar(){
@@ -9528,6 +9576,7 @@ tap('toFern',()=>{ Sfx.select(); openFern() });
 tap('fernBack',()=>{ fern=null; goHome(1) });
 tap('fernNew',()=>{ Sfx.select(); fernPicking=!fernPicking; $('fernPick').hidden=!fernPicking; if(fernPicking) renderFernPick() });
 tap('bs-all',()=>{ Sfx.select(); openBoard('all') }); tap('bs-fr',()=>{ Sfx.select(); openBoard('fr') });
+tap('dk-daily',()=>{ Sfx.select(); dailyKind='daily'; $('dailyResult').hidden=true; openDaily() }); tap('dk-wboss',()=>{ Sfx.select(); dailyKind='wboss'; $('dailyResult').hidden=true; openDaily() });
 tap('ds-all',()=>{ Sfx.select(); dailyScope='all'; renderDaily() }); tap('ds-fr',()=>{ Sfx.select(); dailyScope='fr'; renderDaily() });
 tap('pPublic',()=>{ Sfx.select(); const id=Net.backend&&Net.backend.uid; if(id) openPlayer(id) });
 tap('playerBack',()=>{ const f=plFrom; plData=null;
