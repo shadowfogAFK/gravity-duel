@@ -804,6 +804,46 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .cinv canvas{width:110px;height:110px}
 .cinv b{font-family:var(--display);font-size:1.35rem}.cinv .ctag{font-family:var(--display);font-size:.8rem;color:var(--gold)}
 .cinv .fine{margin:0}
+/* the back button of long menus stays at the bottom of the screen */
+.overlay>.card>button.ghost:last-child{position:sticky;bottom:0;z-index:4;margin-top:4px;background:rgba(26,12,60,.97);color:var(--ink);border-color:rgba(167,123,255,.6);
+  box-shadow:0 -12px 22px 6px rgba(22,10,52,.92),0 6px 18px rgba(0,0,0,.45)}
+/* player rows: crew tag, level, title */
+.lvchip{display:inline-block;margin-left:6px;padding:0 6px;border-radius:7px;font-family:var(--display);font-size:.68rem;font-weight:700;line-height:1.45;color:var(--p2);border:1px solid rgba(46,230,255,.45);background:rgba(46,230,255,.08);vertical-align:.08em;white-space:nowrap}
+.ttchip{display:inline-block;max-width:100%;padding:0 7px;border-radius:99px;border:1px solid var(--c);color:var(--c);background:rgba(22,10,52,.9);font-family:var(--display);font-weight:700;font-size:.66rem;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.ttchip.r-common{color:var(--ink)}
+.ttchip.r-legendary{animation:ttHue 5s linear infinite}
+@keyframes ttHue{to{filter:hue-rotate(360deg)}}
+.ttchip.r-mythic{color:#ffb0b0;text-shadow:0 0 6px #ff2a2a}
+.ttchip.r-cosmic,.ttchip.r-void{background:linear-gradient(90deg,#c46bff,#2ee6ff,#ff4f8b,#c46bff) 0 0/300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:ttFlow 4s linear infinite;box-shadow:inset 0 0 0 1px var(--c)}
+@keyframes ttFlow{to{background-position:300% 0}}
+.fr .crewtag{margin-right:5px}
+.fr.tappable{cursor:pointer}.fr.tappable:hover{border-color:rgba(167,123,255,.5)}
+.fr .fn b .bdg{margin:0 0 0 5px}
+.fr button.mini.off{opacity:.55}
+.fr .btnrow{display:flex;gap:5px;align-items:center}
+#crewMembers .fr .acts,#crewMembers .fr .frpick{grid-column:1/-1}
+#crewMembers .frpick{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px}#crewMembers .frpick button{font-size:.8rem;padding:9px 6px}#crewMembers .frpick span{grid-column:1/-1;font-size:.72rem;color:var(--muted)}
+.fr .frtt{display:block;margin-top:2px;line-height:1}
+/* player profile */
+.plhero{width:100%;height:auto;aspect-ratio:480/190;border-radius:12px;background:radial-gradient(ellipse at 30% 60%,rgba(167,123,255,.16),transparent 70%)}
+.plhead{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.plhead h2{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.plhead .fine{margin:0}
+.plshow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.plmed{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);text-align:center;min-width:0}
+.plmed .mi{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.45rem;border:2px solid var(--c);box-shadow:0 0 14px var(--c);background:rgba(255,255,255,.06)}
+.plmed b{font-family:var(--display);font-size:.74rem;line-height:1.2;color:var(--ink)}
+.plmed span{font-size:.66rem;color:var(--muted);line-height:1.25}
+.plmed.empty{border-style:dashed;opacity:.6}.plmed.empty .mi{border-color:var(--line);box-shadow:none;color:var(--muted);font-size:1.1rem}
+button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
+.plcrew{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.plcrew canvas{width:40px;height:40px;flex:none}.plcrew b{font-family:var(--display);color:var(--ink)}.plcrew span{font-size:.75rem;color:var(--muted);display:block}
+.plstats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.plstats div{padding:8px 6px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(167,123,255,.18);text-align:center;min-width:0}
+.plstats b{display:block;font-family:var(--display);font-size:1.02rem;color:var(--ink)}.plstats span{font-size:.64rem;color:var(--muted);line-height:1.2;display:block}
+.plsub{font-family:var(--display);font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:2px 0 -6px}
+.placts{display:flex;flex-direction:column;gap:8px}.placts .frpick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mysc{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
 </style>
 </head>
 <body>
@@ -997,6 +1037,21 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
       <div class="cinv"><canvas id="ciEmblem" width="220" height="220" aria-hidden="true"></canvas><span class="ctag" id="ciTag"></span><b id="ciName"></b><p class="fine" id="ciInfo"></p><p class="fine" id="ciMotto"></p></div>
       <p class="fine chint" id="ciHint" aria-live="polite"></p>
       <div class="btns"><button id="ciJoin">Beitreten</button><button class="ghost" id="ciBack">Nein danke</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="player" hidden>
+    <div class="card">
+      <span class="label">Spielerprofil</span>
+      <canvas id="plHero" class="plhero" width="480" height="190" aria-hidden="true"></canvas>
+      <div class="plhead"><h2 id="plName">Pilot</h2><span class="fine" id="plInfo"></span></div>
+      <span class="plsub">Vitrine</span>
+      <div class="plshow" id="plShow"></div>
+      <div class="plcrew" id="plCrew" hidden><canvas id="plEmblem" width="80" height="80" aria-hidden="true"></canvas><div><b id="plCrewName"></b><span id="plCrewRole"></span></div></div>
+      <span class="plsub">Statistik</span>
+      <div class="plstats" id="plStats"></div>
+      <div class="placts" id="plActs"></div>
+      <button class="ghost" id="playerBack">Zurück</button>
     </div>
   </div>
 
@@ -1391,6 +1446,8 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
         <div class="pwho"><h2 id="pName">Pilot</h2><span class="fine" id="pInfo"></span></div>
         <button class="ghost mini" id="pRename">Name ändern</button>
       </div>
+      <div class="mysc"><span class="plsub" style="margin:0">Deine Vitrine</span><button class="ghost mini" id="pPublic">So sehen dich andere</button></div>
+      <div class="plshow" id="pShow"></div>
       <div class="tabs" role="tablist" id="pTabs"><button class="tab" id="ptab-ach" role="tab" aria-selected="true">Erfolge</button></div>
       <p class="fine" id="achNote"></p>
       <div class="achlist" id="achList"></div>
@@ -4708,7 +4765,7 @@ function coverReady(){ show(null); startTurn() }
 function startLevel(i){
   if(SERVER_ECON&&!econReady()&&campDiff>1&&!dailyMode&&!ugPlay&&!window.__GD_TEST__){ toast(`${DIFFS[campDiff].name} braucht eine Verbindung. Offline geht der Rang Kadett.`); return }
   mode='campaign'; levelIdx=i; shotCount=0; turn=0; newLevelMap();
-  levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>{});
+  levelDiff=campDiff; if(ugPlay){} else if(dailyMode){ if(SERVER_ECON&&econReady()) rpc('gd_daily_start').catch(()=>{}) } else if(SERVER_ECON&&campDiff>1&&econReady()) lvlStartP.set(curGalaxy().id+':'+i+':'+campDiff,rpc('gd_level_start',{p_gal:curGalaxy().id,p_level:i,p_diff:campDiff}).catch(()=>null));
   const L=curLevel();
   banner=L.boss?{text:'Bosskampf',sub:L.boss.name,t:2.2,player:0}:{text:ugPlay?(ugPlay.test?'Testflug':'Community-Level'):dailyMode?'Tageslevel':`Level ${i+1}`,sub:L.name,t:1.8,player:0};
   // explain new weapons and new kinds of bodies the first time they show up
@@ -6795,14 +6852,24 @@ async function netSyncProfile(){
   if(current==='home') renderHome();
 }
 /* a look sent by someone else: only known shop items, so nothing odd can be drawn */
-function skinFromEquip(e){
+function skinFromEquip(e,raw){
   e=e&&typeof e==='object'?e:{};
   const ok=(cat,id)=>typeof id==='string'&&SHOP[cat].some(i=>i.id===id)?id:SHOP[cat][0].id;
   const c=shopItem('color',ok('color',e.color));
   const s={color:c.color,c2:c.c2,anim:c.anim,aura:ok('aura',e.aura),trail:ok('trail',e.trail),shot:ok('shot',e.shot),pattern:ok('pattern',e.pattern),impact:ok('impact',e.impact),title:ok('title',e.title),companion:ok('companion',e.companion),victory:ok('victory',e.victory)};
+  if(raw) return s;
   const mine=mySkin(); if(!s.anim&&!mine.anim&&s.color===mine.color){ s.color=duelRivalSkin().color; s.c2=null } // never two planets in the same color
   return s;
 }
+const lvlChip=lv=>lv?`<span class="lvchip" title="Spielerlevel">Lv ${lv|0}</span>`:'';
+const pTagHtml=p=>p&&p.tag?`<span class="crewtag" style="--c:${crewCol(p.tagc|0)}">${esc(p.tag)}</span>`:'';
+function titleChip(id){ if(!id||id==='none'||!SHOP.title.some(i=>i.id===id)) return ''; const it=shopItem('title',id), rc=(RARITY[it.rarity]||RARITY.common).color;
+  return `<span class="ttchip r-${it.rarity}" style="--c:${rc}">${esc(it.name)}</span>` }
+/* opens a player's profile when the row (not one of its buttons) is tapped */
+function rowOpensPlayer(el,p){ if(!p||!p.id) return; el.classList.add('tappable'); el.setAttribute('role','button'); el.tabIndex=0;
+  el.setAttribute('aria-label',`Profil von ${cleanName(p.name)}`);
+  el.onclick=ev=>{ if(ev.target.closest('button')) return; Sfx.init(); Sfx.select(); openPlayer(p.id,p) };
+  el.onkeydown=ev=>{ if(ev.target===el&&(ev.key==='Enter'||ev.key===' ')){ ev.preventDefault(); openPlayer(p.id,p) } } }
 const cleanName=n=>String(n||'Pilot').replace(/[\u0000-\u001f]/g,'').slice(0,16)||'Pilot';
 
 /* heartbeat: online status for friends, incoming challenges, current Gravitonen */
@@ -6819,7 +6886,7 @@ async function netPing(){
       search=null; clearInterval(s.poll); if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{});
       invite=inv; invite.back='home'; answerInvite(true);
     }
-    else if(inv&&!online&&!search&&phase==='menu'&&['home','friends','quests','shop','settings','board'].includes(current)) showInvite(inv);
+    else if(inv&&!online&&!search&&phase==='menu'&&['home','friends','quests','shop','settings','board','crew','player','profile','inventory','album','arenas'].includes(current)) showInvite(inv);
     else if(inv&&!search&&current==='over'&&online&&online.over&&!online.ranked&&inv.from.id===online.opp.id) showInvite(inv,true);
     if(current==='friends'&&performance.now()-frLoadedAt>18000) loadFriends(true); // the list refreshes about every 20 s
   }catch(e){}
@@ -7044,10 +7111,12 @@ function econLevel(g,i,st,cb,d=1){
   if(!econReady()&&cb) cb({xp:0,dust:0,up:0,offline:true,pending:true});
   econPump();
 }
+var lvlStartP=new Map();
 async function econPump(){
   if(lvlBusy||!econReady()||!pendingLevels.length) return;
   lvlBusy=true; const x=pendingLevels[0];
   try{
+    const sk=x.g+':'+x.i+':'+x.d, sp=lvlStartP.get(sk); if(sp){ await sp; lvlStartP.delete(sk) }
     const r=await rpc('gd_level_done',x.d>1?{p_gal:x.g,p_level:x.i,p_stars:x.st,p_diff:x.d}:{p_gal:x.g,p_level:x.i,p_stars:x.st});
     if(r&&r.wait){ lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,2200); return }
     pendingLevels.shift(); save(PENDING_LVL,pendingLevels);
@@ -7056,12 +7125,15 @@ async function econPump(){
     if(cb) cb(r.reward||{xp:0,dust:0});
   }catch(e){
     const m=String(e&&e.message||'');
-    if(/bad level|level locked|not started/.test(m)){ pendingLevels.shift(); save(PENDING_LVL,pendingLevels); lvlCb.delete(x.id); econRefresh().catch(()=>{}) } // the server does not accept it
+    if(/not started/.test(m)&&x.d>1&&!x.rs){ // the start never arrived (bad connection): register it now and send again
+      x.rs=1; save(PENDING_LVL,pendingLevels); try{ await rpc('gd_level_start',{p_gal:x.g,p_level:x.i,p_diff:x.d}) }catch(e2){}
+      lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,1300); return }
+    if(/bad level|level locked|not started/.test(m)){ const cb=lvlCb.get(x.id); if(cb) cb({failed:true}); pendingLevels.shift(); save(PENDING_LVL,pendingLevels); lvlCb.delete(x.id); econRefresh().catch(()=>{}) } // the server does not accept it
     else { lvlBusy=false; clearTimeout(lvlTimer); lvlTimer=setTimeout(econPump,8000); return }
   }
   lvlBusy=false; if(pendingLevels.length) econPump();
 }
-const levelLine=rw=>rw&&rw.pending?'Wird gutgeschrieben, sobald du online bist':rewardLine(rw);
+const levelLine=rw=>rw&&rw.failed?'Konnte nicht gespeichert werden, bitte das Level nochmal spielen':rw&&rw.pending?'Wird gutgeschrieben, sobald du online bist':rewardLine(rw);
 async function econDuel(won,cb){
   if(!econReady()){ cb({xp:0,dust:0,up:0,limited:false,offline:true}); $('overReward').textContent='Ohne Verbindung gibt es keine Belohnung'; return }
   try{ const r=await rpc('gd_duel_done',{p_won:!!won}); applyEcon(r.state); if(r.reward.up) Sfx.levelup(); cb(r.reward) }
@@ -7222,7 +7294,9 @@ async function switchedAccount(msg){
 const ACH_FAM={shooter:['🎯','Treffsicher','Ziele zerstört'],stars:['⭐','Sternensammler','Sterne in der Kampagne'],explorer:['🧭','Entdecker','Galaxien abgeschlossen'],
   boss:['👑','Bossjäger','Wächter besiegt'],duelist:['⚔️','Duellant','Duelle gespielt'],champion:['🏆','Champion','Wettkampf-Siege'],perfect:['✨','Perfektionist','Level mit 3 Sternen'],
   longshot:['☄️','Weitflieger','Treffer nach über 3 s Flug'],eventer:['🎪','Eventjäger','Wochen-Events geschafft'],daily:['☀️','Tagesheld','Tageslevel geschafft'],portal:['🌀','Wurmlochreisender','Flüge durch Wurmlöcher'],special:['💥','Spezialist','Spezialgeschosse eingesetzt'],
-  collector:['💎','Sammler','Items im Besitz'],climber:['📈','Aufsteiger','Spielerlevel'],crates:['🎁','Kistenöffner','Kisten geöffnet']};
+  collector:['💎','Sammler','Items im Besitz'],climber:['📈','Aufsteiger','Spielerlevel'],crates:['🎁','Kistenöffner','Kisten geöffnet'],
+  commander:['🛡️','Kommandant','Galaxien im Rang Kommandant'],legend:['💠','Legende','Galaxien im Rang Legende'],winner:['🥇','Siegertyp','Duelle gewonnen'],
+  gunner:['🚀','Dauerfeuer','Schüsse abgefeuert'],architect:['🛠️','Architekt','Eigene Level veröffentlicht'],pathfinder:['🧩','Pfadfinder','Community-Level geschafft']};
 const TIER_COL=['#d08a4f','#c8d4e6','#ffd34f'], TIER_NAME=['I','II','III'];
 let achData=null, achAt=-1e9;
 function badgeOf(id){ const d=typeof id==='string'&&/^([a-z]+)(\d)$/.exec(id); if(!d||!ACH_FAM[d[1]]||!TIER_COL[d[2]-1]) return null; return {e:ACH_FAM[d[1]][0],c:TIER_COL[d[2]-1],name:`${ACH_FAM[d[1]][1]} ${TIER_NAME[d[2]-1]}`} }
@@ -7232,7 +7306,7 @@ async function loadAch(force){
   if(!SERVER_ECON||!econReady()) return;
   if(!force&&performance.now()-achAt<45000) return;
   achAt=performance.now();
-  try{ achData=await rpc('gd_achievements'); profile.badge=achData.badge||''; saveProfile(); renderMe(); if(current==='profile') renderAch() }catch(e){}
+  try{ achData=await rpc('gd_achievements'); profile.badge=achData.badge||''; profile.showcase=myShowcase(); saveProfile(); renderMe(); if(current==='profile') renderAch() }catch(e){}
 }
 function openProfile(){
   const li=levelInfo(profile.xp);
@@ -7240,13 +7314,38 @@ function openProfile(){
   $('pInfo').textContent=`Spielerlevel ${li.level} · ${profile.trophies|0} ${CURRENCY}`;
   show('profile'); renderAch(); loadAch(true);
 }
+const SHOW_MAX=3;
+function myShowcase(){ const l=achData&&Array.isArray(achData.showcase)?achData.showcase:Array.isArray(profile.showcase)?profile.showcase:profile.badge?[profile.badge]:[]; return l.filter(id=>badgeOf(id)).slice(0,SHOW_MAX) }
+function achGoalOf(id){ const a=achData&&achData.list.find(x=>x.id===id); return a?a.goal:0 }
+/* one medal of a showcase; slot buttons on the own profile take it out again */
+function medalHtml(id,goal){ const b=badgeOf(id), f=b&&ACH_FAM[/^[a-z]+/.exec(id)[0]];
+  return b?`<span class="mi" style="--c:${b.c}" aria-hidden="true">${b.e}</span><b>${esc(b.name)}</b><span>${esc(f[2])}${goal?': '+goal:''}</span>`:'' }
+function renderShowcase(box,ids,mine){
+  box.innerHTML='';
+  for(let i=0;i<SHOW_MAX;i++){
+    const id=ids[i], el=document.createElement(mine&&id?'button':'div'); el.className='plmed'+(id?'':' empty'); el.style.setProperty('--c',id?badgeOf(id).c:'var(--line)');
+    if(id){ el.innerHTML=medalHtml(id,mine?achGoalOf(id):0); if(mine){ el.setAttribute('aria-label',`${badgeOf(id).name} aus der Vitrine nehmen`); el.onclick=()=>setShowcase(ids.filter(x=>x!==id)) } }
+    else el.innerHTML=`<span class="mi" aria-hidden="true">+</span><span>${mine?'Tippe unten auf eine Medaille':'Leer'}</span>`;
+    box.appendChild(el);
+  }
+}
+async function setShowcase(ids){
+  try{ achData=await rpc('gd_set_showcase',{p_ids:ids}); profile.badge=achData.badge||''; profile.showcase=myShowcase(); saveProfile(); Sfx.select(); renderAch(); renderMe() }catch(e){ toast(econErr(e)) }
+}
+function toggleShowcase(id){
+  const l=myShowcase();
+  if(l.includes(id)) return setShowcase(l.filter(x=>x!==id));
+  if(l.length>=SHOW_MAX) return toast(`Höchstens ${SHOW_MAX} Erfolge in der Vitrine: tippe oben auf einen, um ihn herauszunehmen`);
+  setShowcase([...l,id]);
+}
 function renderAch(){
   const b=badgeOf(profile.badge), pb=$('pBadge'); pb.textContent=b?b.e:'🪐'; pb.style.setProperty('--c',b?b.c:'var(--line)');
+  const sc=myShowcase(); renderShowcase($('pShow'),sc,true); $('pShow').hidden=!SERVER_ECON; $('pPublic').hidden=!(SERVER_ECON&&Net.state==='ready');
   const box=$('achList'), note=$('achNote');
   if(!SERVER_ECON){ note.textContent='Erfolge gibt es in der Web-Version mit Verbindung zum Server.'; box.innerHTML=''; return }
   if(!achData){ note.textContent=econReady()?'Lade Erfolge …':'Gerade keine Verbindung zum Server.'; box.innerHTML=''; return }
   const got=achData.list.filter(a=>a.claimed).length;
-  note.textContent=`${got} von ${achData.list.length} Stufen geschafft · Tippe auf eine Medaille, um sie als Abzeichen neben deinem Namen zu zeigen.`;
+  note.textContent=`${got} von ${achData.list.length} Stufen geschafft · Tippe auf eine geschaffte Medaille, um sie in deine Vitrine zu stellen (bis zu ${SHOW_MAX}). Andere sehen sie in deinem Profil.`;
   box.innerHTML='';
   for(const fam of Object.keys(ACH_FAM)){
     const tiers=achData.list.filter(a=>a.fam===fam); if(!tiers.length) continue;
@@ -7258,9 +7357,10 @@ function renderAch(){
     const med=el.querySelector('.medals');
     for(const a of tiers){
       const m=document.createElement('button'); m.textContent=TIER_NAME[a.tier-1]; m.style.setProperty('--c',TIER_COL[a.tier-1]);
-      m.className=(a.claimed?'got':'')+(profile.badge===a.id?' pin':'');
-      m.setAttribute('aria-label',`${title} ${TIER_NAME[a.tier-1]}${a.claimed?(profile.badge===a.id?', als Abzeichen gezeigt':', als Abzeichen zeigen'):', noch nicht geschafft'}`);
-      m.disabled=!a.claimed; m.onclick=()=>pinBadge(profile.badge===a.id?'':a.id);
+      const inSc=sc.includes(a.id);
+      m.className=(a.claimed?'got':'')+(inSc?' pin':'');
+      m.setAttribute('aria-label',`${title} ${TIER_NAME[a.tier-1]}${a.claimed?(inSc?', in der Vitrine – herausnehmen':', in die Vitrine stellen'):', noch nicht geschafft'}`);
+      m.disabled=!a.claimed; m.onclick=()=>toggleShowcase(a.id);
       med.appendChild(m);
     }
     if(ready){ const c=document.createElement('button'); c.className='claim'; c.textContent=`Abholen · ✦ ${cur.dust}`; c.onclick=()=>claimAch(cur.id,c); el.appendChild(c) }
@@ -7356,14 +7456,68 @@ function renderArenas(){
   requestAnimationFrame(()=>{ const h=box.querySelector('.here'); if(h) h.scrollIntoView({block:'center'}) });
 }
 
+/* ---------- player profiles (gd_player): look, showcase, crew, stats, challenge ---------- */
+var plData=null, plFrom='home', plPick=false, plSkin=null;
+async function openPlayer(id,hint){
+  if(Net.state!=='ready') return toast('Profile gibt es nur mit Verbindung zum Server');
+  if(current!=='player') plFrom=current||'home';
+  plData=hint&&hint.id===id?{...hint,_part:true}:{id,_part:true}; plPick=false; renderPlayer(); show('player'); $('player').scrollTop=0;
+  try{ const d=await rpc('gd_player',{p_id:id}); if(current!=='player'||!plData||plData.id!==id) return; plData=d; renderPlayer() }
+  catch(e){ if(current==='player') toast(niceErr(e)) }
+}
+function renderPlayer(){
+  const p=plData||{}, nm=cleanName(p.name), st=p.stats;
+  plSkin=skinFromEquip(p.skin,true);
+  $('plName').innerHTML=`${pTagHtml(p)}${esc(p.name?nm:'Lade …')}${lvlChip(p.level)}`;
+  const on=p.duel&&p.online?'<span style="color:var(--gold)">Im Duell</span>':p.online?'<span style="color:#5cff9d">Online</span>':p.seen!=null?seenText(p):'';
+  $('plInfo').innerHTML=[`<span class="gv" aria-hidden="true"></span> ${p.gravitons|0} ${CURRENCY}`,on].filter(Boolean).join(' · ');
+  renderShowcase($('plShow'),(Array.isArray(p.show)?p.show:p.badge?[p.badge]:[]).filter(id=>badgeOf(id)),false);
+  const c=p.crew; $('plCrew').hidden=!c;
+  if(c){ drawCrewEmblem($('plEmblem'),c.color,c.emblem); $('plCrewName').innerHTML=`${crewTagHtml(c)}${esc(c.name)}`; $('plCrewRole').textContent=`Crew · ${CREW_ROLE[c.role]||'Mitglied'}` }
+  const tile=(v,l)=>`<div><b>${v}</b><span>${l}</span></div>`, since=p.since?new Date(p.since):null;
+  $('plStats').innerHTML=st?[
+    tile(st.stars|0,'Sterne'), tile(`${st.galaxies|0}·${st.galaxies2|0}·${st.galaxies3|0}`,'Galaxien Kadett · Kommandant · Legende'), tile(st.boss|0,'Bosse besiegt'),
+    tile(st.duels|0,'Duelle'), tile(`${p.wins|0} : ${p.losses|0}`,'Wettkampf Siege : Niederlagen'), tile(st.onlineWins|0,'Online-Siege'),
+    tile(`${p.ach|0}/${p.achTotal|0}`,'Erfolge'), tile(st.owned|0,'Items'), tile(since?since.toLocaleDateString('de-DE',{month:'short',year:'numeric'}):'–','Pilot seit')].join('')
+    :`<div style="grid-column:1/-1"><span>${p._part?'Lade …':'Keine Daten'}</span></div>`;
+  const a=$('plActs'); a.innerHTML='';
+  const btn=(t,cls,fn)=>{ const b=document.createElement('button'); if(cls) b.className=cls; b.textContent=t; b.onclick=()=>{ Sfx.init(); fn(b) }; a.appendChild(b); return b };
+  if(p._part&&!st) return;
+  if(p.me){ btn('Vitrine bearbeiten','alt',()=>{ Sfx.select(); openProfile() }); return }
+  const can=p.friend||p.crewmate;
+  if(p.duel&&p.online&&p.friend) btn('Beim Duell zuschauen','',()=>{ Sfx.select(); watchFriend(p) });
+  else if(p.online&&can){
+    btn(plPick?'Modus wählen …':'Herausfordern',plPick?'ghost':'',()=>{ Sfx.select(); plPick=!plPick; renderPlayer() });
+    if(plPick){ const pk=document.createElement('div'); pk.className='frpick'; pk.setAttribute('role','group'); pk.setAttribute('aria-label','Modus wählen');
+      for(const md of ['classic','blitz']){ const b=document.createElement('button'); b.className=onlineMode===md?'':'ghost'; b.textContent=MODE_NAME[md];
+        b.onclick=()=>{ plPick=false; setOnlineMode(md); challengeFriend(p) }; pk.appendChild(b) }
+      a.appendChild(pk) }
+  }
+  else if(can){ const b=btn('Herausfordern','ghost',()=>toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`)); b.classList.add('off') }
+  else { const n=document.createElement('p'); n.className='fine'; n.style.textAlign='center'; n.textContent='Herausfordern kannst du Freunde und Mitglieder deiner Crew. Füge Spieler mit ihrem Freundescode hinzu.'; a.appendChild(n) }
+}
+function plTick(t){
+  if(current!=='player'||!plSkin) return;
+  const cv=$('plHero'), g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return;
+  g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  const skin=plSkin, tid=plData&&plData.skin&&plData.skin.title, plate=tid&&tid!=='none'&&SHOP.title.some(i=>i.id===tid), sh=plate?h*.8:h, col=skinColor(skin,t);
+  const tr=[]; for(let i=0;i<=50;i++){ const k=i/50; tr.push([w*.32+k*w*.55,sh*.66-Math.sin(k*Math.PI)*sh*.44+k*sh*.08]) }
+  drawStyledTrail(g,tr,col,skin.trail,t,.9);
+  const e=tr[50], q=tr[49]; g.save(); g.translate(e[0],e[1]); g.rotate(Math.atan2(e[1]-q[1],e[0]-q[0])); g.scale(1.5,1.5); drawShotHead(g,skin.shot,col,t); g.restore();
+  const r=Math.min(32,sh*.21);
+  if(skin.companion&&skin.companion!=='none') drawCompanionPreview(g,w*.22,sh*.58,r,skin,t,1); else drawSkinnedPlanet(g,w*.22,sh*.58,r,skin,t,false);
+  if(plate){ g.save(); g.translate(w/2,h*.88); drawNamePlate(g,shopItem('title',tid),t,Math.min(w*.62,240),26); g.restore() }
+}
+
 /* ---------- leaderboard ---------- */
 async function openBoard(){
   $('boardList').innerHTML='<div class="fr"><span class="fn"><b>Lade …</b></span></div>'; $('boardMe').textContent=''; show('board');
   try{
     const r=await rpc('gd_leaderboard');
-    $('boardMe').textContent=`Dein Platz: ${r.rank} von ${r.players} · ${profile.trophies} ${CURRENCY}`;
+    $('boardMe').textContent=`Dein Platz: ${r.rank} von ${r.players} · ${profile.trophies} ${CURRENCY} · Tippe auf einen Spieler für sein Profil`;
     $('boardList').innerHTML=r.top.map((p,i)=>{ const col=skinFromEquip(p.skin).color, tt=titleName(p.skin&&p.skin.title);
-      return `<div class="fr${p.me?' me':''}"><span class="rank">${i+1}</span><span class="av" style="background:${col}"></span><span class="fn"><b>${badgeHtml(p.badge)}${esc(cleanName(p.name))}</b><i>${tt?esc(tt)+' · ':''}${p.wins|0} ${(p.wins|0)===1?'Sieg':'Siege'}</i></span><span class="st"><span class="gv" aria-hidden="true"></span> ${p.gravitons|0}</span></div>` }).join('')||'<div class="fr"><span class="fn"><b>Noch niemand gewertet</b></span></div>';
+      return `<div class="fr${p.me?' me':''}" data-i="${i}"><span class="rank">${i+1}</span><span class="av" style="background:${col}"></span><span class="fn"><b>${pTagHtml(p)}${esc(cleanName(p.name))}${lvlChip(p.level)}</b><i>${p.wins|0} ${(p.wins|0)===1?'Sieg':'Siege'}</i>${tt?`<span class="frtt">${titleChip(p.skin.title)}</span>`:''}</span><span class="st"><span class="gv" aria-hidden="true"></span> ${p.gravitons|0}</span></div>` }).join('')||'<div class="fr"><span class="fn"><b>Noch niemand gewertet</b></span></div>';
+    $('boardList').querySelectorAll('.fr[data-i]').forEach(el=>rowOpensPlayer(el,r.top[+el.dataset.i]));
   }catch(e){ $('boardList').innerHTML=`<div class="fr"><span class="fn"><b>${esc(niceErr(e))}</b></span></div>` }
 }
 
@@ -7595,7 +7749,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -8994,6 +9148,11 @@ renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
+tap('pPublic',()=>{ Sfx.select(); const id=Net.backend&&Net.backend.uid; if(id) openPlayer(id) });
+tap('playerBack',()=>{ const f=plFrom; plData=null;
+  if(f==='friends') return openFriends(); if(f==='crew'){ show('crew'); return renderCrew() } if(f==='board') return openBoard(); if(f==='profile') return openProfile();
+  if(f&&screens.includes(f)) return show(f); goHome() });
+
 tap('profileBack',()=>goHome());
 tap('pRename',()=>{ nameBack='profile'; $('nameInput').value=playerName(); show('nameEdit'); setTimeout(()=>$('nameInput').focus(),50) });
 tap('ptab-ach',()=>renderAch());
@@ -9661,12 +9820,29 @@ function renderCrew(){
   const me=c.role, box=$('crewMembers'); box.innerHTML='';
   c.members.forEach((m,i)=>{
     const el=document.createElement('div'), col=skinFromEquip(m.skin).color, tt=titleName(m.skin&&m.skin.title);
-    const canAct=!m.me&&(me==='leader'||(me==='vize'&&m.role==='member'));
-    el.className='fr'+(m.me?' me':'')+(canAct?' tappable':'');
-    el.innerHTML=`<span class="av" style="background:${col}"></span><span class="fn"><b>${badgeHtml(m.badge)}${esc(cleanName(m.name))}${m.role!=='member'?`<i class="role${m.role==='vize'?' v':''}">${CREW_ROLE[m.role]}</i>`:''}</b><i>${tt?esc(tt)+' · ':''}<span class="gv" aria-hidden="true"></span> ${m.gravitons|0}</i></span><span class="st">${m.week|0} ${(m.week|0)===1?'Sieg':'Siege'}<br>diese Woche</span>`;
+    const canAct=!m.me&&(me==='leader'||(me==='vize'&&m.role==='member')), nm=cleanName(m.name);
+    el.className='fr'+(m.me?' me':'');
+    el.innerHTML=`<span class="av${m.online&&!m.me?' on':''}" style="background:${col}"></span><span class="fn"><b>${esc(nm)}${lvlChip(m.level)}${m.role!=='member'?`<i class="role${m.role==='vize'?' v':''}">${CREW_ROLE[m.role]}</i>`:''}</b><i>${m.week|0} ${(m.week|0)===1?'Sieg':'Siege'} diese Woche</i>${tt?`<span class="frtt">${titleChip(m.skin.title)}</span>`:''}</span>`;
+    const row=document.createElement('span'); row.className='btnrow';
+    if(!m.me){
+      const d=document.createElement('button'); d.className='mini'+(m.online?'':' ghost off')+(GDX.dpick===m.id?' open':''); d.textContent='Duell';
+      d.setAttribute('aria-label',`${nm} herausfordern`);
+      d.onclick=()=>{ Sfx.init(); if(!m.online) return toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`);
+        Sfx.select(); GDX.dpick=GDX.dpick===m.id?null:m.id; GDX.open=-1; renderCrew() };
+      row.appendChild(d);
+    }
+    if(canAct){ const k=document.createElement('button'); k.className='mini ghost'; k.textContent='⋯'; k.setAttribute('aria-label',`${nm}: Aktionen`); k.setAttribute('aria-expanded',String(GDX.open===i));
+      k.onclick=()=>{ GDX.open=GDX.open===i?-1:i; GDX.dpick=null; Sfx.select(); renderCrew() }; row.appendChild(k) }
+    el.appendChild(row);
+    if(!m.me) rowOpensPlayer(el,m);
+    if(GDX.dpick===m.id&&m.online&&!m.me){
+      const pk=document.createElement('div'); pk.className='frpick'; pk.setAttribute('role','group'); pk.setAttribute('aria-label','Modus wählen');
+      pk.innerHTML='<span>Modus für die Herausforderung</span>';
+      for(const md of ['classic','blitz']){ const b=document.createElement('button'); b.className=onlineMode===md?'':'ghost'; b.textContent=MODE_NAME[md];
+        b.onclick=()=>{ GDX.dpick=null; setOnlineMode(md); challengeFriend(m) }; pk.appendChild(b) }
+      el.appendChild(pk);
+    }
     if(canAct){
-      el.setAttribute('role','button'); el.tabIndex=0; el.setAttribute('aria-label',`${cleanName(m.name)}: Aktionen`);
-      el.onclick=ev=>{ if(ev.target.closest('button')) return; GDX.open=GDX.open===i?-1:i; Sfx.select(); renderCrew() };
       if(GDX.open===i){
         const acts=document.createElement('div'); acts.className='acts';
         const btn=(t,cls,fn)=>{ const b=document.createElement('button'); b.className='mini'+(cls?' '+cls:''); b.textContent=t; b.onclick=()=>{ Sfx.init(); fn(b) }; acts.appendChild(b); return b };
@@ -10157,7 +10333,7 @@ function renderFriends(){
     const col=skinFromEquip(f.skin).color, duel=!!(f.duel&&f.online);
     const st=duel?`<span class="fs duel">Im Duell${f.duel.mode&&MODE_NAME[f.duel.mode]?' · '+MODE_NAME[f.duel.mode]:''}</span>`:`<span class="fs${f.online?' on':''}">${seenText(f)}</span>`;
     el.innerHTML=`<span class="av${duel?' duel':f.online?' on':''}" style="background:${col};box-shadow:0 0 10px ${col}"></span>
-      <span class="fn"><b>${badgeHtml(f.badge)}${esc(cleanName(f.name))}</b><i>${st} · ${f.gravitons|0} ${CURRENCY}</i></span>`;
+      <span class="fn"><b>${pTagHtml(f)}${esc(cleanName(f.name))}${lvlChip(f.level)}</b><i>${st}</i>${titleChip(f.skin&&f.skin.title)?`<span class="frtt">${titleChip(f.skin.title)}</span>`:''}</span>`;
     const nm=cleanName(f.name);
     let btn=null;
     if(duel){
@@ -10170,7 +10346,9 @@ function renderFriends(){
       btn.onclick=()=>{ Sfx.init();
         if(friendCtx) return challengeFriend(f); // from the local duel: its mode and arena are used
         Sfx.select(); frPick=frPick===f.id?null:f.id; renderFriends() };
-    } else { btn=document.createElement('span'); btn.className='st'; }
+    } else { btn=document.createElement('button'); btn.className='mini ghost off'; btn.textContent='Duell';
+      btn.setAttribute('aria-label',`${nm} ist offline`); btn.onclick=()=>{ Sfx.init(); toast(`${nm} ist gerade offline. Herausfordern geht, sobald ${nm} online ist.`) } }
+    rowOpensPlayer(el,f);
     const rm=document.createElement('button'); rm.className='mini x'; rm.textContent='×'; rm.setAttribute('aria-label',`${nm} entfernen`);
     rm.onclick=async()=>{ if(rm.dataset.sure!=='1'){ rm.dataset.sure='1'; rm.textContent='Sicher?'; return }
       try{ await rpc('gd_remove_friend',{p_id:f.id}); Net.friends=Net.friends.filter(x=>x.id!==f.id); renderFriends() }catch(e){ toast(niceErr(e)) } };
@@ -10409,7 +10587,7 @@ function loop(now){
   const t=now/1000;
   // behind list screens (shop, inventory, album …) the sky only needs half the frame rate
   const menuBg=current&&current!=='home'&&current!=='intro'&&current!=='clear'&&current!=='over'&&current!=='cover', skip=menuBg&&(loopN++&1);
-  step(dt); if(!skip){ draw(t); bgTick(t) } homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); pickerTick(t); seasonTick(t); crateTick(t);
+  step(dt); if(!skip){ draw(t); bgTick(t) } homeTick(t); galleryTick(t); shopTick(t); voidTick(t); invTick(t); albTick(t); plTick(t); pickerTick(t); seasonTick(t); crateTick(t);
   requestAnimationFrame(loop);
 }
 resize(); goHome(); if(SERVER_ECON&&NEED_ACCOUNT&&!(!navigator.onLine&&load('gravityDuel.hadAccount.v1',false))) openSetup('wait'); requestAnimationFrame(loop); netInit();
