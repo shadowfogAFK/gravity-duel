@@ -884,6 +884,62 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .lgclaim{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;border:1px solid var(--gold);background:rgba(255,211,79,.08)}
 .lgclaim b{font-family:var(--display);color:var(--gold)}
 .lgprog{height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}.lgprog i{display:block;height:100%;background:linear-gradient(90deg,var(--p2),var(--gold))}
+/* ---------- five areas: bottom navigation and hub pages ---------- */
+.navbar{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding-block:6px 10px;background:rgba(8,3,22,.94);border-top:1px solid rgba(167,123,255,.22)}
+.navbar button{position:relative;gap:3px;padding:7px 2px 5px;font-size:.68rem;font-weight:600;background:transparent;border:0;border-radius:12px;min-width:0}
+.navbar button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.navbar button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.navbar button[aria-selected="true"]{color:#8ff3ff;background:rgba(46,230,255,.13);border:0}
+.navbar .nbadge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:#ff3d5e;color:#fff;font-size:.68rem;font-weight:700;line-height:18px;text-align:center}
+.navbar .nbadge.dot{min-width:0;width:10px;height:10px;padding:0;top:5px;left:calc(50% + 8px);background:var(--gold);box-shadow:0 0 8px var(--gold)}
+#nav-1 .tnlive{top:-6px}
+.topbar{padding-block:8px 6px}
+.secthead{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:2px 0 -6px}
+.pagehead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:4px}
+.pagehead h2{font-size:1.6rem}
+.minigrid,.hubgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.minicard,.hubcard{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:16px;background:rgba(22,10,52,.8);border:1px solid var(--line);box-shadow:none;color:var(--ink);text-align:left;min-width:0}
+.hubcard{min-height:108px}
+.minicard svg,.hubcard svg{width:24px;height:24px;fill:none;stroke:var(--c,var(--p2));stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:2px}
+.minicard b,.hubcard>b:not(.badge){font-family:var(--display);font-size:1rem}
+.minicard span,.hubcard span{font-size:.74rem;color:var(--muted);line-height:1.3}
+.hubcard .badge{top:10px;right:10px;left:auto}
+.hubcard .badge.dot{min-width:0;width:11px;height:11px;padding:0;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.findbox{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:18px;background:rgba(22,10,52,.8);border:1px solid var(--line)}
+.findbox .seg{background:transparent;border:0;padding:0}
+.weekrow{display:flex;gap:8px}
+.weekrow .evcard{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:10px;margin:0}
+.weekrow .evcard[hidden]{display:none}
+.weekrow .evcard .evic{font-size:1.15rem}
+.weekrow .evcard>div{min-width:0;width:100%}
+.weekrow .evcard b{font-size:.8rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.weekrow .evcard span:not(.evic){font-size:.7rem!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal!important}
+.weekrow .evcard .mini{width:100%;padding:6px 4px;font-size:.72rem}
+.weekrow .evcard .bar{margin-top:4px}
+.rowlist{display:flex;flex-direction:column;border-radius:16px;background:rgba(22,10,52,.8);border:1px solid var(--line);overflow:hidden}
+.rowbtn{display:flex;align-items:center;gap:12px;padding:14px;background:transparent;border:0;border-radius:0;box-shadow:none;color:var(--ink);text-align:left;font-weight:600}
+.rowbtn+.rowbtn{border-top:1px solid rgba(167,123,255,.18)}
+.rowbtn svg{width:20px;height:20px;fill:none;stroke:var(--p2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rowbtn span{flex:1}.rowbtn i{font-style:normal;color:var(--muted)}
+.evlist{display:flex;flex-direction:column;gap:8px}
+.evrow{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 12px;border-radius:16px;background:rgba(22,10,52,.8);border:1px solid var(--line);box-shadow:none;color:var(--ink);text-align:left}
+.evrow .eic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,transparent)}
+.evrow .eic svg{width:22px;height:22px;fill:none;stroke:var(--c);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.evrow .et{display:flex;flex-direction:column;gap:2px;min-width:0}
+.evrow .et b{font-size:.95rem}
+.evrow .et span{font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.evrow .chev{color:var(--muted);font-size:1.2rem}
+.evrow.hot{border-color:color-mix(in srgb,var(--c) 70%,transparent);background:color-mix(in srgb,var(--c) 9%,rgba(22,10,52,.85))}
+.evrow.hot .et span{color:var(--ink)}
+.evrow .badge{top:8px;right:8px}
+.evrow .badge.dot,.hubcard .badge.dot{min-width:0;width:11px;height:11px;padding:0}
+.evrow .medot{position:absolute;top:8px;right:8px}
+.seasoncard{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:18px;background:linear-gradient(120deg,rgba(255,79,139,.2),rgba(46,230,255,.12));border:1px solid rgba(167,123,255,.5);box-shadow:none;color:var(--ink);text-align:left}
+.seasoncard .sh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.78rem;color:var(--muted)}
+.seasoncard .sh b{font-family:var(--display);font-size:1.05rem;color:var(--ink)}
+.seasoncard .gold{color:var(--gold)}
+#hubOnline .fr{grid-template-columns:34px minmax(0,1fr) auto}
+.duelcard .hero{margin:0}
 </style>
 </head>
 <body>
@@ -908,16 +964,10 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         <button class="me" id="me" aria-label="Profil und Erfolge"></button>
         <button class="gear" id="toSettings" aria-label="Optionen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/></svg></button>
       </div>
-      <nav class="tiles" aria-label="Menü">
-        <button class="tile" id="toQuests" aria-label="Aufgaben"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg><span>Aufgaben</span><b class="badge dot" id="questBadge" hidden></b></button>
-        <button class="tile" id="toFriends" aria-label="Freunde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span><b class="badge dot" id="frBadge" hidden></b></button>
-        <button class="tile" id="toInv" aria-label="Inventar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><span>Inventar</span><b class="badge dot" id="invBadge" hidden></b></button>
-        <button class="tile shop" id="toShop" aria-label="Shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><span>Shop</span></button>
-      </nav>
     </div>
     <div class="pager" id="pager">
-      <section class="page" id="page-campaign" aria-label="Kampagne">
-        <div class="hero" id="campHero"><button class="heromore ugentry" id="toCommunity" aria-label="Community-Level und Level-Editor">✎ Community ›</button><canvas id="campCanvas" width="440" height="341" aria-hidden="true"></canvas>
+      <section class="page" id="page-campaign" aria-label="Spielen">
+        <div class="hero" id="campHero"><canvas id="campCanvas" width="440" height="341" aria-hidden="true"></canvas>
           <div class="cap"><span class="label" id="campLabel">Kampagne · Galaxie 1</span><h2 id="campName">Nova-Nebel</h2><p id="campSub"></p></div></div>
         <div class="stats">
           <div class="stat"><b id="campLevels">0/30</b><span>Level geschafft</span></div>
@@ -925,10 +975,14 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
           <div class="stat"><b id="campTotal">★ 0</b><span>Sterne gesamt</span></div>
         </div>
         <div class="bar" aria-hidden="true"><i id="campBar"></i></div>
-        <div class="seg diffseg" role="radiogroup" aria-label="Schwierigkeit" data-diffseg></div>
         <div class="btns">
           <button id="campPlay">Weiter: Level 1</button>
-          <div class="duo"><button class="ghost" id="campAll">Alle Galaxien</button><button class="ghost dailybtn" id="toDaily">☀ Tageslevel<i class="medot" id="dailyDot" hidden></i></button></div>
+          <button class="ghost" id="campAll">Alle Galaxien &amp; Rang wählen</button>
+        </div>
+        <span class="secthead">Weitere Spielarten</span>
+        <div class="minigrid">
+          <button class="minicard" id="toLocal" style="--c:var(--p2)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="17" r="3.5"/><circle cx="17" cy="7" r="3.5"/><path d="M9.5 14.5l5-5"/></svg><b>Lokales Duell</b><span>2 Spieler · 1 Handy</span></button>
+          <button class="minicard" id="toAiPractice" style="--c:var(--gold)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="7" width="14" height="11" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M9.5 15h5"/></svg><b>KI-Übung</b><span>Ohne Gravitonen</span></button>
         </div>
       </section>
       <section class="page" id="page-ranked" aria-label="Wettkampf">
@@ -936,18 +990,70 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
           <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div>
           <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
         <div class="arenaprog"><div class="bar" aria-hidden="true"><i id="arenaBar"></i></div><p class="hint" id="arenaNext"></p></div>
-        <div class="evcard" id="evCard" hidden><span class="evic" id="evIcon">🎪</span><div><b id="evName">Wochen-Event</b><span id="evText"></span><div class="bar" aria-hidden="true"><i id="evBar"></i></div></div><button class="mini" id="evClaim" hidden>Abholen</button></div>
-        <div class="evcard" id="lgCard" role="button" tabindex="0" hidden><span class="evic" id="lgCardIc" aria-hidden="true">🏅</span><div><b id="lgCardName">Ligen</b><span id="lgCardText"></span></div><button class="mini" id="lgCardBtn">Ansehen</button></div>
-        <div class="evcard" id="tnCard" role="button" tabindex="0" hidden><span class="evic" aria-hidden="true">🏆</span><div><b id="tnCardName">Wochenend-Turnier</b><span id="tnCardText"></span></div><button class="mini" id="tnCardBtn">Ansehen</button></div>
         <p class="netstate" id="netState" hidden>Verbinde …</p>
+        <div class="findbox">
         <div class="seg" role="radiogroup" aria-label="Online-Modus">
           <button id="om-classic" role="radio">Klassisch</button><button id="om-blitz" role="radio">Blitzduell</button>
         </div>
-        <button id="findMatch" disabled>Gegner suchen</button>
-        <button class="ghost fernbtn" id="toFern">🪐 Fernduelle · ohne gleichzeitig online zu sein<b class="badge" id="fernBadge" hidden></b></button>
-        <div class="trio"><button class="ghost" id="toBoard" disabled>Bestenliste</button><button class="ghost" id="toCrewR">Crew</button><button class="ghost" id="toReplays">Replays</button></div>
+          <button id="findMatch" disabled>Gegner suchen</button>
+        </div>
+        <span class="secthead">Diese Woche</span>
+        <div class="weekrow">
+        <div class="evcard" id="evCard" hidden><span class="evic" id="evIcon">🎪</span><div><b id="evName">Wochen-Event</b><span id="evText"></span><div class="bar" aria-hidden="true"><i id="evBar"></i></div></div><button class="mini" id="evClaim" hidden>Abholen</button></div>
+        <div class="evcard" id="tnCard" role="button" tabindex="0" hidden><span class="evic" aria-hidden="true">🏆</span><div><b id="tnCardName">Wochenend-Turnier</b><span id="tnCardText"></span></div><button class="mini" id="tnCardBtn">Ansehen</button></div>
+        <div class="evcard" id="lgCard" role="button" tabindex="0" hidden><span class="evic" id="lgCardIc" aria-hidden="true">🏅</span><div><b id="lgCardName">Ligen</b><span id="lgCardText"></span></div><button class="mini" id="lgCardBtn">Ansehen</button></div>
+        </div>
+        <div class="rowlist">
+          <button class="rowbtn" id="toBoard" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20V10M12 20V4M18 20v-7"/></svg><span>Bestenliste</span><i aria-hidden="true">›</i></button>
+          <button class="rowbtn" id="toReplays"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6l10 6-10 6z"/></svg><span>Replays</span><i aria-hidden="true">›</i></button>
+        </div>
       </section>
-      <section class="page" id="page-duel" aria-label="Lokales Duell">
+      <section class="page" id="page-events" aria-label="Events">
+        <div class="pagehead"><h2>Events</h2><span class="hint" id="evOpenHint"></span></div>
+        <div class="evlist">
+          <button class="evrow" id="toQuests" style="--c:#ffd34f"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg></span><span class="et"><b>Aufgaben</b><span id="evQuestsSub">Täglich und wöchentlich</span></span><span class="chev" aria-hidden="true">›</span><b class="badge dot" id="questBadge" hidden></b></button>
+          <button class="evrow" id="toDaily" style="--c:#ff9a4f"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></span><span class="et"><b>Tageslevel</b><span id="evDailySub">Jeden Tag ein neues Level</span></span><span class="chev" aria-hidden="true">›</span><i class="medot" id="dailyDot" hidden></i></button>
+          <button class="evrow" id="toWboss" style="--c:#8ff3ff"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l4 3 4-6 4 6 4-3-2 10H6z"/></svg></span><span class="et"><b>Wochenboss</b><span id="evWbossSub">Jede Woche ein stärkerer Boss</span></span><span class="chev" aria-hidden="true">›</span></button>
+          <button class="evrow" id="toWeekEv" style="--c:#c49bff"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span><span class="et"><b>Wochen-Event</b><span id="evWeekSub">Besondere Regel im Wettkampf</span></span><span class="chev" aria-hidden="true">›</span></button>
+          <button class="evrow" id="toTnRow" style="--c:#ffd34f"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 01-8 0zM8 6H5v1a3 3 0 003 3M16 6h3v1a3 3 0 01-3 3M12 13v4M9 20h6"/></svg></span><span class="et"><b>Wochenend-Turnier</b><span id="evTnSub">Fr 18 bis So 22 Uhr</span></span><span class="chev" aria-hidden="true">›</span></button>
+          <button class="evrow" id="toCwRow" style="--c:#3dffa8"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/></svg></span><span class="et"><b>Crew-Kampf</b><span id="evCwSub">Am Wochenende mit deiner Crew</span></span><span class="chev" aria-hidden="true">›</span></button>
+          <button class="evrow" id="toCommunity" style="--c:#ff7ad9"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/></svg></span><span class="et"><b>Community-Level</b><span id="evUgSub">Level der Woche und Level-Editor</span></span><span class="chev" aria-hidden="true">›</span></button>
+        </div>
+      </section>
+      <section class="page" id="page-social" aria-label="Freunde">
+        <div class="pagehead"><h2>Freunde</h2></div>
+        <div class="hubgrid">
+          <button class="hubcard" id="toFriends" style="--c:var(--p2)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><b>Freunde</b><span id="hubFrSub">Freundesliste</span><b class="badge" id="frBadge" hidden></b></button>
+          <button class="hubcard" id="toFern" style="--c:#8fc4ff"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M3 12c2-4 5-6 9-6s7 2 9 6c-2 4-5 6-9 6s-7-2-9-6z"/></svg><b>Fernduelle</b><span id="hubFernSub">Zug um Zug</span><b class="badge" id="fernBadge" hidden></b></button>
+          <button class="hubcard" id="toCrewR" style="--c:var(--gold)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 8v8M8 10l4 2 4-2"/></svg><b>Crew</b><span id="hubCrewSub">Gemeinsam Wochenziele</span></button>
+          <button class="hubcard" id="hubInvite" style="--c:var(--p1)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3.5 19c.7-3.4 3.2-5.3 6.5-5.3 1.2 0 2.3.3 3.2.8M18 13v6M15 16h6"/></svg><b>Einladen</b><span>Bonus 500 ✦</span></button>
+        </div>
+        <span class="secthead">Gerade online</span>
+        <div class="friendlist" id="hubOnline"></div>
+      </section>
+      <section class="page" id="page-coll" aria-label="Sammlung">
+        <div class="pagehead"><h2>Sammlung</h2></div>
+        <button class="seasoncard" id="hubSeason"><span class="sh"><b id="hubSeasonName">Saison</b><span id="hubSeasonEnds"></span></span><span class="bar" aria-hidden="true"><i id="hubSeasonBar"></i></span><span class="sh"><span id="hubSeasonLvl"></span><span class="gold" id="hubSeasonReady"></span></span></button>
+        <div class="hubgrid">
+          <button class="hubcard" id="toInv" style="--c:var(--p2)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8.5h12v11.5H6z"/><path d="M9 8.5V7a3 3 0 016 0v1.5M6 13h12M11 13v2h2v-2"/></svg><b>Inventar</b><span id="hubInvSub">Dein Look</span><b class="badge dot" id="invBadge" hidden></b></button>
+          <button class="hubcard" id="toShop" style="--c:var(--gold)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1.2 11.5H6.2z"/><path d="M9 8V6.5a3 3 0 016 0V8"/></svg><b>Shop</b><span id="hubShopSub">Neue Items</span></button>
+          <button class="hubcard" id="hubAlbum" style="--c:#c49bff"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M4 9h16M9 4v16"/></svg><b>Album</b><span id="hubAlbSub">Sammelalbum</span><b class="badge dot" id="hubAlbDot" hidden></b></button>
+          <button class="hubcard" id="hubProfile" style="--c:#ff9a4f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><b>Erfolge</b><span id="hubAchSub">Profil und Vitrine</span><b class="badge" id="hubAchBadge" hidden></b></button>
+        </div>
+      </section>
+    </div>
+    <div class="installbar" id="installBar" hidden><img src="icon-192.png" alt=""><div><b>Gravity Duel als App</b><span id="ibText">Startet schneller, geht offline und erinnert dich ans Tageslevel</span></div><button class="mini" id="ibGo">Installieren</button><button class="ibx" id="ibClose" aria-label="Hinweis schließen">✕</button></div>
+    <nav class="navbar" role="tablist" aria-label="Bereiche">
+      <button role="tab" id="nav-0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg><span>Spielen</span></button>
+      <button role="tab" id="nav-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l9-9M14 5h5v5M10 19H5v-5M19 19l-6-6"/></svg><span>Wettkampf</span></button>
+      <button role="tab" id="nav-2"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>Events</span><b class="nbadge" id="navB-2" hidden></b></button>
+      <button role="tab" id="nav-3"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><span>Freunde</span><b class="nbadge" id="navB-3" hidden></b></button>
+      <button role="tab" id="nav-4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8l7-4 7 4v8l-7 4-7-4z"/><path d="M5 8l7 4 7-4M12 12v8"/></svg><span>Sammlung</span><b class="nbadge dot" id="navB-4" hidden></b></button>
+    </nav>
+  </div>
+
+  <div class="overlay" id="duelSetup" hidden>
+    <div class="card duelcard">
         <div class="hero"><canvas id="duelCanvas" width="440" height="341" aria-hidden="true"></canvas>
           <div class="cap"><span class="label">2 Spieler · 1 Handy</span><h2>Lokales Duell</h2><p>3 Treffer und raus</p></div></div>
         <div class="modes" role="radiogroup" aria-label="Duell-Modus">
@@ -960,14 +1066,8 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         <button id="duelPlay">Duell starten</button>
         <button class="alt" id="duelFriend">Gegen Freund spielen</button>
         <button class="ghost" id="duelRules">Regeln</button>
-      </section>
+      <button class="ghost" id="duelSetupBack">Zurück</button>
     </div>
-    <div class="installbar" id="installBar" hidden><img src="icon-192.png" alt=""><div><b>Gravity Duel als App</b><span id="ibText">Startet schneller, geht offline und erinnert dich ans Tageslevel</span></div><button class="mini" id="ibGo">Installieren</button><button class="ibx" id="ibClose" aria-label="Hinweis schließen">✕</button></div>
-    <nav class="navbar" role="tablist" aria-label="Spielmodus">
-      <button role="tab" id="nav-0"><i></i>Kampagne</button>
-      <button role="tab" id="nav-1"><i></i>Wettkampf</button>
-      <button role="tab" id="nav-2"><i></i>Lokales Duell</button>
-    </nav>
   </div>
 
   <div class="overlay" id="replays" hidden>
@@ -7215,7 +7315,7 @@ async function playAi(){
 function cancelSearch(){ if(online&&online.spec) return specExit(true);
   const s=search; search=null; $('searchCancel').textContent='Abbrechen'; $('searchAi').hidden=true;
   if(s){ clearInterval(s.poll); if(s.matchId) rpc('gd_cancel',{p_id:s.matchId}).catch(()=>{}) }
-  if(s&&s.kind==='challenge'&&!s.rematch) openFriends(); else goHome(s&&s.rematch&&friendCtx?2:1);
+  if(s&&s.kind==='challenge'&&!s.rematch) openFriends(); else goHome(s&&s.rematch&&friendCtx?'duel':1);
 }
 
 /* incoming challenge */
@@ -7253,7 +7353,7 @@ function openFriends(ctx){
   if(Net.state==='ready'){ loadFriends(); loadRequests(); loadReferrals(); schedulePing(3000) }
 }
 /* ---------- friend requests (sent from a profile), invite rewards ---------- */
-function renderFrBadge(){ const b=$('frBadge'); if(b){ b.hidden=!(Net.freq>0); b.textContent='' } }
+function renderFrBadge(){ const b=$('frBadge'); if(b){ b.hidden=!(Net.freq>0); b.textContent=Net.freq>0?String(Net.freq):'' } renderNavBadges() }
 async function loadRequests(){
   if(Net.state!=='ready') return;
   try{ Net.req=await rpc('gd_friend_requests'); Net.freq=(Net.req.incoming||[]).length; renderFrBadge(); if(current==='friends') renderRequests() }catch(e){}
@@ -7298,7 +7398,7 @@ function renderReferrals(){
   box.innerHTML=h; box.hidden=false;
 }
 async function loadFriends(quiet){
-  try{ Net.friends=await friendsLive(); if(current==='friends') renderFriends() }catch(e){ if(!quiet) $('addHint').textContent=niceErr(e) }
+  try{ Net.friends=await friendsLive(); if(current==='friends') renderFriends(); if(current==='home') renderHub() }catch(e){ if(!quiet) $('addHint').textContent=niceErr(e) }
 }
 function renderFriendsV1(){
   const box=$('friendList'); box.innerHTML='';
@@ -7763,7 +7863,7 @@ const fernErr=e=>{ const m=String(e&&e.message||e);
   return /too many fern/.test(m)?'Höchstens 12 laufende Fernduelle':/fern exists/.test(m)?'Mit diesem Spieler läuft schon ein Fernduell':/not your turn|fern moved/.test(m)?'Das Fernduell hat sich inzwischen geändert'
     :/not a friend/.test(m)?'Fernduelle gehen mit Freunden und Crew-Mitgliedern':/not yet/.test(m)?'Noch keine 48 Stunden vergangen':/fern over/.test(m)?'Dieses Fernduell ist schon vorbei':niceErr(e) };
 const fernActive=id=>fernRows.find(r=>r.status==='active'&&r.opp&&r.opp.id===id);
-function renderFernBadge(){ const b=$('fernBadge'); if(!b) return; const n=Net.fernTurn|0; b.hidden=!n; b.textContent=n?String(n):'' }
+function renderFernBadge(){ const b=$('fernBadge'); if(!b) return; const n=Net.fernTurn|0; b.hidden=!n; b.textContent=n?String(n):''; renderNavBadges() }
 async function openFern(){
   if(fern){ fern=null; phase='menu'; bodies=[]; players=[]; proj=[]; resize() }
   fernPicking=false; $('fernPick').hidden=true; show('fern'); renderFern(true);
@@ -8217,7 +8317,7 @@ function onlineCleanup(){
 /* ---------- arenas for the ranked mode (online play comes later) ---------- */
 
 /* ---------- screens ---------- */
-const screens=['league','fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+const screens=['duelSetup','league','fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
@@ -8247,8 +8347,9 @@ function activeGalaxy(){
 const nextLevelIn=g=>{ const p=progress[pkey(g)]||[]; const i=g.levels.findIndex((_,k)=>!(p[k]>0)); return i<0?null:i };
 
 /* ---------- home ---------- */
-const pager=$('pager');
-let page=Math.max(0,Math.min(2,load(KEYS.page,0)|0));
+const pager=$('pager'); var hubAt=0;
+let page=Math.max(0,Math.min(4,load(KEYS.page,0)|0));
+const NPAGES=5;
 const heroScenes={};
 function heroScene(id){ return heroScenes[id]||(heroScenes[id]=makeScene(id,42)) }
 function renderMe(){
@@ -8274,6 +8375,61 @@ function drawMeTitle(t){
   const g=cv.getContext('2d'); g.setTransform(d,0,0,d,0,0); g.clearRect(0,0,w,h); g.save(); g.translate(w/2,h/2); drawNamePlate(g,cv._it,t,w-2,h-2); g.restore();
 }
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* ---------- hub pages (Events, Freunde, Sammlung) and the badges in the bottom bar ---------- */
+var hubWbAt=-1e9;
+function navBadge(i,n,dot){ const b=$('navB-'+i); if(!b) return; b.hidden=!n; if(!dot) b.textContent=n?String(n>9?'9+':n):'' }
+function renderNavBadges(){
+  try{
+    const q=SERVER_ECON?claimableCount():0, d=dailyData&&dailyData.active&&!dailyData.playedToday?1:0;
+    navBadge(2,q+d); navBadge(3,(Net.freq|0)+(Net.fernTurn|0));
+    navBadge(4,!$('invBadge').hidden||achClaimable()>0||seasonClaimable()>0||(window.albumReady===true)?1:0,true);
+  }catch(e){}
+}
+function renderHub(){
+  try{ renderNavBadges() }catch(e){}
+  if(current!=='home') return;
+  try{
+    // Events
+    const q=SERVER_ECON?claimableCount():0;
+    $('evQuestsSub').textContent=q?`${q} ${q===1?'Belohnung':'Belohnungen'} bereit`:'Täglich und wöchentlich'; $('toQuests').classList.toggle('hot',q>0);
+    const d=dailyData;
+    $('evDailySub').textContent=d&&d.active?(d.playedToday?`Geschafft · Bestwert ${d.best} · Serie ${d.streak}`:`Neu: „${d.level.name}“`+(d.streak?` · Serie ${d.streak}`:'')):'Jeden Tag ein neues Level';
+    $('toDaily').classList.toggle('hot',!!(d&&d.active&&!d.playedToday));
+    const w=wbossData;
+    if(w){ const b=(GALAXIES.find(g=>g.id===w.gal)||GALAXIES[0]), L=b.levels[b.levels.length-1]; $('evWbossSub').textContent=w.played?`Besiegt mit ${w.best} ${w.best===1?'Schuss':'Schüssen'}${w.rank?` · Platz ${w.rank}`:''}`:`${L.boss?L.boss.name:b.name} wartet · ${b.name}` }
+    $('toWboss').classList.toggle('hot',!!(w&&!w.played));
+    if(page===2&&Net.state==='ready'&&SERVER_ECON&&econReady()&&performance.now()-hubWbAt>120000){ hubWbAt=performance.now(); rpc('gd_wboss').then(x=>{ wbossData=x; renderHub() }).catch(()=>{}) }
+    $('evWeekSub').textContent=!$('evCard').hidden?($('evName').textContent+' · '+$('evText').textContent):'Besondere Regel im Wettkampf';
+    $('evTnSub').textContent=!$('tnCard').hidden&&$('tnCardText').textContent?$('tnCardText').textContent:'Fr 18 bis So 22 Uhr';
+    $('toTnRow').classList.toggle('hot',$('tnCardBtn').textContent==='Abholen');
+    $('evCwSub').textContent=GDX.crew?`Mit ${GDX.crew.name} · Fr 18 bis So 22 Uhr`:'Tritt einer Crew bei, um mitzumachen';
+    const open=[...document.querySelectorAll('#page-events .evrow.hot')].length; $('evOpenHint').textContent=open?`${open} offen`:'';
+    // Freunde
+    const fr=Net.friends||[], on=fr.filter(f=>f.online);
+    $('hubFrSub').textContent=Net.state!=='ready'?'Braucht eine Verbindung':`${fr.length} ${fr.length===1?'Freund':'Freunde'} · ${on.length} online`+(Net.freq?` · ${Net.freq} ${Net.freq===1?'Anfrage':'Anfragen'}`:'');
+    $('hubFernSub').textContent=Net.fernTurn?`Du bist ${Net.fernTurn}× dran`:'Zug um Zug, ohne Zeitdruck';
+    $('hubCrewSub').textContent=GDX.crew?`[${GDX.crew.tag}] ${GDX.crew.name}`:'Gemeinsam Wochenziele';
+    if(page===3&&Net.state==='ready'&&performance.now()-frLoadedAt>45000){ frLoadedAt=performance.now(); loadFriends(true) }
+    const box=$('hubOnline'), key=on.map(f=>f.id+(f.duel?'d':'')).join(',')+'|'+fr.length;
+    if(box.dataset.k!==key){ box.dataset.k=key; box.innerHTML='';
+      if(!on.length){ box.innerHTML=`<div class="fr"><span class="av"></span><span class="fn"><b>Gerade ist niemand online</b><i>${fr.length?'Fordere jemanden zum Fernduell heraus':'Füge Freunde hinzu oder lade welche ein'}</i></span></div>`; const b=document.createElement('button'); b.className='mini ghost'; b.textContent=fr.length?'Fernduell':'Einladen'; b.onclick=()=>{ Sfx.init(); fr.length?openFern():shareFriendLink() }; box.firstChild.appendChild(b) }
+      for(const f of on.slice(0,5)){ const el=document.createElement('div'); el.className='fr'; const col=skinFromEquip(f.skin).color, duel=!!f.duel;
+        el.innerHTML=`<span class="av ${duel?'duel':'on'}" style="background:${col}"></span><span class="fn"><b>${pTagHtml(f)}${esc(cleanName(f.name))}${lvlChip(f.level)}</b><i>${duel?'Im Duell':'Online'}</i></span>`;
+        const b=document.createElement('button'); b.className='mini'+(duel?' ghost':''); b.textContent=duel?'Zuschauen':'Duell';
+        b.onclick=()=>{ Sfx.init(); Sfx.select(); duel?watchFriend(f):challengeFriend(f) }; el.appendChild(b); rowOpensPlayer(el,f); box.appendChild(el) } }
+    // Sammlung
+    const sd=seasonData;
+    if(sd&&sd.active){ const lv=seasonLevel(), n=sd.tiers.length, ready=seasonClaimable();
+      $('hubSeasonName').textContent=`Saison „${sd.name||''}“`; $('hubSeasonEnds').textContent=sd.ends?`noch ${Math.max(0,Math.ceil((Date.parse(sd.ends)-Date.now())/864e5))} Tage`:'';
+      $('hubSeasonBar').style.width=`${Math.round(100*lv/Math.max(1,n))}%`; $('hubSeasonLvl').textContent=`Stufe ${lv} / ${n}`; $('hubSeasonReady').textContent=ready?`${ready} ${ready===1?'Belohnung':'Belohnungen'} bereit`:'' }
+    else { $('hubSeasonName').textContent='Saison'; $('hubSeasonEnds').textContent=''; $('hubSeasonLvl').textContent=SERVER_ECON?'Lade …':'Saison-Pass gibt es online'; $('hubSeasonReady').textContent='' }
+    $('hubShopSub').textContent=`${profile.dust} ✦ verfügbar`;
+    const own=Object.keys(profile.owned||{}).length; $('hubInvSub').textContent=`${own} Items`;
+    const ac=achClaimable(); $('hubAchBadge').hidden=!ac; $('hubAchBadge').textContent=ac?String(ac):'';
+    $('hubAchSub').textContent=ac?`${ac} Erfolg${ac>1?'e':''} abholbereit`:'Profil und Vitrine';
+    const ad=$('albumDot'); $('hubAlbDot').hidden=!(ad&&!ad.hidden); window.albumReady=!!(ad&&!ad.hidden);
+  }catch(e){ console.warn('hub',e) }
+}
 function renderHome(){ refreshAlbumDot();
   renderMe(); updateQuestBadge();
   const gi=activeGalaxy(), g=GALAXIES[gi], th=THEMES[g.id];
@@ -8302,27 +8458,29 @@ function renderHome(){ refreshAlbumDot();
 }
 function setNav(i,remember=true){
   page=i;
-  for(let k=0;k<3;k++) $('nav-'+k).setAttribute('aria-selected',String(k===i));
+  for(let k=0;k<NPAGES;k++) $('nav-'+k).setAttribute('aria-selected',String(k===i));
+  renderHub();
   if(remember) save(KEYS.page,i);
-  const id=i===0?GALAXIES[activeGalaxy()].id:i===1?ARENAS[arenaIndex(profile.trophies)].theme:'nova';
+  const id=i===1?ARENAS[arenaIndex(profile.trophies)].theme:GALAXIES[activeGalaxy()].id;
   if(scene.id!==id) scene=makeScene(id,7);
 }
-pager.addEventListener('scroll',()=>{ const i=Math.round(pager.scrollLeft/Math.max(1,pager.clientWidth)); if(i!==page&&i>=0&&i<3) setNav(i) },{passive:true});
-for(let k=0;k<3;k++) $('nav-'+k).addEventListener('click',()=>{ pager.scrollTo({left:k*pager.clientWidth,behavior:'smooth'}); setNav(k) });
+pager.addEventListener('scroll',()=>{ const i=Math.round(pager.scrollLeft/Math.max(1,pager.clientWidth)); if(i!==page&&i>=0&&i<NPAGES) setNav(i) },{passive:true});
+for(let k=0;k<NPAGES;k++) $('nav-'+k).addEventListener('click',()=>{ pager.scrollTo({left:k*pager.clientWidth,behavior:'smooth'}); setNav(k) });
 document.addEventListener('keydown',e=>{
   if(current!=='home') return;
-  if(e.key==='ArrowRight'&&page<2) $('nav-'+(page+1)).click();
+  if(e.key==='ArrowRight'&&page<NPAGES-1) $('nav-'+(page+1)).click();
   if(e.key==='ArrowLeft'&&page>0) $('nav-'+(page-1)).click();
 });
-function goHome(p){ ugReset(); if(fern){ fern=null; resize() } if(tut){ tut=null; tutShow(null) }
+function goHome(p){ const toDuel=p==='duel'; if(toDuel) p=0; ugReset(); if(fern){ fern=null; resize() } if(tut){ tut=null; tutShow(null) }
   dailyMode=false; if(p===1) setTimeout(loadEvent,300);
   if(online) onlineCleanup();
   endAi();
   phase='menu'; bodies=[]; players=[]; proj=[];
   if(p!==undefined) page=p;
-  renderHome(); show('home');
+  renderHome(); show(toDuel?'duelSetup':'home');
   requestAnimationFrame(()=>{ pager.scrollLeft=page*pager.clientWidth });
 }
+function openDuelSetup(){ renderHome(); show('duelSetup'); $('duelSetup').scrollTop=0 }
 
 function fitCanvas(c){
   const w=Math.round(c.clientWidth*dpr), h=Math.round(c.clientHeight*dpr);
@@ -8345,7 +8503,8 @@ function showcaseBody(g,type,x,y,t){
   drawBody(g,b,t,(t%PHYS.PULSE_PERIOD));
 }
 function homeTick(t){
-  if(current!=='home') return;
+  if(current!=='home'&&current!=='duelSetup') return;
+  if(current==='home'&&t-hubAt>3){ hubAt=t; renderHub() }
   drawMeTitle(t);
   const gi=activeGalaxy(), gal=GALAXIES[gi], fresh=THEMES[gal.id].fresh||'n', skin=mySkin();
   paintHero($('campCanvas'),gal.id,t,(g,w,h)=>{
@@ -9565,7 +9724,7 @@ tap('dailyBack',()=>goHome(0));
 tap('duelPlay',startDuel);
 tap('duelRules',()=>show('rules'));
 tap('duelFriend',()=>openFriends({fromDuel:true}));
-tap('rulesBack',()=>goHome(2));
+tap('rulesBack',()=>openDuelSetup());
 /* arena picker for the local duel */
 (()=>{ const sel=$('arenaPick');
   sel.innerHTML='<option value="-1">Zufällige Arena</option>'+ARENAS.map((a,i)=>`<option value="${i}">${i+1} · ${a.name}</option>`).join('');
@@ -9660,9 +9819,20 @@ renderInstall();
 /* name editing: tap the profile */
 let nameBack='home';
 tap('me',()=>openProfile());
+tap('toLocal',()=>{ Sfx.select(); openDuelSetup() });
+tap('duelSetupBack',()=>goHome(0));
+tap('toAiPractice',()=>{ Sfx.select(); startAiDuel(arenaIndex(profile.trophies),duelMode) });
+tap('toWboss',()=>{ Sfx.select(); openWboss() });
+tap('toWeekEv',()=>{ Sfx.select(); $('nav-1').click() });
+tap('toTnRow',()=>{ Sfx.select(); openTourney('home') });
+tap('toCwRow',()=>{ Sfx.select(); openCrew('home') });
+tap('hubInvite',()=>{ Sfx.select(); shareFriendLink() });
+tap('hubAlbum',()=>{ Sfx.select(); openAlbum() });
+tap('hubProfile',()=>{ Sfx.select(); openProfile() });
+tap('hubSeason',()=>{ Sfx.select(); setQTab('season'); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
 tap('lgCard',()=>{ Sfx.select(); openLeague() }); tap('lgClaimBtn',()=>lgClaim()); tap('leagueBack',()=>goHome(1));
 tap('toFern',()=>{ Sfx.select(); openFern() });
-tap('fernBack',()=>{ fern=null; goHome(1) });
+tap('fernBack',()=>{ fern=null; goHome() });
 tap('fernNew',()=>{ Sfx.select(); fernPicking=!fernPicking; $('fernPick').hidden=!fernPicking; if(fernPicking) renderFernPick() });
 tap('bs-all',()=>{ Sfx.select(); openBoard('all') }); tap('bs-fr',()=>{ Sfx.select(); openBoard('fr') });
 tap('dk-daily',()=>{ Sfx.select(); dailyKind='daily'; $('dailyResult').hidden=true; openDaily() }); tap('dk-wboss',()=>{ Sfx.select(); dailyKind='wboss'; $('dailyResult').hidden=true; openDaily() });
@@ -9702,7 +9872,7 @@ for(const [t] of SHOP_TABS) tap('tab-'+t,()=>{ shopTab=t; renderShop() });
 tap('crateBack',()=>{ crateAnim=null; if(crateFrom==='league') return openLeague(); if(crateFrom==='crew') return openCrew(); if(crateFrom==='tourney') return openTourney(); if(crateFrom==='quests'){ setQTab(qTab); show('quests') } else if(crateFrom==='home') goHome(); else if(crateFrom==='album') openAlbum(); else { renderShop(); show('shop') } });
 tap('qtab-tasks',()=>setQTab('tasks'));
 tap('qtab-season',()=>setQTab('season'));
-tap('toQuests',()=>{ setQTab(qTab); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
+tap('toQuests',()=>{ setQTab('tasks'); show('quests'); if(SERVER_ECON&&econReady()) econRefresh().catch(()=>{}) });
 tap('questsBack',()=>goHome());
 tap('toFriends',()=>openFriends(null));
 tap('friendsBack',()=>goHome());
@@ -9745,7 +9915,7 @@ $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.reveale
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
 tap('again',()=>{ if(fern&&fern.over){ const op=fern.opp; fernExit(true); return fernStartWith(op) } if(online&&online.spec) return specExit(); if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
-tap('overBack',()=>{ if(fern) return fernExit(); goHome(ai||online&&!online.fromDuel?1:2) });
+tap('overBack',()=>{ if(fern) return fernExit(); goHome(ai||online&&!online.fromDuel?1:'duel') });
 tap('next',()=>{
   const g=curGalaxy();
   if(levelIdx<g.levels.length-1) startLevel(levelIdx+1);
@@ -9755,7 +9925,7 @@ tap('next',()=>{
 tap('retry',()=>startLevel(levelIdx));
 tap('clearBack',()=>goLevels());
 tap('introOk',nextIntro);
-tap('back',()=>{ if(fern&&mode==='duel') return fernExit(); if(ugPlay&&!online&&!ai) return ugBack(); if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome(2) });
+tap('back',()=>{ if(fern&&mode==='duel') return fernExit(); if(ugPlay&&!online&&!ai) return ugBack(); if(online&&!online.over) return onlineForfeit(); if(online||ai) return goHome(1); if(dailyMode) return openDaily(); mode==='campaign'?goLevels():goHome('duel') });
 /* sound settings: the volume sliders, the on/off switches and the in-game chips all show one state (kept in Sfx) */
 function syncAudioUI(){
   const m=Sfx.volume('music'), s=Sfx.volume('sfx');
@@ -10310,7 +10480,7 @@ function openCrew(from){
   $('crewHint').textContent=''; GDX.open=-1; renderCrew(); show('crew'); $('crew').scrollTop=0;
   crewLoad().then(()=>{ if(current==='crew'&&!GDX.crew) crewSearch() });
 }
-function crewBack(){ if(GDX.from==='ranked') goHome(1); else openFriends() }
+function crewBack(){ if(GDX.from==='friends') openFriends(); else goHome() }
 function renderCrew(){
   const c=GDX.crew; $('crewIn').hidden=!c; $('crewOut').hidden=!!c;
   if(!c){
