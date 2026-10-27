@@ -806,6 +806,7 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .cinv .fine{margin:0}
 /* ---------- one frame for every subpage: fixed head (area, title, key figure) and fixed foot (back + main action) ---------- */
 .overlay>.card.subpg{padding-top:0;padding-bottom:0}
+.overlay:has(>.card.subpg){scroll-padding:110px 0 96px}
 .card.subpg.scrolled .subhead{box-shadow:0 calc(-1 * max(24px,env(safe-area-inset-top,0px)) - 2px) 0 2px #120828}
 .card.subpg.tall>.subfoot{box-shadow:0 calc(max(24px,env(safe-area-inset-bottom,0px)) + 2px) 0 2px #120828}
 .subhead{position:sticky;top:0;z-index:30;margin:0 -20px;padding:max(16px,env(safe-area-inset-top,0px)) 20px 12px;
@@ -3254,6 +3255,8 @@ const SHOP={
     {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1},
     {id:'polar',   name:'Polarnacht',      color:'#9fe9ff',c2:'#6a4dff',anim:'shift',price:0,rarity:'season',season:2},
     {id:'mitternacht',name:'Mitternachtsgold',color:'#ffd34f',c2:'#3a4dff',anim:'shift',price:0,rarity:'season',season:3},
+    {id:'harlekin',name:'Harlekin',color:'#ff3b6b',c2:'#ffd34f',anim:'shift',price:0,rarity:'season',season:5},
+    {id:'kirsch',  name:'Kirschblüte',color:'#ffb3d1',c2:'#fff4fa',anim:'shift',price:0,rarity:'season',season:6},
     {id:'nordlicht',name:'Nordlicht',color:'#3dffa8',c2:'#b45cff',anim:'shift',price:0,rarity:'season',season:4},
     {id:'urlicht',     name:'Urlicht',          color:'#fff1c4',c2:'#9a5a12',anim:'dawn', price:60000,rarity:'cosmic',minLevel:200},
     {id:'milchstrasse',name:'Milchstraße',      color:'#8a6bff',c2:'#090225',anim:'milky',price:55000,rarity:'cosmic',minLevel:200},
@@ -3282,6 +3285,7 @@ const SHOP={
     {id:'armillar',   name:'Himmelsuhr',       price:60000, rarity:'cosmic',   minLevel:200},
     {id:'galaxis',    name:'Galaxienwirbel',   price:55000, rarity:'cosmic',   minLevel:200},
     {id:'riss',       name:'Realitätsriss',    price:0,     rarity:'void',     src:'void'},
+    {id:'schlangen',  name:'Luftschlangen',    price:0,     rarity:'season',   season:5},
     {id:'relnova',    name:'Nova-Relikt',      price:0,     rarity:'legendary',src:'campaign',gal:'nova',diff:3},
     {id:'relkristall',name:'Kristall-Relikt',  price:0,     rarity:'mythic',   src:'campaign',gal:'kristall',diff:3},
     {id:'relzwilling',name:'Zwillings-Relikt', price:0,     rarity:'mythic',   src:'campaign',gal:'zwilling',diff:3}
@@ -3308,6 +3312,7 @@ const SHOP={
     {id:'dragon',  name:'Drachenschweif',price:12500, rarity:'mythic',   minLevel:12},
     {id:'pioneer', name:'Pionierspur',   price:0,    rarity:'season',   season:1},
     {id:'frost',   name:'Frostspur',     price:0,    rarity:'season',   season:2},
+    {id:'bluete',  name:'Blütenspur',    price:0,    rarity:'season',   season:6},
     {id:'aurora',  name:'Polarschleier', price:0, rarity:'season',  season:4},
     {id:'goldfaden',  name:'Goldfaden',        price:45000, rarity:'cosmic',   minLevel:200},
     {id:'spektral',   name:'Spektralschleier', price:40000, rarity:'cosmic',   minLevel:200},
@@ -3375,6 +3380,14 @@ function auraBack(ctx,x,y,r,c,id,t){
     ctx.strokeStyle='rgba(255,220,180,.9)';ctx.lineWidth=2;ctx.shadowColor='#ffb15c';ctx.shadowBlur=12;
     ctx.beginPath();ctx.arc(0,0,r*1.7,0,Math.PI*1.2);ctx.stroke();
     ctx.strokeStyle=rgba(c,.8);ctx.beginPath();ctx.arc(0,0,r*1.45,Math.PI,Math.PI*2.4);ctx.stroke();
+    ctx.restore();ctx.shadowBlur=0;
+  }
+  if(id==='schlangen'){ // carnival streamers curl around the planet in four colours
+    const cols=['#ff3b6b','#ffd34f','#2ee6ff','#3dffa8'];
+    ctx.save();ctx.translate(x,y);ctx.lineCap='round';
+    for(let k=0;k<4;k++){ const a0=t*(.7+k*.12)+k*Math.PI/2; ctx.strokeStyle=cols[k]; ctx.lineWidth=2.4; ctx.shadowColor=cols[k]; ctx.shadowBlur=6; ctx.beginPath();
+      for(let i=0;i<=28;i++){ const u=i/28, a=a0+u*2.4, d=r*1.25+u*r*.9+3.5*Math.sin(u*14-t*6+k); const px=Math.cos(a)*d, py=Math.sin(a)*d; i?ctx.lineTo(px,py):ctx.moveTo(px,py) }
+      ctx.stroke() }
     ctx.restore();ctx.shadowBlur=0;
   }
   if(id==='corona'){
@@ -3514,6 +3527,14 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
         for(let i=n-1, k=0;i>4;i-=6, k++){ const p=seg[i], q=nrm(i), h=5+4*Math.abs(Math.sin(t*2+k*.9));
           ctx.strokeStyle=rgba(cols[k%3],.28*alpha); ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(p[0]-q[0]*h,p[1]-q[1]*h); ctx.stroke() }
         break }
+      case 'bluete': { // a soft pink line, petals tumble away from it
+        line(()=>0,2.2,'#ffb3d1'); line(i=>1.6*Math.sin(i*.4-t*4),.9,'rgba(255,255,255,.7)');
+        ctx.shadowBlur=0;
+        for(let i=n-1, k=0;i>0;i-=8, k++){ const p=seg[i], q=nrm(i), drift=((t*12+k*6)%24), sd=k%2?1:-1;
+          const x=p[0]+q[0]*sd*drift*.6, y=p[1]+q[1]*sd*drift*.6+drift*.3, rot=t*2+k*1.3, sz=3+1.2*Math.abs(Math.sin(k*2.1));
+          ctx.globalAlpha=alpha*Math.max(0,1-drift/24); ctx.fillStyle=k%3?'#ffc6dd':'#fff0f6';
+          ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.beginPath(); ctx.ellipse(0,0,sz,sz*.55,0,0,7); ctx.fill(); ctx.restore() }
+        ctx.globalAlpha=alpha; break }
       case 'frost': { line(()=>0,2.6,'#bfefff'); line(i=>2.2*Math.sin(i*.6-t*6),1,'rgba(255,255,255,.8)');
         ctx.strokeStyle='#e8fbff'; ctx.lineWidth=1.1; ctx.shadowColor='#7fdcff';
         for(let i=n-1, k=0;i>0;i-=9, k++){ const p=seg[i], q=nrm(i), drift=((t*14+k*7)%22), sz=3.2+1.6*Math.abs(Math.sin(k*1.7));
@@ -4080,6 +4101,8 @@ SHOP.title=[
   {id:'pioneer',  name:'Pionier · Saison 1',      price:0,    rarity:'season',   season:1},
   {id:'winter',   name:'Frostherz · Saison 2',    price:0,    rarity:'season',   season:2},
   {id:'neujahr',  name:'Mitternachtsstern · Saison 3', price:0, rarity:'season', season:3},
+  {id:'narr',     name:'Sternennarr · Saison 5', price:0, rarity:'season', season:5},
+  {id:'fruehling',name:'Frühlingsbote · Saison 6', price:0, rarity:'season', season:6},
   {id:'polarlicht',name:'Nordlichtjäger · Saison 4', price:0, rarity:'season', season:4},
   {id:'schoepfer',  name:'Weltenschöpfer',   price:25000, rarity:'cosmic',   minLevel:200},
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
@@ -5233,7 +5256,9 @@ const EMOTE_LIST=[
   {id:'darkmatter',name:'Dunkle Materie',price:0,    rarity:'void',src:'void'},
   {id:'snowball',name:'Schneeballschlacht',price:0,  rarity:'season',season:2},
   {id:'countdown',name:'Countdown',price:0,  rarity:'season',season:3},
-  {id:'nordlicht',name:'Polarlicht',price:0,  rarity:'season',season:4}
+  {id:'nordlicht',name:'Polarlicht',price:0,  rarity:'season',season:4},
+  {id:'maske',    name:'Maskenball',price:0,  rarity:'season',season:5},
+  {id:'bluetenregen',name:'Blütenregen',price:0,rarity:'season',season:6}
 ];
 SHOP.emote=EMOTE_LIST;
 const EMOTE_BY=Object.fromEntries(EMOTE_LIST.map(e=>[e.id,e]));
@@ -6018,6 +6043,30 @@ function drawEmoteArt(g,id,t,c){
     if(!thrown){ eCircle(g,ax+1,ay-6,5.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
     else if(k<1){ const bx=34+k*40, by=-10-Math.sin(k*Math.PI)*26; eCircle(g,bx,by,5-k*1.5); g.fillStyle='#f4fbff'; g.fill(); g.strokeStyle='#9fd0e8'; g.lineWidth=1; g.stroke() }
     else { g.fillStyle='rgba(255,255,255,.9)'; for(let i=0;i<6;i++){ const a=i*1.05; eCircle(g,44+Math.cos(a)*6,-8+Math.sin(a)*6,1.6); g.fill() } }
+    break; }
+  case 'maske': {
+    // Gravi wears a carnival mask with a feather and blows a party horn
+    const cols=['#ff3b6b','#ffd34f','#2ee6ff','#3dffa8'];
+    for(let i=0;i<10;i++){ const p=(t*.45+i*.11)%1; g.fillStyle=cols[i%4]; g.save(); g.translate(-44+((i*37)%88),-48+p*96); g.rotate(t*3+i); g.fillRect(-2,-1,4,2.4); g.restore() }
+    eBody(g,c); eBlush(g,.5);
+    eEyes(g,'happy');
+    g.fillStyle='#ff3b6b'; g.strokeStyle=DARK; g.lineWidth=1.3;
+    g.beginPath(); g.moveTo(-24,0); g.quadraticCurveTo(-18,-12,-6,-6); g.quadraticCurveTo(0,-3,6,-6); g.quadraticCurveTo(18,-12,24,0); g.quadraticCurveTo(16,10,6,6); g.quadraticCurveTo(0,4,-6,6); g.quadraticCurveTo(-16,10,-24,0); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle='#ffd34f'; for(const sd of [-1,1]){ g.beginPath(); g.ellipse(sd*11,1,5.2,3.6,0,0,7); g.fill() }
+    g.fillStyle=INK; for(const sd of [-1,1]){ eCircle(g,sd*11,1,2.1); g.fill() }
+    const fw=Math.sin(t*3)*.18; g.save(); g.translate(20,-6); g.rotate(-.5+fw); g.fillStyle='#2ee6ff'; g.beginPath(); g.ellipse(4,-14,4,14,.15,0,7); g.fill(); g.strokeStyle='rgba(255,255,255,.7)'; g.lineWidth=1; g.beginPath(); g.moveTo(2,0); g.lineTo(6,-26); g.stroke(); g.restore();
+    const blow=.5+.5*Math.sin(t*4), len=10+14*blow;
+    g.fillStyle='#ffd34f'; g.strokeStyle=DARK; g.lineWidth=1.2; g.beginPath(); g.moveTo(-3,17); g.lineTo(-3-len,14+len*.2); g.lineTo(-3-len,20+len*.2); g.lineTo(-3,20); g.closePath(); g.fill(); g.stroke();
+    eArm(g,c,-20,16,-14,20); eArm(g,c,20,16,28,24);
+    break; }
+  case 'bluetenregen': {
+    // cherry petals fall, Gravi with a blossom on the head catches one
+    for(let i=0;i<14;i++){ const p=(t*.3+i*.137)%1; g.fillStyle=i%3?'#ffc6dd':'#fff0f6'; g.save(); g.translate(-46+((i*43)%92)+Math.sin(p*6+i)*6,-52+p*104); g.rotate(t*2+i); g.beginPath(); g.ellipse(0,0,3.2,1.9,0,0,7); g.fill(); g.restore() }
+    eBody(g,c); eBlush(g,.75);
+    eEyes(g,'happy',{lx:.3,ly:-.6}); eMouth(g,'smile',{w:7});
+    g.save(); g.translate(-12,-20); for(let k=0;k<5;k++){ g.rotate(Math.PI*2/5); g.fillStyle='#ffb3d1'; g.strokeStyle=DARK; g.lineWidth=1; g.beginPath(); g.ellipse(0,-5,3.6,5,0,0,7); g.fill(); g.stroke() }
+    g.fillStyle='#ffd34f'; eCircle(g,0,0,2.6); g.fill(); g.restore();
+    const up=Math.sin(t*2.2)*4; eArm(g,c,20,12,30,-10+up); eArm(g,c,-20,16,-28,22);
     break; }
   case 'nordlicht': {
     // curtains of northern light wave over Gravi, who looks up in wonder
