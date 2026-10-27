@@ -240,6 +240,7 @@ pre{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.75rem;
   <!-- Auswertung -->
   <section id="p-insight" role="tabpanel" aria-labelledby="t-insight" hidden>
     <div class="list">
+      <div class="card"><h2>Einstieg nach Starttag</h2><p class="hint" id="cohHint">Neue Spieler je Tag: wie viele schaffen Level 1 und 5 Level, wie viele legen ein Konto an</p><div class="tablewrap"><table id="cohTable"></table></div></div>
       <div class="grid2">
         <div class="card"><h2>Wie weit Spieler kommen</h2><p class="hint">Anteil aller Spieler (auch ohne Konto), die einen Schritt erreicht haben</p><div class="hbars" id="funnel"></div></div>
         <div class="card"><h2>Galaxien</h2><p class="hint">Begonnen und bis zum Boss geschafft (Rang Kadett)</p><div class="tablewrap"><table id="galTable"></table></div></div>
@@ -469,7 +470,16 @@ async function loadInsight(){
   const hd=a.hardest||[], ls=a.lowStars||[];
   $('hardTable').innerHTML=hd.length?'<tr><th>Level</th><th class="n">Quote</th><th class="n">Ø Sterne</th></tr>'+hd.slice(0,10).map(x=>`<tr><td>${esc(galN(x.gal))} ${x.level}</td><td class="n">${x.rate} %</td><td class="n">${x.stars}</td></tr>`).join('')
     +(ls.length?`<tr><th colspan="3">Wenig Sterne (geschafft, aber knapp)</th></tr>`+ls.slice(0,5).map(x=>`<tr><td>${esc(galN(x.gal))} ${x.level}</td><td class="n">${fmt(x.done)} Spieler</td><td class="n">${x.stars}</td></tr>`).join(''):''):'<tr><td class="hint">Noch keine Daten</td></tr>';
-  loadFlags();
+  loadFlags(); loadCohorts();
+}
+async function loadCohorts(){
+  const t=$('cohTable'); t.innerHTML='<tr><td class="hint">Lade …</td></tr>';
+  let r; try{ r=await rpc('gd_admin_cohorts') }catch(e){ t.innerHTML=`<tr><td class="err">${esc(errText(e))}</td></tr>`; return }
+  const since=r.guestFirstSince||'', pc=(a,b)=>b?Math.round(100*a/b)+' %':'–';
+  const sum=(l)=>l.reduce((o,x)=>({n:o.n+x.started,l1:o.l1+x.l1,l5:o.l5+x.l5,ac:o.ac+x.acct}),{n:0,l1:0,l5:0,ac:0});
+  const days=r.days||[], after=sum(days.filter(x=>since&&x.day>=since)), before=sum(days.filter(x=>!since||x.day<since));
+  $('cohHint').textContent=since?`Seit ${since.split('-').reverse().join('.')} kann man ohne Konto loslegen. Vorher: ${pc(before.l1,before.n)} schafften Level 1 · danach: ${after.n?pc(after.l1,after.n):'noch keine Spieler'}`:'Neue Spieler je Tag';
+  t.innerHTML=days.length?'<tr><th>Starttag</th><th class="n">neu</th><th class="n">Level 1</th><th class="n">5 Level</th><th class="n">Konto</th></tr>'+days.map(x=>`<tr${since&&x.day===since?' style="border-bottom:2px solid #2ee6ff"':''}><td>${esc(x.day.split('-').reverse().join('.'))}</td><td class="n">${fmt(x.started)}</td><td class="n">${fmt(x.l1)} <span class="hint">· ${pc(x.l1,x.started)}</span></td><td class="n">${fmt(x.l5)} <span class="hint">· ${pc(x.l5,x.started)}</span></td><td class="n">${fmt(x.acct)} <span class="hint">· ${pc(x.acct,x.started)}</span></td></tr>`).join(''):'<tr><td class="hint">In den letzten 3 Wochen keine neuen Spieler</td></tr>';
 }
 async function loadFlags(){
   const box=$('flags'); box.innerHTML='<p class="hint">Lade …</p>';

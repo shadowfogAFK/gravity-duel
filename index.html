@@ -804,6 +804,32 @@ button.mini.x.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .cinv canvas{width:110px;height:110px}
 .cinv b{font-family:var(--display);font-size:1.35rem}.cinv .ctag{font-family:var(--display);font-size:.8rem;color:var(--gold)}
 .cinv .fine{margin:0}
+/* ---------- one frame for every subpage: fixed head (area, title, key figure) and fixed foot (back + main action) ---------- */
+.overlay>.card.subpg{padding-top:0;padding-bottom:0}
+.card.subpg.scrolled .subhead{box-shadow:0 calc(-1 * max(24px,env(safe-area-inset-top,0px)) - 2px) 0 2px #120828}
+.card.subpg.tall>.subfoot{box-shadow:0 calc(max(24px,env(safe-area-inset-bottom,0px)) + 2px) 0 2px #120828}
+.subhead{position:sticky;top:0;z-index:30;margin:0 -20px;padding:max(16px,env(safe-area-inset-top,0px)) 20px 12px;
+  background:#160a34;border-bottom:1px solid rgba(167,123,255,.22);border-radius:14px 14px 0 0;display:flex;flex-direction:column;gap:2px}
+.subhead .subrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.subhead .subarea{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim,#a99cd6)}
+.subhead h2{margin:0;font-size:1.6rem;line-height:1.1}
+.subhead .subold{display:none}
+.subhead .subfig{flex:none;max-width:48%;padding:4px 10px;border-radius:11px;border:1px solid rgba(46,230,255,.4);background:rgba(46,230,255,.08);color:var(--p2);
+  font-family:var(--display);font-weight:700;font-size:.78rem;letter-spacing:.02em;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+.subhead .subfig:empty{display:none}
+.subhead .subfig.sub2{max-width:none;padding:0;border:0;background:none;font-size:.72rem;color:var(--dim,#a99cd6);font-weight:600;margin-top:2px}
+.overlay>.card>.subfoot>button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subhead .subtitle{display:flex;align-items:center;gap:8px;min-width:0}
+.subhead .subinfo{flex:none;width:26px;height:26px;padding:0;border-radius:50%;border:1px solid rgba(167,123,255,.5);background:transparent;color:var(--dim,#a99cd6);font-size:.85rem;line-height:1}
+.subhead .subinfo[aria-expanded="true"]{color:var(--ink);border-color:var(--p2)}
+.subhead>div:not(.subrow){width:100%}
+.subinfotext{margin:0;padding:10px 12px;border-radius:10px;background:rgba(46,230,255,.06);border:1px solid rgba(46,230,255,.25);font-size:.88rem}
+.overlay>.card>.subfoot{position:sticky;bottom:0;z-index:30;margin:4px -20px 0;padding:12px 20px max(16px,env(safe-area-inset-bottom,0px));
+  background:rgba(14,6,34,.97);border-top:1px solid rgba(167,123,255,.25);border-radius:0 0 14px 14px;display:grid;grid-template-columns:1fr;gap:10px}
+.overlay>.card>.subfoot.two{grid-template-columns:1fr 1fr}
+.overlay>.card>.subfoot>button{margin:0;position:static;box-shadow:none}
+.overlay>.card>.subfoot>button.ghost{background:transparent;border-color:rgba(167,123,255,.55);color:var(--ink)}
+.subfoot .back::before{content:'‹';margin-right:8px;font-size:1.25em;line-height:0;vertical-align:-.08em}
 /* the back button of long menus stays at the bottom of the screen */
 .overlay>.card>button.ghost:last-child{position:sticky;bottom:0;z-index:4;margin-top:4px;background:rgba(26,12,60,.97);color:var(--ink);border-color:rgba(167,123,255,.6);
   box-shadow:0 -12px 22px 6px rgba(22,10,52,.92),0 6px 18px rgba(0,0,0,.45)}
@@ -940,6 +966,23 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .seasoncard .gold{color:var(--gold)}
 #hubOnline .fr{grid-template-columns:34px minmax(0,1fr) auto}
 .duelcard .hero{margin:0}
+/* onboarding: areas unlock step by step, a friendly nudge to save the progress */
+.navbar button.lockd{opacity:.42}
+.navbar button.lockd .nbadge,.navbar button.lockd .tnlive{display:none}
+.navbar button.lockd svg{stroke-dasharray:3 3}
+.navbar button.fresh::after{content:'';position:absolute;inset:2px;border-radius:12px;box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(255,211,79,.55);animation:freshPulse 1.6s ease-in-out infinite}
+@keyframes freshPulse{50%{opacity:.35}}
+.lockcover{display:none}
+.page.lockedpage>*:not(.lockcover){display:none!important}
+.page.lockedpage>.lockcover{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;margin:auto;padding:28px 20px;border-radius:20px;background:rgba(22,10,52,.8);border:1px dashed rgba(167,123,255,.5)}
+.lockcover svg{width:44px;height:44px;fill:none;stroke:var(--gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lockcover h2{font-size:1.4rem}.lockcover p{margin:0}
+.lockcover .bar{width:100%;max-width:240px}
+.acctnudge{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(46,230,255,.08);border:1px solid rgba(46,230,255,.45);text-align:left}
+.acctnudge svg{flex:none;width:26px;height:26px;fill:none;stroke:var(--p2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.acctnudge div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.acctnudge b{font-size:.9rem}.acctnudge span{font-size:.75rem;color:var(--muted)}
+.acctnudge button{flex:none;padding:8px 12px;font-size:.8rem}
+#acctBar{margin:0 12px 6px}
 </style>
 </head>
 <body>
@@ -986,6 +1029,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         </div>
       </section>
       <section class="page" id="page-ranked" aria-label="Wettkampf">
+        <div class="lockcover" data-lock="1"></div>
         <button class="hero herobtn" id="arenaHero" aria-label="Alle Arenen anzeigen"><canvas id="arenaCanvas" width="440" height="341" aria-hidden="true"></canvas>
           <div class="cap"><span class="label" id="arenaLabel">Arena 1</span><h2 id="arenaName">Startrampe</h2><p id="arenaTrophies">0 Gravitonen</p></div>
           <span class="heromore" aria-hidden="true">Alle Arenen ›</span></button>
@@ -1009,6 +1053,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         </div>
       </section>
       <section class="page" id="page-events" aria-label="Events">
+        <div class="lockcover" data-lock="2"></div>
         <div class="pagehead"><h2>Events</h2><span class="hint" id="evOpenHint"></span></div>
         <div class="evlist">
           <button class="evrow" id="toQuests" style="--c:#ffd34f"><span class="eic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 9l1.6 1.6L13 7.7M8.5 15h7"/></svg></span><span class="et"><b>Aufgaben</b><span id="evQuestsSub">Täglich und wöchentlich</span></span><span class="chev" aria-hidden="true">›</span><b class="badge dot" id="questBadge" hidden></b></button>
@@ -1021,6 +1066,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         </div>
       </section>
       <section class="page" id="page-social" aria-label="Freunde">
+        <div class="lockcover" data-lock="3"></div>
         <div class="pagehead"><h2>Freunde</h2></div>
         <div class="hubgrid">
           <button class="hubcard" id="toFriends" style="--c:var(--p2)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><circle cx="16.5" cy="10" r="2.6"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5M14.5 14.6c.6-.3 1.3-.5 2-.5 2.2 0 3.8 1.5 4.2 4.4"/></svg><b>Freunde</b><span id="hubFrSub">Freundesliste</span><b class="badge" id="frBadge" hidden></b></button>
@@ -1042,6 +1088,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
         </div>
       </section>
     </div>
+    <div class="acctnudge" id="acctBar" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><div><b>Spielstand sichern</b><span>Mit einem Konto geht nichts verloren</span></div><button class="mini" id="acctBarGo">Sichern</button><button class="ibx" id="acctBarX" aria-label="Später erinnern">✕</button></div>
     <div class="installbar" id="installBar" hidden><img src="icon-192.png" alt=""><div><b>Gravity Duel als App</b><span id="ibText">Startet schneller, geht offline und erinnert dich ans Tageslevel</span></div><button class="mini" id="ibGo">Installieren</button><button class="ibx" id="ibClose" aria-label="Hinweis schließen">✕</button></div>
     <nav class="navbar" role="tablist" aria-label="Bereiche">
       <button role="tab" id="nav-0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg><span>Spielen</span></button>
@@ -1261,6 +1308,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <p id="clearInfo"></p>
       <p class="reward" id="clearReward"></p>
       <p class="levelup" id="clearLevelUp" hidden></p>
+      <div class="acctnudge" id="clearAcct" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg><div><b>Gut gespielt! Spielstand sichern?</b><span>Mit einem Konto bleiben deine Sterne erhalten</span></div><button class="mini" id="clearAcctGo">Sichern</button></div>
       <div class="btns">
         <button id="next">Nächstes Level</button>
         <button id="retry" class="alt">Nochmal für mehr Sterne</button>
@@ -1301,8 +1349,8 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
       <h2>Gravity Duel</h2>
       <section data-step="wait"><p id="setupWait">Verbinde …</p><button id="setupRetry" hidden>Erneut versuchen</button></section>
       <section data-step="welcome">
-        <p>Zum Spielen brauchst du ein Konto. So bleiben dein Fortschritt, deine Items und deine Gravitonen sicher – auf jedem Gerät.</p>
-        <div class="btns"><button id="setupNew">Konto erstellen</button><button class="alt" id="setupGoogle">Mit Google</button><button class="ghost" id="setupHave">Ich habe schon ein Konto</button></div>
+        <p id="setupWhy">Sichere deinen Spielstand mit einem Konto: Fortschritt, Items und Gravitonen bleiben erhalten, auf jedem Gerät.</p>
+        <div class="btns"><button id="setupNew">Konto erstellen</button><button class="alt" id="setupGoogle">Mit Google</button><button class="ghost" id="setupHave">Ich habe schon ein Konto</button><button class="ghost" id="setupLater" hidden>Später</button></div>
       </section>
       <form data-step="create" id="setupCreate">
         <p>Wähle deinen Spielernamen und gib deine E-Mail ein. Dein Passwort legst du gleich danach fest.</p>
@@ -4862,7 +4910,7 @@ function newLevelMap(){
   const p1=mkPlanet(0); bodies.push(p1);
   for(const spec of L.moons) bodies.push(withCraters(PHYS.makeBody(spec,H)));
   PHYS.linkPortals(bodies);
-  for(const [x,fy] of L.targets) bodies.push(mkTarget(x,fy));
+  for(const [x,fy] of L.targets){ const t=mkTarget(x,fy); if(!ugPlay&&!dailyMode&&galIdx===0&&levelIdx<3&&campDiff===1) t.r=17; bodies.push(t) }
   if(L.boss) bodies.push(mkBoss(L.boss));
   players=[mkPlayer('Du',L.ammo||{},mySkin())]; players[0].planet=p1;
   resetShotState();
@@ -6360,7 +6408,7 @@ function levelCleared(){ if(tut){ save(TUT_KEY,tut.lv===1?2:Math.max(1,load(TUT_
   $('clearStars').innerHTML=[0,1,2].map(i=>`<span class="${i<st?'on':'off'}">★</span>`).join('');
   $('clearStars').setAttribute('aria-label',`${st} von 3 Sternen`);
   $('clearInfo').textContent=campDiff===3?`Perfekt gelöst mit ${shotCount} ${shotCount===1?'Schuss':'Schüssen'}`:`${shotCount} ${shotCount===1?'Schuss':'Schüsse'} · 3 Sterne bei höchstens ${L.par}, 2 Sterne bei höchstens ${L.par+2}`;
-  $('clearReward').textContent=r.line;
+  $('clearReward').textContent=r.line; renderAcctNudges();
   $('clearLevelUp').hidden=!r.up; $('clearLevelUp').textContent=r.up||'';
   const last=levelIdx===g.levels.length-1, nextGal=GALAXIES[galIdx+1];
   $('next').textContent=last?(nextGal?`Galaxie geschafft · weiter nach ${nextGal.name}`:'Alle Galaxien geschafft'):'Nächstes Level';
@@ -7048,8 +7096,21 @@ const niceErr=e=>{ const m=String(e&&(e.message||e)||'Fehler'); return /fetch|ne
 /* playing needs an account (switched on in the database: gd_settings require_account).
    New players go through a short setup: name + e-mail (confirmation link, then password) or Google. */
 let NEED_ACCOUNT=load('gravityDuel.needAccount.v1',false), setupStep='welcome';
+/* guests play right away; an account is asked for at good moments (after a few levels) and for the social parts */
+var askingWhy=false;
+const ACCT_NUDGE='gravityDuel.acctNudge.v1';
+function askAccount(why){ askingWhy=true; $('setupWhy').textContent=why; $('setupLater').hidden=false; openSetup('welcome') }
+function needAccountFor(what){
+  if((window.__GD_TEST__&&!window.__GD_TEST_LOCKS__)||!SERVER_ECON||Net.state!=='ready'||isAccount()) return false;
+  askAccount(`${what} brauchst du ein Konto. Dein bisheriger Fortschritt wird übernommen.`); return true;
+}
+const clearedLevels=()=>Object.values(progress||{}).reduce((a,l)=>a+(Array.isArray(l)?l.filter(x=>x>0).length:0),0);
+function nudgeAccountDue(){ if((window.__GD_TEST__&&!window.__GD_TEST_LOCKS__)||!SERVER_ECON||Net.state!=='ready'||isAccount()) return false; const n=clearedLevels(); if(n<5) return false;
+  const st=load(ACCT_NUDGE,{until:0}); return Date.now()>(st.until||0) }
+function renderAcctNudges(){ const due=nudgeAccountDue(); const b=$('acctBar'); if(b) b.hidden=!due; const c=$('clearAcct'); if(c) c.hidden=!due }
+function snoozeAccount(){ save(ACCT_NUDGE,{until:Date.now()+3*864e5}); renderAcctNudges() }
 function openSetup(step,msg){
-  setupStep=step; save('gravityDuel.needAccount.v1',true);
+  setupStep=step; save('gravityDuel.needAccount.v1',!!NEED_ACCOUNT); if(step==='welcome'&&!askingWhy){ $('setupWhy').textContent=NEED_ACCOUNT?'Zum Spielen brauchst du ein Konto. So bleiben dein Fortschritt, deine Items und deine Gravitonen sicher, auf jedem Gerät.':'Sichere deinen Spielstand mit einem Konto: Fortschritt, Items und Gravitonen bleiben erhalten, auf jedem Gerät.'; $('setupLater').hidden=!!NEED_ACCOUNT } askingWhy=false;
   for(const el of document.querySelectorAll('#setup [data-step]')) el.classList.toggle('on',el.dataset.step===step);
   $('setupHint').textContent=''; $('setupRetry').hidden=!msg; $('setupWait').textContent=msg||'Verbinde …';
   if(step==='create'&&!$('setupName').value) $('setupName').value=profile.name||'';
@@ -7342,6 +7403,7 @@ async function answerInvite(yes){
 /* ---------- friends ---------- */
 let friendCtx=null; // {fromDuel:true} when opened from the local duel menu: its mode and arena are used
 function openFriends(ctx){
+  if(needAccountFor('Für Freunde, Herausforderungen und Fernduelle')) return;
   if(ctx!==undefined) friendCtx=ctx;
   $('friendCode').textContent=(Net.me&&Net.me.friend_code)||friendCode();
   const where=friendCtx?`${MODE_NAME[duelMode]} · ${duelArenaPick>=0?`Arena ${duelArenaPick+1}: ${esc(ARENAS[duelArenaPick].name)}`:'Zufällige Arena'}`:'';
@@ -7865,6 +7927,7 @@ const fernErr=e=>{ const m=String(e&&e.message||e);
 const fernActive=id=>fernRows.find(r=>r.status==='active'&&r.opp&&r.opp.id===id);
 function renderFernBadge(){ const b=$('fernBadge'); if(!b) return; const n=Net.fernTurn|0; b.hidden=!n; b.textContent=n?String(n):''; renderNavBadges() }
 async function openFern(){
+  if(needAccountFor('Für Fernduelle')) return;
   if(fern){ fern=null; phase='menu'; bodies=[]; players=[]; proj=[]; resize() }
   fernPicking=false; $('fernPick').hidden=true; show('fern'); renderFern(true);
   if(Net.state!=='ready'){ $('fernList').innerHTML='<div class="fr"><span></span><span class="fn"><b>Fernduelle brauchen eine Verbindung</b></span></div>'; return }
@@ -8318,11 +8381,81 @@ function onlineCleanup(){
 
 /* ---------- screens ---------- */
 const screens=['duelSetup','league','fern','player','crewInvite','iosInstall','ugReport','crew','crewNew','tourney','setup','community','editor','ugdone','replays','login','daily','delAcct','settings','nameEdit','home','galaxies','levels','intro','clear','over','shop','crate','quests','friends','cover','search','invite','board','rules','account','profile','inventory','album','arenas','void'];
+/* ---------- subpage frame ----------
+   every subpage gets the same head (area · title · key figure, ⓘ for the explanation) and foot (Zurück + one main action).
+   it is built once from the existing markup, so the screens keep their ids and handlers. */
+var SUBPAGES={
+  galaxies:{area:'Spielen'}, levels:{area:'Spielen'},
+  league:{area:'Wettkampf'}, board:{area:'Wettkampf'}, replays:{area:'Wettkampf'}, arenas:{area:'Wettkampf'},
+  quests:{area:'Events',title:'Belohnungen'}, daily:{area:'Events'}, tourney:{area:'Events'}, community:{area:'Events'},
+  friends:{area:'Freunde'}, fern:{area:'Freunde'},
+  shop:{area:'Sammlung',main:['Zum Inventar',()=>openInventory()]},
+  inventory:{area:'Sammlung',main:['Zum Shop',()=>$('invToShop').click()],hide:['invToShop']},
+  album:{area:'Sammlung'}, profile:{area:'Sammlung',title:'Dein Profil'},
+  settings:{area:'Einstellungen'}, rules:{area:'Spielen'}
+};
+function frameSubpages(){
+  for(const [id,cfg] of Object.entries(SUBPAGES)){
+    const ov=$(id), card=ov&&ov.querySelector(':scope>.card'); if(!card||card.classList.contains('subpg')) continue;
+    card.classList.add('subpg');
+    // head: take the leading label / title nodes
+    const head=document.createElement('div'); head.className='subhead';
+    const row=document.createElement('div'); row.className='subrow';
+    const left=document.createElement('div'); left.className='subtitle';
+    const titleBox=document.createElement('div');
+    const area=document.createElement('span'); area.className='subarea'; area.textContent=cfg.area; titleBox.appendChild(area);
+    let fig=null, h2=null, wrapped=null;
+    const kids=[...card.children].slice(0,3);
+    for(const k of kids){
+      if(k.matches('div.seg')&&!h2&&k===card.firstElementChild) continue; // e.g. Tageslevel / Wochenboss switch stays under the head
+      if(k.matches('span.label')){ if(k.id){ fig=k; } else k.classList.add('subold'); continue }
+      if(k.tagName==='H2'){ h2=k; break }
+      if(k===card.firstElementChild&&k.tagName==='DIV'&&k.querySelector(':scope>div>span.label+h2')){ wrapped=k; break }
+      break;
+    }
+    if(wrapped){ // shop / inventory: their own head row with a figure or buttons on the right
+      const inner=wrapped.querySelector(':scope>div'); h2=inner.querySelector('h2');
+      for(const l of inner.querySelectorAll('span.label')) if(l.id){ fig=l } else l.classList.add('subold');
+      const rest=[...wrapped.children].filter(e=>e!==inner); row.append(left); for(const r of rest) row.appendChild(r); wrapped.remove();
+    } else row.append(left);
+    if(!h2&&cfg.title){ h2=document.createElement('h2'); h2.textContent=cfg.title }
+    if(h2) titleBox.appendChild(h2);
+    left.appendChild(titleBox);
+    for(const k of kids) if(k.classList&&k.classList.contains('subold')) k.remove();
+    if(fig){ fig.classList.remove('label'); fig.classList.add('subfig'); fig.classList.add('sub2'); titleBox.appendChild(fig) }
+    head.appendChild(row);
+    // ⓘ: a long explanation right under the title folds away
+    const nxt=card.firstElementChild&&[...card.children].find(e=>e.tagName==='P'||!e.matches('span.label,h2'));
+    if(nxt&&nxt.tagName==='P'&&!nxt.id&&nxt.textContent.trim().length>60){
+      const b=document.createElement('button'); b.type='button'; b.className='subinfo'; b.textContent='i'; b.setAttribute('aria-label','Erklärung'); b.setAttribute('aria-expanded','false');
+      nxt.classList.add('subinfotext'); nxt.hidden=true;
+      b.addEventListener('click',()=>{ nxt.hidden=!nxt.hidden; b.setAttribute('aria-expanded',String(!nxt.hidden)) });
+      left.appendChild(b);
+    }
+    if(h2&&h2.parentNode!==titleBox) titleBox.appendChild(h2);
+    card.insertBefore(head,card.firstChild);
+    ov.addEventListener('scroll',()=>subFit(id),{passive:true});
+    for(const x of cfg.hide||[]) if($(x)) $(x).hidden=true;
+    // foot: the back button plus the main action
+    const back=card.lastElementChild;
+    if(back&&back.tagName==='BUTTON'&&back.classList.contains('ghost')){
+      const foot=document.createElement('div'); foot.className='subfoot';
+      back.classList.add('back'); foot.appendChild(back);
+      if(cfg.main){ const m=document.createElement('button'); m.type='button'; m.className='submain'; m.id=id+'Main'; m.textContent=cfg.main[0];
+        m.addEventListener('click',()=>{ Sfx.init(); cfg.main[1]() }); foot.appendChild(m); foot.classList.add('two') }
+      card.appendChild(foot);
+    }
+  }
+}
+function subFit(id){ const ov=$(id), card=ov&&ov.querySelector(':scope>.card.subpg'); if(!card) return;
+  card.classList.toggle('scrolled',ov.scrollTop>card.offsetTop-2); card.classList.toggle('tall',card.offsetHeight>ov.clientHeight-2) }
+frameSubpages();
 let current='home';
 function show(name){
   if(name==='over'&&rec&&!replay) recFinish();
   current=name;
   for(const s of screens) $(s).hidden=s!==name;
+  if(name&&SUBPAGES[name]) requestAnimationFrame(()=>subFit(name));
   const inGame=name===null||name==='intro';
   document.documentElement.classList.toggle('playing',name===null);
   $('back').hidden=!inGame; $('mute').hidden=!inGame; $('music').hidden=!inGame;
@@ -8388,6 +8521,7 @@ function renderNavBadges(){
 function renderHub(){
   try{ renderNavBadges() }catch(e){}
   if(current!=='home') return;
+  try{ renderLocks(); renderAcctNudges() }catch(e){}
   try{
     // Events
     const q=SERVER_ECON?claimableCount():0;
@@ -8430,7 +8564,29 @@ function renderHub(){
     const ad=$('albumDot'); $('hubAlbDot').hidden=!(ad&&!ad.hidden); window.albumReady=!!(ad&&!ad.hidden);
   }catch(e){ console.warn('hub',e) }
 }
-function renderHome(){ refreshAlbumDot();
+/* new players start with Spielen and Sammlung; the other areas open after a few levels (everyone with an account or more levels has all) */
+const UNLOCK=[0,3,5,8,0], UNLOCK_NAME=['Spielen','Wettkampf','Events','Freunde','Sammlung'];
+const UNLOCK_TXT=['','Online-Duelle gegen echte Gegner, Arenen und Bestenliste.','Tageslevel, Wochenboss, Turniere und Aufgaben mit Belohnungen.','Freunde, Fernduelle und Crews.',''];
+const UNLOCK_KEY='gravityDuel.unlocked.v1';
+function areaOpen(i){ if(!UNLOCK[i]||(window.__GD_TEST__&&!window.__GD_TEST_LOCKS__)) return true; const u=load(UNLOCK_KEY,null); if(u&&u.all) return true; if(isAccount()||clearedLevels()>=UNLOCK[i]) return true; return !!(u&&u.a&&u.a[i]) }
+function renderLocks(){
+  let u=load(UNLOCK_KEY,null);
+  if(!u){ u={a:{}}; if(isAccount()||clearedLevels()>=8) u.all=true; save(UNLOCK_KEY,u) } // players from before keep everything
+  if(!u.all&&isAccount()){ u.all=true; u.fresh={} } // with an account everything is open
+  const fresh=[];
+  for(let i=0;i<UNLOCK.length;i++){
+    const open=areaOpen(i), nav=$('nav-'+i); if(!nav) continue;
+    if(open&&UNLOCK[i]&&!u.all&&!(u.a&&u.a[i])){ u.a=u.a||{}; u.a[i]=1; u.fresh=u.fresh||{}; u.fresh[i]=1; fresh.push(i) }
+    nav.classList.toggle('lockd',!open); nav.classList.toggle('fresh',!!(u.fresh&&u.fresh[i]));
+    const sec=document.querySelector(`#pager .lockcover[data-lock="${i}"]`);
+    if(sec){ const pg=sec.parentElement; pg.classList.toggle('lockedpage',!open);
+      if(!open){ const n=clearedLevels(), need=UNLOCK[i], left=Math.max(0,need-n);
+        sec.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span class="label">Bald freigeschaltet</span><h2>${UNLOCK_NAME[i]}</h2><p>${UNLOCK_TXT[i]}</p><div class="bar" aria-hidden="true"><i style="width:${Math.round(100*n/need)}%"></i></div><p class="hint">Noch ${left} ${left===1?'Level':'Level'} in der Kampagne</p><button class="lockplay">Weiter spielen</button>`;
+        sec.querySelector('.lockplay').onclick=()=>{ Sfx.init(); Sfx.select(); $('nav-0').click() } } } }
+  save(UNLOCK_KEY,u);
+  if(fresh.length) setTimeout(()=>toast(`Neu freigeschaltet: ${fresh.map(i=>UNLOCK_NAME[i]).join(' und ')}!`),600);
+}
+function renderHome(){ refreshAlbumDot(); renderLocks(); renderAcctNudges();
   renderMe(); updateQuestBadge();
   const gi=activeGalaxy(), g=GALAXIES[gi], th=THEMES[g.id];
   const done=galDone(g), nxt=nextLevelIn(g);
@@ -8459,6 +8615,7 @@ function renderHome(){ refreshAlbumDot();
 function setNav(i,remember=true){
   page=i;
   for(let k=0;k<NPAGES;k++) $('nav-'+k).setAttribute('aria-selected',String(k===i));
+  { const u=load(UNLOCK_KEY,null); if(u&&u.fresh&&u.fresh[i]){ delete u.fresh[i]; save(UNLOCK_KEY,u); $('nav-'+i).classList.remove('fresh') } }
   renderHub();
   if(remember) save(KEYS.page,i);
   const id=i===1?ARENAS[arenaIndex(profile.trophies)].theme:GALAXIES[activeGalaxy()].id;
@@ -9896,7 +10053,10 @@ $('delForm').addEventListener('submit',async e=>{ e.preventDefault(); if($('delG
     $('delHint').textContent='Dein Konto wurde gelöscht.'; setTimeout(()=>location.replace(location.pathname),1200);
   }catch(err){ $('delGo').disabled=false; $('delHint').textContent=/function|does not exist|schema cache/i.test(String(err&&err.message))?'Löschen ist gerade nicht möglich. Bitte schreib uns (siehe Impressum).':niceErr(err) }
 });
-tap('setupNew',()=>openSetup('create')); tap('setupHave',()=>openSetup('login')); tap('setupGoogle',setupGoogle); tap('setupGoogle2',setupGoogle);
+tap('setupNew',()=>openSetup('create')); tap('setupLater',()=>{ snoozeAccount(); goHome() });
+tap('acctBarGo',()=>askAccount('Mit einem Konto sind dein Fortschritt, deine Items und deine Gravitonen sicher, auch auf einem neuen Handy.'));
+tap('acctBarX',()=>snoozeAccount());
+tap('clearAcctGo',()=>askAccount('Sichere deine Sterne und Items mit einem Konto. Danach spielst du genau hier weiter.')); tap('setupHave',()=>openSetup('login')); tap('setupGoogle',setupGoogle); tap('setupGoogle2',setupGoogle);
 tap('setupConfirmed',setupCheck); tap('setupResend',setupResend); tap('setupRetry',()=>{ openSetup('wait'); netInit() });
 tap('setupForgot',()=>{ $('acctEmail').value=$('setupLEmail').value; accountForgot().then(()=>$('setupHint').textContent=$('acctHint').textContent) });
 for(const b of document.querySelectorAll('#setup [data-goto]')) b.addEventListener('click',()=>openSetup(b.dataset.goto));
@@ -9956,7 +10116,7 @@ tap('settingsBack',()=>goHome());
 tap('setName',()=>{ nameBack='settings'; $('nameInput').value=playerName(); show('nameEdit'); setTimeout(()=>$('nameInput').focus(),50) });
 
 /* online */
-tap('findMatch',findMatch);
+tap('findMatch',()=>{ if(needAccountFor('Für Online-Duelle im Wettkampf')) return; findMatch() });
 tap('searchCancel',cancelSearch);
 tap('searchAi',playAi);
 tap('emoteBtn',toggleEmotes);
@@ -10475,6 +10635,7 @@ const crewNextGoal=w=>(CREW_TIERS.find(t=>w<t.n)||CREW_TIERS[2]).n;
 function crewClaimable(c){ c=c||GDX.crew; if(!c||!c.week||c.week.mine<1) return 0; return CREW_TIERS.filter((t,i)=>c.week.wins>=t.n&&!c.week.claimed.includes(i+1)).length }
 
 function openCrew(from){
+  if(needAccountFor('Für Crews')) return;
   if(from) GDX.from=from;
   if(!econReady()) return toast('Crews gibt es nur online');
   $('crewHint').textContent=''; GDX.open=-1; renderCrew(); show('crew'); $('crew').scrollTop=0;
