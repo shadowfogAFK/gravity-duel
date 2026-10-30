@@ -9521,10 +9521,9 @@ const VSlot={
     this.st.reels.forEach((R,j)=>{ const gcol=this.st.grid[j]; R.tape[2]=gcol[0]; R.tape[1]=gcol[1]; R.tape[0]=gcol[2] });
   },
   opts(box){
-    box.innerHTML=`<div class="vrow"><span>Autospin</span><div class="vchips vauto" role="group" aria-label="Autospin">${VOID_AUTO.map(n=>`<button data-auto="${n}">${n===Infinity?'∞':n+'×'}</button>`).join('')}</div></div>`;
-    for(const b of box.querySelectorAll('[data-auto]')) b.addEventListener('click',()=>{ if(VS.busy||VS.auto) return; Sfx.init(); Sfx.select(); vAutoStart(+b.dataset.auto) });
+    box.innerHTML='';
   },
-  sync(){ for(const b of document.querySelectorAll('#voidOpts [data-auto]')) b.setAttribute('aria-pressed',String(!!VS.auto&&VS.auto.n===+b.dataset.auto)) },
+  sync(){},
   args(){ return {} },
   info(){
     const P=VOID_T.slot.pay, rows=Object.keys(P).map(k=>`<tr><td>${VOID_SYM[k]}${k==='w'?' (Wild)':''}</td><td>${P[k][0]}</td><td>${P[k][1]}</td><td>${P[k][2]}</td></tr>`).join('');
@@ -9692,11 +9691,9 @@ const VHai={
   reset(){ const prev=this.st&&this.st.grid; this.st={ph:'idle',grid:prev||[['m','r','a','k'],['q','q','e','g'],['s','h','w','a'],['e','a','m','r'],['g','k','s','e']],spins:null,idx:0,M:1,total:0,shown:0,hl:null,banner:null,reels:[0,1,2,3,4].map(()=>({stop:true,off:0,v:0,strip:[]})),nud:null,rev:null,free:false,planned:0} },
   isVoid(){ return VS.game==='haivoid' },
   opts(box){
-    if(this.isVoid()){ box.innerHTML=''; return }
-    box.innerHTML=`<div class="vrow"><span>Autospin</span><div class="vchips vauto" role="group" aria-label="Autospin">${VOID_AUTO.map(n=>`<button data-auto="${n}">${n===Infinity?'∞':n+'×'}</button>`).join('')}</div></div>`;
-    for(const b of box.querySelectorAll('[data-auto]')) b.addEventListener('click',()=>{ if(VS.busy||VS.auto) return; Sfx.init(); Sfx.select(); vAutoStart(+b.dataset.auto) });
+    box.innerHTML='';
   },
-  sync(){ for(const b of document.querySelectorAll('#voidOpts [data-auto]')) b.setAttribute('aria-pressed',String(!!VS.auto&&VS.auto.n===+b.dataset.auto)) },
+  sync(){},
   args(){ return this.isVoid()?{void:true}:{} },
   info(){
     const H=VOID_T.hai, P=H.pay, V=this.isVoid(), name=k=>k==='w'?'Schwarzes Loch (Wild)':VOID_SYM[k];
@@ -10073,7 +10070,7 @@ function vOpenGame(id){
   $('voidPicker').hidden=true; $('voidStage').hidden=false; $('voidPrize').hidden=true; $('voidInfo').hidden=true; $('voidInfoBtn').setAttribute('aria-expanded','false');
   $('voidGameName').textContent=G.name; $('voidTitle').textContent=G.degen?'Void-Modus':'Void'; $('voidLabel').textContent=G.degen?'Achtung · hohes Risiko':'Shop · Spielecke';
   $('voidWarn').hidden=!G.degen; if(G.warn) $('voidWarn').innerHTML=G.warn; $('voidBetRow').hidden=false;
-  M.reset(); M.opts($('voidOpts')); vMsg(G.degen?`Fester Einsatz ✦ ${vNum(vFixed(id))}`:'',''); vSyncBet();
+  M.reset(); M.opts($('voidOpts')); vAutoRow($('voidOpts')); vMsg(G.degen?`Fester Einsatz ✦ ${vNum(vFixed(id))}`:'',''); vSyncBet();
 }
 function vRenderInfo(){ const M=VGAME[VS.game]; if(!M) return; $('voidInfo').innerHTML=M.info()+`<p>Void ist reines Spielgeld: Sternenstaub ✦ verdienst du im Spiel, er ist nicht käuflich und nicht auszahlbar. Jedes Ergebnis lost der Server aus. Einsatz ✦ ${VOID_T.minBet}–${vNum(VOID_T.maxBet)}.</p>` }
 
@@ -10092,20 +10089,28 @@ function vSyncBet(){
     P.textContent=VS.busy?'Läuft …':VS.game==='plinkovoid'?'In den Abgrund · ✦ 500':VS.game==='haivoid'?'Abgrund-Dreh · ✦ 500':VS.game==='wheelvoid'?'Mond in den Abgrund · ✦ 500':VS.game==='serie'?`${VSerie.n()} Planeten ansagen · ✦ 500`:VS.game==='slot'||VS.game==='hai'?`Drehen · ✦ ${vNum(b)}`:VS.game==='plinko'?(nb>1?`${nb} Bälle · ✦ ${vNum(st)}`:`Fallen lassen · ✦ ${vNum(b)}`):VS.game==='crash'?`Starten · ✦ ${vNum(b)}`:VS.game==='wheel'?`Mond schicken · ✦ ${vNum(b)}`:`Werfen · ✦ ${vNum(b)}` }
   $('voidToPicker').disabled=VS.busy;
   for(const el of document.querySelectorAll('#voidOpts button,#voidOpts input')) el.disabled=lock;
-  const M=VGAME[VS.game]; if(M&&(M===VSlot||M===VHai||M===VSerie)) M.sync();
+  const M=VGAME[VS.game]; if(M&&(M===VSlot||M===VHai||M===VSerie)) M.sync(); vAutoSync();
 }
 function vSetBet(b){ if(VS.busy||VS.auto||vFixed()) return; const L=VOID_LADDER; let best=L[0]; for(const x of L) if(x<=b) best=x; vPrefs.bet[VS.game]=best; vSavePrefs(); Sfx.tick(L.indexOf(best)/L.length); vSyncBet() }
 function vStepBet(d){ const L=VOID_LADDER, i=L.indexOf(vBet()); vSetBet(L[vClamp(i+d,0,L.length-1)]) }
 function vMsg(text,cls){ const el=$('voidMsg'); el.textContent=text; el.className='vmsg'+(cls?' '+cls:'') }
 
 /* ---------- autospin (slot): rounds back to back until "Stopp", no stardust, an error or leaving ---------- */
-function vAutoStart(n){ if(!VGAME[VS.game]||!VGAME[VS.game].auto||VS.busy) return; VS.auto={n,left:n,timer:0}; vSyncBet(); voidPlay() }
+function vAutoRow(box){
+  const el=document.createElement('div'); el.className='vrow'; el.id='voidAutoSpin';
+  el.innerHTML=`<span>Autospin</span><div class="vchips vauto" role="group" aria-label="Autospin">${VOID_AUTO.map(n=>`<button data-spins="${n}">${n===Infinity?'∞':n+'×'}</button>`).join('')}</div>`;
+  box.appendChild(el);
+  for(const b of el.querySelectorAll('[data-spins]')) b.addEventListener('click',()=>{ if(VS.busy||VS.auto) return; Sfx.init(); Sfx.select(); vAutoStart(+b.dataset.spins) });
+}
+function vAutoSync(){ for(const b of document.querySelectorAll('#voidOpts [data-spins]')) b.setAttribute('aria-pressed',String(!!VS.auto&&VS.auto.n===+b.dataset.spins)) }
+function vAutoStart(n){ if(!VGAME[VS.game]||VS.busy) return;
+  if(VS.game==='crash'&&!vPrefs.crashAuto){ vPrefs.crashAuto=true; vSavePrefs(); VCrash.sync(); toast(`Autospin steigt automatisch bei ${vX(VCrash.target())} aus`) } VS.auto={n,left:n,timer:0}; vSyncBet(); voidPlay() }
 function vAutoStop(why){ if(!VS.auto) return; clearTimeout(VS.auto.timer); VS.auto=null; if(why) toast(why); if(VS.game) vSyncBet() }
 function vAutoNext(){
   const A=VS.auto; if(!A) return;
-  if(current!=='void'||!VGAME[VS.game]||!VGAME[VS.game].auto) return vAutoStop();
+  if(current!=='void'||!VGAME[VS.game]) return vAutoStop();
   if(A.left<=0) return vAutoStop();
-  if(profile.dust<vBet()) return vAutoStop('Autospin gestoppt: nicht genug Sternenstaub');
+  if(profile.dust<vStake()) return vAutoStop('Autospin gestoppt: nicht genug Sternenstaub');
   const R=VS.round, big=R&&(R.r.payout|0)>=R.bet*20;
   A.timer=setTimeout(()=>{ if(VS.auto===A&&!VS.busy) voidPlay() },big?1600:250);
 }
