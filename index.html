@@ -7524,15 +7524,15 @@ async function pollSearch(){
       return queueSearch();
     }
     if(s.kind==='ranked'){
-      $('searchText').textContent=secs>=10?`Seit ${secs} s · ab 30 s spielst du gegen die KI`:`Seit ${secs} s`;
-      $('searchAi').hidden=secs<10;
+      $('searchText').textContent=secs>=5?`Seit ${secs} s · ab 30 s spielst du gegen die KI`:`Seit ${secs} s`;
+      $('searchAi').hidden=secs<5;
       if(secs>=30) return playAi();
       if(performance.now()-s.queued>75000) await queueSearch(); // keep the search fresh on the server
     } else if(secs>170){ cancelSearch(); toast('Die Einladung ist abgelaufen') }
   }catch(e){} finally{ s.busy=false }
 }
 function searchFailed(e){ const s=search; if(s) clearInterval(s.poll); search=null; $('searchTitle').textContent='Das hat nicht geklappt'; $('searchText').textContent=niceErr(e); $('searchCancel').textContent='Zurück' }
-/* nobody else is searching: an AI match in your own arena. It counts for Gravitonen, but less than a real opponent;
+/* nobody else is searching: an AI match in your own arena. It counts for Gravitonen like an equal opponent (+30 / −20, 15 games a day);
    the server books the loss at the start and refunds it on a win (gd_ai_start / gd_ai_finish) */
 async function playAi(){
   const s=search; if(!s||s.kind!=='ranked') return;
