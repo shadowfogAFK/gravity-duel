@@ -3530,6 +3530,10 @@ function moons(ctx,x,y,r,c,id,t,front){
   }
 }
 
+/* long trails: the newest TRAIL_DETAIL points stay, the older part is reduced to about TRAIL_OLD points (keeps every style cheap) */
+var TRAIL_DETAIL=110, TRAIL_OLD=70;
+function thinTrail(seg){ const n=seg.length, keep=n-TRAIL_DETAIL, step=Math.ceil(keep/TRAIL_OLD), out=[];
+  for(let i=0;i<keep;i+=step) out.push(seg[i]); for(let i=keep;i<n;i++) out.push(seg[i]); return out }
 /* draws a projectile trail in the chosen style; null entries break the line (wormholes) */
 function drawStyledTrail(ctx,tr,c,style,t,alpha){
   if(!tr||tr.length<2) return;
@@ -3537,11 +3541,15 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
   const segs=[];let cur=[];
   for(const p of tr){ if(p===null){ if(cur.length>1) segs.push(cur); cur=[] } else cur.push(p) }
   if(cur.length>1) segs.push(cur);
+  for(let q=0;q<segs.length;q++) if(segs[q].length>TRAIL_DETAIL+TRAIL_OLD) segs[q]=thinTrail(segs[q]);
   const glow=style!=='basic'&&style!=='dash';
   if(glow){ ctx.globalCompositeOperation='lighter'; ctx.shadowColor=c; ctx.shadowBlur=12 }
   for(const seg of segs){
     const n=seg.length;
     const nrm=i=>{ const a=seg[Math.max(0,i-1)], b=seg[Math.min(n-1,i+1)], dx=b[0]-a[0], dy=b[1]-a[1], l=Math.hypot(dx,dy)||1; return [-dy/l,dx/l] };
+    // per-part colours/widths: a few bands, each one path (one stroke per band instead of one per point)
+    const band=(from,nb,set)=>{ const span=n-1-from; nb=Math.max(1,Math.min(nb,span)); for(let b=0;b<nb;b++){ const i0=from+Math.floor(b*span/nb), i1=from+Math.floor((b+1)*span/nb); if(i1<=i0) continue;
+      set(i0,i1); ctx.beginPath(); ctx.moveTo(seg[i0][0],seg[i0][1]); for(let i=i0+1;i<=i1;i++) ctx.lineTo(seg[i][0],seg[i][1]); ctx.stroke() } };
     const line=(off,width,color)=>{ ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();
       for(let i=0;i<n;i++){ const o=off(i), q=nrm(i), x=seg[i][0]+q[0]*o, y=seg[i][1]+q[1]*o; i?ctx.lineTo(x,y):ctx.moveTo(x,y) } ctx.stroke() };
     switch(style){
@@ -3550,11 +3558,11 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'twin': line(()=>3.2,1.6,c); line(()=>-3.2,1.6,'#ffffff'); break;
       case 'zigzag': line(i=>(i%2?4.5:-4.5),1.8,c); line(()=>0,.8,'#ffffff'); break;
       case 'helix': line(i=>4.5*Math.sin(i*.45+t*8),1.6,c); line(i=>-4.5*Math.sin(i*.45+t*8),1.6,'#ffffff'); break;
-      case 'plasma': for(let i=1;i<n;i++){ const k=i/n; ctx.strokeStyle=rgba(c,.3+.7*k);ctx.lineWidth=1+5*k;ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() } break;
-      case 'fire': for(let i=1;i<n;i++){ const k=i/n; ctx.strokeStyle=k>.8?'#fff3b0':k>.5?'#ffb020':k>.25?'#ff5a1f':'rgba(140,20,10,.6)';ctx.shadowColor=ctx.strokeStyle;ctx.lineWidth=1.5+5*k;ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() } break;
-      case 'comet': { const s0=Math.max(1,n-45); for(let i=s0;i<n;i++){ const k=(i-s0)/(n-s0); ctx.strokeStyle=rgba(c,k);ctx.lineWidth=1+9*k*k;ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() }
+      case 'plasma': band(0,18,(i0,i1)=>{ const k=i1/n; ctx.strokeStyle=rgba(c,.3+.7*k);ctx.lineWidth=1+5*k }); break;
+      case 'fire': band(0,18,(i0,i1)=>{ const k=i1/n; ctx.strokeStyle=k>.8?'#fff3b0':k>.5?'#ffb020':k>.25?'#ff5a1f':'rgba(140,20,10,.6)';ctx.shadowColor=ctx.strokeStyle;ctx.lineWidth=1.5+5*k }); break;
+      case 'comet': { const s0=Math.max(1,n-45); band(s0-1,15,(i0,i1)=>{ const k=(i1-s0)/(n-s0); ctx.strokeStyle=rgba(c,Math.max(0,k));ctx.lineWidth=1+9*k*k });
         if(s0>1){ ctx.strokeStyle=rgba(c,.25);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(seg[0][0],seg[0][1]);for(let i=1;i<=s0;i++)ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() } break }
-      case 'rainbow': for(let i=1;i<n;i++){ const hue=(i*5+t*120)%360; ctx.strokeStyle=`hsl(${hue},100%,65%)`;ctx.shadowColor=ctx.strokeStyle;ctx.lineWidth=2.8;ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() } break;
+      case 'rainbow': band(0,40,(i0,i1)=>{ const hue=((i0+i1)*2.5+t*120)%360; ctx.strokeStyle=`hsl(${hue},100%,65%)`;ctx.shadowColor=ctx.strokeStyle;ctx.lineWidth=2.8 }); break;
       case 'echo': line(()=>0,2,c); for(const back of [8,16,24]){ const p=seg[n-1-back]; if(!p) break; ctx.fillStyle=rgba(c,.6-back/50);ctx.beginPath();ctx.arc(p[0],p[1],3.4,0,7);ctx.fill() } break;
       case 'thin': line(()=>0,1,c); break;
       case 'pioneer': line(i=>4.5*Math.sin(i*.32-t*7),2,'#3dffd0'); line(i=>-4.5*Math.sin(i*.32-t*7),2,'#ff4f8b'); line(()=>0,1,'#ffffff');
@@ -3585,8 +3593,8 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'chain': line(()=>0,.8,rgba(c,.5)); ctx.strokeStyle=c; ctx.lineWidth=1.4; for(let i=0;i<n;i+=5){ ctx.beginPath();ctx.arc(seg[i][0],seg[i][1],3,0,7);ctx.stroke() } break;
       case 'ghost': for(const [o,a] of [[7,.22],[-7,.22],[3.5,.42],[-3.5,.42]]) line(i=>o*Math.sin(i*.12+t*3),1.2,rgba(c,a)); line(()=>0,2,'#ffffff'); break;
       case 'dragon': ctx.shadowColor='#ff2a1a';
-        for(let i=1;i<n;i++){ const k=i/n; ctx.strokeStyle=k>.85?'#ffe2a0':k>.6?'#ff3b1f':k>.3?'#c4001a':'rgba(80,0,10,.5)';
-          ctx.lineWidth=1+8*k*(.8+.2*Math.sin(i*.9-t*14));ctx.beginPath();ctx.moveTo(seg[i-1][0],seg[i-1][1]);ctx.lineTo(seg[i][0],seg[i][1]);ctx.stroke() }
+        band(0,28,(i0,i1)=>{ const k=i1/n; ctx.strokeStyle=k>.85?'#ffe2a0':k>.6?'#ff3b1f':k>.3?'#c4001a':'rgba(80,0,10,.5)';
+          ctx.lineWidth=1+8*k*(.8+.2*Math.sin(i1*.9-t*14)) });
         line(i=>3*Math.sin(i*.5+t*9),.8,'rgba(255,220,160,.7)'); break;
       case 'goldfaden': case 'spektral': case 'nichts': case 'relice': case 'relnebel': case 'relwind': cxTrail(ctx,seg,n,line,nrm,c,style,t); break;
       case 'rellinse': gxTrail(ctx,seg,n,line,nrm,c,style,t); break;
@@ -6529,7 +6537,8 @@ function flightStep(){
     if(s.boostT>0) s.boostT-=h;
     if(s.lz&&s.t>s.life){ if(!replaying) explode(s.x,s.y,'#ff4a6a',10); resolveProjectile(s,null); continue } // the laser fades out
     if(s.type==='fission') gxFission(s);
-    if(s.t-s.lastPt>1/60){
+    const lp=s.trail[s.trail.length-1];
+    if(s.t-s.lastPt>1/60&&(!lp||(s.x-lp[0])**2+(s.y-lp[1])**2>=9||s.t-s.lastPt>.25)){
       const pl=players[s.o];
       s.trail.push([s.x,s.y]); s.lastPt=s.t;
       if(!replaying){ const pt=trailParticles(pl.skin.trail,s.x,s.y,pl.color); if(pt) particles.push(pt) }
