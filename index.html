@@ -6865,7 +6865,7 @@ const CRATES=[
    odds:{epic:74,legendary:22,mythic:4}}
 ];
 const ODDS_LABEL={dust:'Sternenstaub',common:'Gewöhnliches Item',rare:'Seltenes Item',epic:'Episches Item',legendary:'Legendäres Item',mythic:'Mystisches Item'};
-const DUP_REFUND=.3; // an item you already own turns into 30 % of its shop price
+const DUP_REFUND=1; // an item you already own turns into its full shop price in stardust
 
 function rollCrate(c){
   let u=Math.random()*100, kind='dust';
@@ -6876,7 +6876,7 @@ function rollCrate(c){
   // prefer items you do not own yet; duplicates only once a rarity is complete
   const fresh=pool.filter(p=>!profile.owned[p.cat+':'+p.it.id]), from=fresh.length?fresh:pool;
   const pick=from[Math.floor(Math.random()*from.length)], dup=!fresh.length;
-  return {kind:'item',cat:pick.cat,item:pick.it,rarity:kind,dup,refund:dup?Math.max(5,Math.round(pick.it.price*(kind==='legendary'?.15:kind==='mythic'?.12:DUP_REFUND)/5)*5):0};
+  return {kind:'item',cat:pick.cat,item:pick.it,rarity:kind,dup,refund:dup?Math.max(5,pick.it.price):0};
 }
 function applyReward(r){
   if(r.kind==='dust') profile.dust+=r.amount;
@@ -6924,7 +6924,7 @@ function renderCrates(box){
       <span class="iname">${c.name}</span>${c.theme?`<span class="ctheme">${c.theme}</span>`:''}
       <span class="odds-short">${c.odds.mythic?`<b style="color:${RARITY.mythic.color}">Mystisch ${String(c.odds.mythic).replace('.',',')} %</b> · `:''}${c.odds.legendary?`Legendär ${String(c.odds.legendary).replace('.',',')} % · `:''}${c.odds.epic?`Episch ${String(c.odds.epic).replace('.',',')} %`:`Selten ${String(c.odds.rare).replace('.',',')} %`}</span>
       <details><summary>Alle Wahrscheinlichkeiten</summary><table>${rows}</table>
-      <p class="fine">Doppelte Items werden zu ${Math.round(DUP_REFUND*100)} % ihres Shop-Preises in Sternenstaub umgewandelt. Neue Items haben Vorrang.</p></details>`;
+      <p class="fine">Doppelte Items bekommst du zum vollen Shop-Preis in Sternenstaub gutgeschrieben. Neue Items haben Vorrang.</p></details>`;
     const b=document.createElement('button'); b.id='crate-'+c.id;
     b.textContent=`Öffnen · ✦ ${c.price}`; b.disabled=profile.dust<c.price;
     b.onclick=()=>{ crateFrom='shop'; openCrate(c) };
