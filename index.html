@@ -410,6 +410,9 @@ button.ghost.danger{color:#ff6b7d;border-color:rgba(255,80,100,.5)}
 .rules{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.9rem;line-height:1.4}
 .rules b{color:var(--ink)}
 .cratecv{width:100%;height:auto;aspect-ratio:1.25/1;cursor:pointer}
+.item.crate .ctheme{font-size:.72rem;color:var(--muted);margin-top:-4px}
+#crate .crtop{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+#crateTurbo[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:rgba(255,211,79,.1)}
 @media (prefers-reduced-motion:reduce){button:active{transform:none}.pager{scroll-behavior:auto}}
 /* online */
 #findMatch[disabled],#toBoard[disabled],button.mini[disabled]{opacity:.45}
@@ -1751,7 +1754,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 
   <div class="overlay" id="crate" hidden>
     <div class="card center">
-      <span class="label" id="crateTitle">Sternenkiste</span>
+      <div class="crtop"><span class="label" id="crateTitle">Sternenkiste</span><button class="ghost mini" id="crateTurbo" aria-pressed="false">⚡ Turbo</button></div>
       <canvas id="crateCanvas" class="cratecv" aria-hidden="true"></canvas>
       <h2 id="crateRar"></h2>
       <p id="crateSub" aria-live="polite"></p>
@@ -6844,12 +6847,22 @@ function draw(t){
 
 /* ---------- crates: paid with stardust only, odds shown openly ---------- */
 const CRATES=[
+  {id:'comet', name:'Kometenkiste',    price:75,   color:'#7fe8ff', dust:[20,90],
+   odds:{dust:68,common:26,rare:5.5,epic:.5}},
   {id:'star',  name:'Sternenkiste',    price:150,  color:'#7fa9ff', dust:[40,140],
    odds:{dust:55,common:28,rare:13,epic:3.5,legendary:.5}},
   {id:'nebula',name:'Nebelkiste',      price:400,  color:'#c46bff', dust:[120,380],
    odds:{dust:42,common:18,rare:28,epic:10,legendary:1.8,mythic:.2}},
   {id:'nova',  name:'Supernova-Kiste', price:1000, color:'#ffd34f', dust:[350,900],
-   odds:{dust:30,rare:45,epic:20,legendary:4,mythic:1}}
+   odds:{dust:30,rare:45,epic:20,legendary:4,mythic:1}},
+  {id:'palette',name:'Farbkiste',      price:300,  color:'#3dffa8', dust:[80,260], cats:['color','pattern'], theme:'Nur Farben und Planetenmuster',
+   odds:{dust:38,common:22,rare:28,epic:10,legendary:1.8,mythic:.2}},
+  {id:'trail', name:'Schweifkiste',    price:500,  color:'#2ee6ff', dust:[150,450], cats:['trail','shot','impact'], theme:'Nur Spuren, Geschosse und Treffereffekte',
+   odds:{dust:36,rare:36,epic:22,legendary:5,mythic:1}},
+  {id:'buddy', name:'Begleiterkiste',  price:800,  color:'#ff9a4f', dust:[250,700], cats:['companion','victory','emote','title'], theme:'Nur Begleiter, Sieg-Animationen, Emotes und Titel',
+   odds:{dust:32,rare:32,epic:28,legendary:6.5,mythic:1.5}},
+  {id:'galaxy',name:'Galaxienkiste',   price:2500, color:'#ff4f8b', dust:[0,0], theme:'Nur Episch oder besser',
+   odds:{epic:74,legendary:22,mythic:4}}
 ];
 const ODDS_LABEL={dust:'Sternenstaub',common:'Gewöhnliches Item',rare:'Seltenes Item',epic:'Episches Item',legendary:'Legendäres Item',mythic:'Mystisches Item'};
 const DUP_REFUND=.3; // an item you already own turns into 30 % of its shop price
@@ -6859,7 +6872,7 @@ function rollCrate(c){
   for(const [k,p] of Object.entries(c.odds)){ if((u-=p)<0){ kind=k; break } }
   if(kind==='dust'){ const n=Math.round((c.dust[0]+Math.random()*(c.dust[1]-c.dust[0]))/5)*5; return {kind:'dust',amount:n,rarity:'common'} }
   const pool=[];
-  for(const cat of COSMETIC_CATS) for(const it of SHOP[cat]) if(it.rarity===kind&&it.price>0) pool.push({cat,it});
+  for(const cat of COSMETIC_CATS) if(!c.cats||c.cats.includes(cat)) for(const it of SHOP[cat]) if(it.rarity===kind&&it.price>0&&!it.src) pool.push({cat,it});
   // prefer items you do not own yet; duplicates only once a rarity is complete
   const fresh=pool.filter(p=>!profile.owned[p.cat+':'+p.it.id]), from=fresh.length?fresh:pool;
   const pick=from[Math.floor(Math.random()*from.length)], dup=!fresh.length;
@@ -6908,8 +6921,8 @@ function renderCrates(box){
     const el=document.createElement('div'); el.className='item crate';
     const rows=Object.entries(c.odds).map(([k,p])=>`<tr><td>${k==='dust'?`${ODDS_LABEL[k]} (${c.dust[0]}–${c.dust[1]} ✦)`:`<span style="color:${RARITY[k].color}">${ODDS_LABEL[k]}</span>`}</td><td>${String(p).replace('.',',')} %</td></tr>`).join('');
     el.innerHTML=`<canvas width="480" height="240" aria-hidden="true"></canvas>
-      <span class="iname">${c.name}</span>
-      <span class="odds-short">${c.odds.mythic?`<b style="color:${RARITY.mythic.color}">Mystisch ${String(c.odds.mythic).replace('.',',')} %</b> · `:''}Legendär ${String(c.odds.legendary).replace('.',',')} % · Episch ${String(c.odds.epic).replace('.',',')} %</span>
+      <span class="iname">${c.name}</span>${c.theme?`<span class="ctheme">${c.theme}</span>`:''}
+      <span class="odds-short">${c.odds.mythic?`<b style="color:${RARITY.mythic.color}">Mystisch ${String(c.odds.mythic).replace('.',',')} %</b> · `:''}${c.odds.legendary?`Legendär ${String(c.odds.legendary).replace('.',',')} % · `:''}${c.odds.epic?`Episch ${String(c.odds.epic).replace('.',',')} %`:`Selten ${String(c.odds.rare).replace('.',',')} %`}</span>
       <details><summary>Alle Wahrscheinlichkeiten</summary><table>${rows}</table>
       <p class="fine">Doppelte Items werden zu ${Math.round(DUP_REFUND*100)} % ihres Shop-Preises in Sternenstaub umgewandelt. Neue Items haben Vorrang.</p></details>`;
     const b=document.createElement('button'); b.id='crate-'+c.id;
@@ -6937,12 +6950,82 @@ function openCrate(c,free,given){
   const reward=given||rollCrate(c);
   if(!given) applyReward(reward); // saved right away, so closing the page mid-animation changes nothing
   track('crate');
-  crateAnim={c,reward,start:performance.now()/1000,revealed:false};
-  $('crateTitle').textContent=c.name; $('crateSub').textContent='Tippe, um schneller zu öffnen';
+  crateAnim={c,reward,start:performance.now()/1000,revealed:false,roll:crateRoller(c,reward)};
+  $('crateTitle').textContent=c.name; $('crateSub').textContent='Tippe, um sofort aufzudecken';
   $('crateRar').textContent=''; $('crateResult').hidden=true;
   Sfx.init(); Sfx.crateShake();
   $('crateAgain').hidden=crateFrom!=='shop'; $('crateBack').textContent=crateFrom==='shop'?'Zurück zum Shop':'Zurück';
   show('crate');
+}
+/* ---------- the roller ----------
+   A strip of possible prizes runs past a marker and slows down; the card under the marker is the prize the server already drew.
+   The other cards are drawn with the crate's own odds, so the strip shows what the crate really contains. */
+var CRATE_TURBO_KEY='gravityDuel.crateTurbo.v1';
+function crateTurbo(){ try{ return localStorage.getItem(CRATE_TURBO_KEY)==='1' }catch(e){ return false } }
+function crateTurboSet(v){ try{ localStorage.setItem(CRATE_TURBO_KEY,v?'1':'0') }catch(e){} $('crateTurbo').setAttribute('aria-pressed',String(v)) }
+function crateFiller(c){
+  let u=Math.random()*100, kind='dust';
+  for(const [k,p] of Object.entries(c.odds)){ if((u-=p)<0){ kind=k; break } }
+  if(kind==='dust') return {kind:'dust',amount:Math.round((c.dust[0]+Math.random()*(c.dust[1]-c.dust[0]))/5)*5,rarity:'common'};
+  const pool=[]; for(const cat of COSMETIC_CATS) if(!c.cats||c.cats.includes(cat)) for(const it of SHOP[cat]) if(it.rarity===kind&&it.price>0&&!it.src) pool.push({cat,it});
+  if(!pool.length) return {kind:'dust',amount:c.dust[1]||100,rarity:'common'};
+  const q=pool[Math.floor(Math.random()*pool.length)]; return {kind:'item',cat:q.cat,item:q.it,rarity:kind};
+}
+function crateRoller(c,reward){
+  const turbo=crateTurbo(), n=turbo?34:52, win=n-6, cards=[];
+  for(let i=0;i<n;i++) cards.push(i===win?reward:crateFiller(c));
+  return {cards,win,dur:turbo?1.5:5.6,off:(Math.random()-.5)*.76,lastIdx:-1,turbo};
+}
+function crateRollPos(R,e){ // position (in cards) of the marker over time: fast start, long glide
+  const k=Math.min(1,e/R.dur), ease=1-Math.pow(1-k,4.2);
+  return ease*(R.win+R.off);
+}
+function crateCardSkin(card){
+  if(card.skin) return card.skin;
+  const skin=mySkin(); if(card.kind==='item'){ const it=card.item; if(card.cat==='color'){ skin.color=it.color; skin.c2=it.c2; skin.anim=it.anim } else skin[card.cat]=it.id }
+  return card.skin=skin;
+}
+function drawCrateCard(g,x,y,cw,ch,card,t,hot){
+  const rc=card.kind==='dust'?COL.gold:(RARITY[card.rarity]||RARITY.common).color;
+  g.save();
+  const bg=g.createLinearGradient(0,y,0,y+ch); bg.addColorStop(0,'rgba(22,10,52,.96)'); bg.addColorStop(.7,rgba(rc,.18)); bg.addColorStop(1,rgba(rc,.38));
+  g.fillStyle=bg; roundRect(g,x+3,y,cw-6,ch,10); g.fill();
+  g.strokeStyle=rgba(rc,hot?1:.55); g.lineWidth=hot?2.5:1.2; if(hot){ g.shadowColor=rc; g.shadowBlur=18 } g.stroke(); g.shadowBlur=0;
+  g.fillStyle=rc; g.fillRect(x+8,y+ch-6,cw-16,3);
+  const cx=x+cw/2, cy=y+ch*.42, r=Math.min(cw,ch)*.17;
+  g.beginPath(); roundRect(g,x+3,y,cw-6,ch,10); g.clip();
+  if(card.kind==='dust'){ g.fillStyle=COL.gold; g.shadowColor=COL.gold; g.shadowBlur=12; star(g,cx,cy,r*1.15); g.fill(); g.shadowBlur=0;
+    vText(g,`+${card.amount}`,cx,y+ch*.78,Math.max(10,cw*.12),'#fff') }
+  else {
+    const it=card.item, skin=crateCardSkin(card);
+    if(card.cat==='emote'){ g.save(); g.translate(cx,cy+r*.1); g.scale(r/36,r/36); drawEmoteArt(g,it.id,t,skinColor(mySkin(),t)); g.restore() }
+    else if(card.cat==='title'){ g.save(); g.translate(cx,cy); g.font=`700 ${Math.max(9,cw*.09)}px "Chakra Petch", ui-monospace, monospace`; g.textAlign='center'; g.textBaseline='middle';
+      const tw=Math.min(cw-14,g.measureText(it.name).width+14); g.strokeStyle=rc; g.lineWidth=1.5; roundRect(g,-tw/2,-11,tw,22,11); g.stroke(); g.fillStyle=rc; g.fillText(it.name,0,1,cw-20); g.restore() }
+    else {
+      if(card.cat==='trail'||card.cat==='shot'){ const tr=[]; for(let i=0;i<=20;i++){ const k=i/20; tr.push([cx-r*2.2+k*r*3.4,cy+r*.8-Math.sin(k*Math.PI)*r*1.5]) } drawStyledTrail(g,tr,skinColor(skin,t),skin.trail,t,.85) }
+      if(card.cat==='companion') drawCompanionPreview(g,cx,cy,r,skin,t,1.2); else drawSkinnedPlanet(g,cx,cy,r,skin,t,false);
+      g.shadowBlur=0;
+    }
+    g.font=`600 ${Math.max(9,cw*.095)}px Figtree, system-ui, sans-serif`; g.textAlign='center'; g.textBaseline='middle'; g.fillStyle='#f3eeff'; g.fillText(it.name,cx,y+ch*.8,cw-14);
+  }
+  g.restore();
+}
+function drawCrateRoller(g,w,h,t,a){
+  const R=a.roll, e=t-a.start, pos=crateRollPos(R,e), cw=Math.min(w*.3,124), ch=cw*1.18, cy=h*.5-ch/2, mid=w/2;
+  // ticking: one tick each time a new card passes the marker
+  const idx=Math.floor(pos+.5); if(idx!==R.lastIdx){ if(R.lastIdx>=0) Sfx.tick(.25+.5*Math.min(1,e/R.dur)); R.lastIdx=idx }
+  g.fillStyle='rgba(6,2,20,.55)'; g.fillRect(0,cy-14,w,ch+28);
+  const first=Math.max(0,Math.floor(pos-mid/cw)-1), last=Math.min(R.cards.length-1,Math.ceil(pos+mid/cw)+1);
+  const done=e>=R.dur;
+  for(let i=first;i<=last;i++){ const x=mid+(i-pos)*cw-cw/2; drawCrateCard(g,x,cy,cw,ch,R.cards[i],t,done&&i===R.win) }
+  // fade at both edges
+  for(const [x0,x1] of [[0,w*.22],[w,w*.78]]){ const gr=g.createLinearGradient(x0,0,x1,0); gr.addColorStop(0,'rgba(10,4,30,1)'); gr.addColorStop(1,'rgba(10,4,30,0)'); g.fillStyle=gr; g.fillRect(Math.min(x0,x1),cy-16,Math.abs(x1-x0),ch+32) }
+  // the marker
+  g.save(); g.strokeStyle=COL.gold; g.shadowColor=COL.gold; g.shadowBlur=10; g.lineWidth=2.5; g.beginPath(); g.moveTo(mid,cy-16); g.lineTo(mid,cy+ch+16); g.stroke();
+  g.fillStyle=COL.gold; for(const [yy,d] of [[cy-16,1],[cy+ch+16,-1]]){ g.beginPath(); g.moveTo(mid-9,yy); g.lineTo(mid+9,yy); g.lineTo(mid,yy+d*11); g.closePath(); g.fill() } g.restore();
+  // the crate shakes above the strip while the strip runs
+  drawCrate(g,w/2,cy-ch*.42,Math.min(w*.2,ch*.55),a.c.color,t,done?1:0,done?0:.25+.5*(1-Math.min(1,e/R.dur)));
+  vText(g,R.turbo?'⚡ TURBO':'',w-12,14,11,COL.gold,'right',600);
 }
 function revealCrate(){
   const a=crateAnim; if(!a||a.revealed) return;
@@ -6963,11 +7046,12 @@ function revealCrate(){
 function crateTick(t){
   if(current!=='crate'||!crateAnim) return;
   const a=crateAnim, cvs=$('crateCanvas'), g=fitCanvas(cvs), w=cvs.width/dpr, h=cvs.height/dpr; if(!w) return;
-  const e=t-a.start;
-  if(!a.revealed&&e>1.5) revealCrate();
+  const e=t-a.start, R=a.roll, hold=R?(R.turbo?.25:.75):0;
+  if(!a.revealed&&e>(R?R.dur+hold:1.5)) revealCrate();
   g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
   const r=a.reward, rc=r.kind==='dust'?COL.gold:RARITY[r.rarity].color;
   if(!a.revealed){
+    if(R){ drawCrateRoller(g,w,h,t,a); if(e>R.dur&&!R.landed){ R.landed=true; Sfx.moon(); if(r.rarity!=='common'||r.kind==='item') vibrate(r.rarity==='mythic'||r.rarity==='legendary'?[30,40,90]:[20]) } return }
     const k=Math.min(1,e/1.5);
     drawCrate(g,w/2,h*.6,Math.min(w*.55,h*.9),a.c.color,t,0,k*k);
     return;
@@ -10446,6 +10530,8 @@ tap('copyCode',()=>{
 tap('crateAgain',()=>{ const c=crateAnim&&crateAnim.c; if(c&&profile.dust>=c.price) openCrate(c) });
 tap('crateEquip',()=>{ const r=crateAnim&&crateAnim.reward; if(r&&r.kind==='item'){ if(SERVER_ECON) econEquip(r.cat,r.item.id); else { equipLocal(r.cat,r.item.id); saveProfile() } Sfx.select(); $('crateEquip').hidden=true } });
 $('crateCanvas').addEventListener('click',()=>{ if(crateAnim&&!crateAnim.revealed) revealCrate() });
+$('crateTurbo').addEventListener('click',()=>{ Sfx.init(); Sfx.select(); const v=!crateTurbo(); crateTurboSet(v); const a=crateAnim; if(v&&a&&!a.revealed&&a.roll&&!a.roll.turbo){ revealCrate() } });
+crateTurboSet(crateTurbo());
 tap('galaxiesBack',()=>goHome(0));
 tap('levelsBack',goGalaxies);
 tap('again',()=>{ if(fern&&fern.over){ const op=fern.opp; fernExit(true); return fernStartWith(op) } if(online&&online.spec) return specExit(); if(ai) return startAiDuel(ai.arena,duelMode); if(!online) return startDuel(); const o=online, ranked=o.ranked; onlineCleanup(); if(ranked){ goHome(1); findMatch() } else { phase='menu'; bodies=[]; players=[]; challengeFriend(o.opp,{mode:o.mode,arena:o.arena,rematch:true}) } });
