@@ -56,9 +56,9 @@ button:active{transform:translateY(1px)}
 .score{font-family:var(--display);font-size:1.1rem;font-variant-numeric:tabular-nums;color:var(--ink)}
 .center{text-align:center}
 .chip{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));z-index:2;
-  font-size:.75rem;padding:8px 12px;border-radius:999px;background:rgba(22,10,52,.7);color:var(--muted);border:1px solid rgba(167,123,255,.4);box-shadow:none}
+  font-size:.75rem;padding:11px 14px;min-height:40px;border-radius:999px;background:rgba(22,10,52,.7);color:var(--muted);border:1px solid rgba(167,123,255,.4);box-shadow:none}
 #mute{right:calc(10px + env(safe-area-inset-right,0px))}
-#music{right:calc(10px + env(safe-area-inset-right,0px));top:calc(50px + env(safe-area-inset-top,0px))}
+#music{right:calc(10px + env(safe-area-inset-right,0px));top:calc(56px + env(safe-area-inset-top,0px))}
 .topbar .iconbtn{padding:9px 10px}
 .topbar .iconbtn.round{width:42px;height:42px;padding:0;border-radius:50%;font-size:.8rem;display:flex;align-items:center;justify-content:center}
 #homeMusic{font-size:1.2rem}
@@ -839,6 +839,7 @@ button.plmed{font:inherit;color:inherit;box-shadow:none;cursor:pointer}
 .navbar button{position:relative;gap:3px;padding:7px 2px 5px;font-size:.68rem;font-weight:600;background:transparent;border:0;border-radius:12px;min-width:0}
 .navbar button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .navbar button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:400px){.navbar button span{font-size:.62rem;letter-spacing:-.01em}}
 .navbar button[aria-selected="true"]{color:#8ff3ff;background:rgba(46,230,255,.13);border:0}
 .navbar .nbadge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:#ff3d5e;color:#fff;font-size:.68rem;font-weight:700;line-height:18px;text-align:center}
 .navbar .nbadge.dot{min-width:0;width:10px;height:10px;padding:0;top:5px;left:calc(50% + 8px);background:var(--gold);box-shadow:0 0 8px var(--gold)}
@@ -7624,6 +7625,7 @@ const MODE_NAME={classic:'Klassisch',blitz:'Blitzduell'};
 let onlineMode=load('gravityDuel.onlineMode.v1','classic');
 
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=()=>rej(new Error('load')); document.head.appendChild(s) }) }
+const firstGesture=new Promise(res=>{ const ev=['pointerdown','touchstart','keydown']; const f=()=>{ ev.forEach(e=>removeEventListener(e,f,true)); res() }; ev.forEach(e=>addEventListener(e,f,{capture:true,passive:true})) });
 async function supabaseBackend(){
   if(!window.supabase){
     let ok=false;
@@ -7632,7 +7634,7 @@ async function supabaseBackend(){
   }
   const sb=window.supabase.createClient(NET_CFG.url,NET_CFG.key,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'gravityDuel.auth.v1'}});
   let {data:{session}}=await sb.auth.getSession();
-  if(!session){ const r=await sb.auth.signInAnonymously(); if(r.error) throw r.error; session=r.data.session }
+  if(!session){ await firstGesture; const r=await sb.auth.signInAnonymously(); if(r.error) throw r.error; session=r.data.session }
   return {
     uid:session.user.id, sb, user:session.user,
     async rpc(name,args){ const {data,error}=await sb.rpc(name,args||{}); if(error) throw error; return data },
@@ -7787,6 +7789,7 @@ let pingTimer=null;
 function schedulePing(ms){ clearTimeout(pingTimer); pingTimer=setTimeout(netPing,ms) }
 async function netPing(){
   if(Net.state!=='ready') return;
+  if(document.hidden&&!online&&!search){ schedulePing(60000); return }
   try{
     const r=await rpc('gd_ping');
     if(typeof r.gravitons==='number'&&r.gravitons!==profile.trophies&&!online){ profile.trophies=r.gravitons; saveProfile(); if(current==='home') renderHome() }
@@ -8202,7 +8205,7 @@ async function econMatchReward(before){
     $('overLevelUp').hidden=lv<=lv0; $('overLevelUp').textContent=lv>lv0?`Aufstieg auf Spielerlevel ${lv}!`:'';
   }catch(e){}
 }
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') econFlush() });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') econFlush(); else if(Net.state==='ready') schedulePing(400) });
 
 /* ---------- account: e-mail and password or Google, so the game state can move between devices ---------- */
 let acctMode='new';
@@ -8954,7 +8957,7 @@ var SUBPAGES={
   league:{area:'Wettkampf'}, board:{area:'Wettkampf'}, replays:{area:'Wettkampf'}, arenas:{area:'Wettkampf'},
   quests:{area:'Events',title:'Belohnungen'}, daily:{area:'Events'}, tourney:{area:'Events'}, community:{area:'Events'},
   friends:{area:'Freunde'}, fern:{area:'Freunde'},
-  shop:{area:'Sammlung',main:['Zum Inventar',()=>openInventory()]},
+  shop:{area:'Sammlung',main:['Inventar',()=>openInventory()]},
   inventory:{area:'Sammlung',main:['Zum Shop',()=>$('invToShop').click()],hide:['invToShop']},
   album:{area:'Sammlung'}, profile:{area:'Sammlung',title:'Dein Profil'},
   settings:{area:'Einstellungen'}, rules:{area:'Spielen'}
