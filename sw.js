@@ -1,6 +1,6 @@
 /* Gravity Duel service worker: the game starts from the cache (fast, also offline),
    pages are fetched fresh when online, the online backend is never cached. */
-const VERSION = 'gd-v2';
+const VERSION = 'gd-v3';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-180.png', 'icon-maskable-512.png', 'favicon-32.png',
   'fonts/chakra-500.woff', 'fonts/chakra-700.woff', 'fonts/figtree.woff', 'impressum.html', 'datenschutz.html'];
 const LIB = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0/dist/umd/supabase.js';
