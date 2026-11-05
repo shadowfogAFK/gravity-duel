@@ -3179,26 +3179,31 @@ const SHOP={
     {id:'mint',  name:'Minze',           color:'#7fd6b5',            price:40,   rarity:'common'},
     {id:'coral', name:'Koralle',         color:'#ff7f6b',            price:40,   rarity:'common'},
     {id:'mauve', name:'Altrosa',         color:'#d48aa8',            price:50,   rarity:'common'},
+    {id:'pfirsich',name:'Pfirsich',       color:'#ffb38a',            price:60,   rarity:'common'},
     {id:'neon',  name:'Neon-Pink',       color:'#ff4f8b',            price:90,   rarity:'rare'},
     {id:'laser', name:'Laser-Orange',    color:'#ff8a1f',            price:90,   rarity:'rare'},
     {id:'ice',   name:'Eisblau',         color:'#7fe3ff',            price:90,   rarity:'rare'},
     {id:'teal',  name:'Petrol',          color:'#1fc4b4',            price:120,  rarity:'rare'},
     {id:'emer',  name:'Smaragd',         color:'#3dffa8',            price:130,  rarity:'rare'},
     {id:'lilac', name:'Flieder',         color:'#c9a2ff',            price:130,  rarity:'rare'},
+    {id:'lagune',name:'Lagune',          color:'#26d7c4',            price:150,  rarity:'rare'},
     {id:'plasma',name:'Plasma-Violett',  color:'#b26bff',            price:220,  rarity:'epic'},
     {id:'acid',  name:'Säuregelb',       color:'#e6ff4a',            price:220,  rarity:'epic'},
     {id:'ruby',  name:'Rubin',           color:'#ff2d55',            price:260,  rarity:'epic'},
     {id:'copper',name:'Kupfer',          color:'#e08a4f',c2:'#4a1d08',price:320,  rarity:'epic'},
     {id:'void',  name:'Leere',           color:'#6a55c8',c2:'#05010f',price:380,  rarity:'epic'},
+    {id:'kobalt',name:'Kobalt',          color:'#3f6bff',            price:300,  rarity:'epic'},
     {id:'sun',   name:'Sonnengold',      color:'#ffd34f',            price:420,  rarity:'epic',     minLevel:4},
     {id:'sunset',name:'Sonnenuntergang', color:'#ff6a3d',c2:'#b026ff',price:2200, rarity:'legendary',minLevel:5},
     {id:'ocean', name:'Tiefsee',         color:'#2ee6ff',c2:'#2a3bff',price:2200, rarity:'legendary',minLevel:5},
     {id:'white', name:'Weißglut',        color:'#ffffff',c2:'#ff3d7f',price:3000, rarity:'legendary',minLevel:7},
     {id:'galaxy',name:'Galaxie',         color:'#8a6bff',c2:'#ff2d8a',price:3400, rarity:'legendary',minLevel:7},
+    {id:'zwielicht',name:'Zwielicht',    color:'#ff7ac8',c2:'#2a1a7a',price:2600, rarity:'legendary',minLevel:5},
     {id:'aurora',name:'Polarlicht',      color:'#3dffa8',anim:'hue', price:8750, rarity:'mythic',   minLevel:9},
     {id:'inferno',name:'Höllenglut',     color:'#ff4a1f',c2:'#5a0500',anim:'fire',price:11250,rarity:'mythic',minLevel:11},
     {id:'blood', name:'Blutmond',        color:'#ff1f3d',c2:'#1a0006',anim:'beat',price:15000,rarity:'mythic',minLevel:13},
     {id:'plasmasturm',name:'Plasmasturm',   color:'#ff2bd6',c2:'#1c0036',anim:'storm',price:13000,rarity:'mythic',minLevel:11},
+    {id:'neonwelle',name:'Neonwelle',    color:'#00f0ff',c2:'#ff1f8e',anim:'shift',price:9500,rarity:'mythic',minLevel:10},
     {id:'aufbruch',name:'Aufbruch',        color:'#3dffd0',c2:'#ff4f8b',anim:'shift',price:0,rarity:'season',season:1},
     {id:'polar',   name:'Polarnacht',      color:'#9fe9ff',c2:'#6a4dff',anim:'shift',price:0,rarity:'season',season:2},
     {id:'mitternacht',name:'Mitternachtsgold',color:'#ffd34f',c2:'#3a4dff',anim:'shift',price:0,rarity:'season',season:3},
@@ -3209,7 +3214,8 @@ const SHOP={
     {id:'milchstrasse',name:'Milchstraße',      color:'#8a6bff',c2:'#090225',anim:'milky',price:55000,rarity:'cosmic',minLevel:200},
     {id:'pulsar',      name:'Pulsarherz',       color:'#7fe8ff',c2:'#06123a',anim:'pulsar',price:58000,rarity:'cosmic',minLevel:200},
     {id:'herzleere',   name:'Schlagende Leere', color:'#ff3b5c',c2:'#000000',anim:'heart',price:0,rarity:'void',src:'void'},
-    {id:'abyss',       name:'Abgrund',   color:'#7a2cff',c2:'#000000',anim:'abyss',price:0,rarity:'void',src:'void'}
+    {id:'abyss',       name:'Abgrund',   color:'#7a2cff',c2:'#000000',anim:'abyss',price:0,rarity:'void',src:'void'},
+    {id:'ereignisrand',name:'Ereignisrand',color:'#ffa646',c2:'#000000',anim:'rand',price:0,rarity:'void',src:'void'}
   ],
   aura:[
     {id:'none',   name:'Keine',            price:0,    rarity:'common'},
@@ -3220,6 +3226,7 @@ const SHOP={
     {id:'pulse',  name:'Pulsring',         price:220,  rarity:'rare',     minLevel:3},
     {id:'bubble', name:'Schutzblase',      price:260,  rarity:'rare'},
     {id:'ring',   name:'Saturnring',       price:280,  rarity:'rare'},
+    {id:'staubring',name:'Staubring',      price:240,  rarity:'rare'},
     {id:'sparks', name:'Funkenkranz',      price:340,  rarity:'epic'},
     {id:'hex',    name:'Schildgitter',     price:380,  rarity:'epic'},
     {id:'nebula', name:'Nebelhülle',       price:460,  rarity:'epic'},
@@ -3229,6 +3236,7 @@ const SHOP={
     {id:'flare',  name:'Sonnenfackeln',    price:2800, rarity:'legendary',minLevel:5},
     {id:'glitch', name:'Glitch',           price:3600, rarity:'legendary',minLevel:7},
     {id:'wings',  name:'Lichtschwingen',   price:4400, rarity:'legendary',minLevel:8},
+    {id:'kometenkranz',name:'Kometenkranz',price:3000, rarity:'legendary',minLevel:6},
     {id:'horizon',name:'Ereignishorizont', price:10000, rarity:'mythic',   minLevel:10},
     {id:'inferno',name:'Höllenfeuer',      price:13750, rarity:'mythic',   minLevel:12},
     {id:'magneto',name:'Magnetosphäre',    price:12500, rarity:'mythic',   minLevel:11},
@@ -3237,6 +3245,7 @@ const SHOP={
     {id:'kollektor',  name:'Kollektorschwarm', price:60000, rarity:'cosmic',   minLevel:200},
     {id:'riss',       name:'Realitätsriss',    price:0,     rarity:'void',     src:'void'},
     {id:'schlund',    name:'Hungriger Schlund',price:0,     rarity:'void',     src:'void'},
+    {id:'leerenkrone',name:'Leerenkrone',      price:0,     rarity:'void',     src:'void'},
     {id:'schlangen',  name:'Luftschlangen',    price:0,     rarity:'season',   season:5},
     {id:'relnova',    name:'Nova-Relikt',      price:0,     rarity:'legendary',src:'campaign',gal:'nova',diff:3},
     {id:'relkristall',name:'Kristall-Relikt',  price:0,     rarity:'mythic',   src:'campaign',gal:'kristall',diff:3},
@@ -3252,6 +3261,7 @@ const SHOP={
     {id:'plasma',  name:'Plasmastrahl',  price:220,  rarity:'rare'},
     {id:'wave',    name:'Welle',         price:240,  rarity:'rare'},
     {id:'sparks',  name:'Funkenschweif', price:280,  rarity:'rare',     minLevel:2},
+    {id:'funkenregen',name:'Funkenregen', price:260,  rarity:'rare',     minLevel:2},
     {id:'zigzag',  name:'Blitz',         price:320,  rarity:'epic'},
     {id:'comet',   name:'Komet',         price:380,  rarity:'epic'},
     {id:'helix',   name:'Helix',         price:440,  rarity:'epic'},
@@ -3260,6 +3270,7 @@ const SHOP={
     {id:'stardust',name:'Sternenstaub',  price:2600, rarity:'legendary',minLevel:6},
     {id:'echo',    name:'Echo',          price:3200, rarity:'legendary',minLevel:7},
     {id:'ghost',   name:'Geisterspur',   price:3600, rarity:'legendary',minLevel:8},
+    {id:'lichtband',name:'Lichtband',     price:3000, rarity:'legendary',minLevel:6},
     {id:'rainbow', name:'Regenbogen',    price:8750, rarity:'mythic',   minLevel:8},
     {id:'dragon',  name:'Drachenschweif',price:12500, rarity:'mythic',   minLevel:12},
     {id:'plasmasturm',name:'Plasmagewitter',   price:14000, rarity:'mythic',   minLevel:12},
@@ -3272,6 +3283,7 @@ const SHOP={
     {id:'ereignis',   name:'Horizontfaden', price:60000, rarity:'cosmic',   minLevel:200},
     {id:'nichts',     name:'Spur des Nichts',  price:0,     rarity:'void',     src:'void'},
     {id:'abgrund',    name:'Riss im Abgrund',  price:0,     rarity:'void',     src:'void'},
+    {id:'zerfall',    name:'Zerfallsspur',     price:0,     rarity:'void',     src:'void'},
     {id:'relice',     name:'Frost-Relikt',     price:0,     rarity:'legendary',src:'campaign',gal:'ice',diff:3},
     {id:'relnebel',   name:'Nebel-Relikt',     price:0,     rarity:'mythic',   src:'campaign',gal:'nebel',diff:3},
     {id:'relwind',    name:'Sturm-Relikt',     price:0,     rarity:'mythic',   src:'campaign',gal:'wind',diff:3}
@@ -3349,10 +3361,28 @@ function lkColorFx(g,x,y,r,c,anim,t){
   g.save(); g.strokeStyle=`rgba(162,77,255,${.25+.35*b})`; g.lineWidth=Math.max(.8,r*.05); g.beginPath(); g.arc(x,y,r-.5,0,7); g.stroke(); g.restore();
   return true;
 }
+/* ---------- skin pack 4 (sk4*): colors ---------- */
+function sk4SkinColor(skin,t){ if(skin.anim==='rand') return hslHex(30+14*Math.sin(t*1.3),100,58+6*Math.sin(t*2.7)); return null }
+function sk4ColorFx(g,x,y,r,c,anim,t){
+  if(anim!=='rand') return false;
+  // Ereignisrand: a black disc, light circles around it on tilted photon rings
+  g.save(); g.beginPath(); g.arc(x,y,r,0,7); g.clip();
+  const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba(0,0,0,1)'); gr.addColorStop(.62,'rgba(4,0,10,.96)'); gr.addColorStop(1,'rgba(70,24,0,.55)');
+  g.fillStyle=gr; g.fillRect(x-r,y-r,2*r,2*r);
+  g.globalCompositeOperation='lighter'; g.lineCap='round';
+  for(let k=0;k<3;k++){ const a0=t*(1.6+k*.5)+k*2.1, rr=r*(.7+k*.1);
+    g.strokeStyle=k===1?'rgba(162,77,255,.85)':'rgba(255,170,70,.9)'; g.lineWidth=Math.max(.8,r*(.1-k*.02));
+    g.beginPath(); g.ellipse(x,y,rr,rr*.34,-.35,a0,a0+2.4); g.stroke() }
+  radialHex(g,x,y,r*.5,'#a24dff',.18+.1*Math.sin(t*2));
+  g.restore();
+  g.save(); g.globalCompositeOperation='lighter'; g.strokeStyle=`rgba(255,180,90,${.55+.25*Math.sin(t*2.2)})`; g.lineWidth=Math.max(1,r*.07); g.beginPath(); g.arc(x,y,r-g.lineWidth*.5,0,7); g.stroke(); g.restore();
+  return true;
+}
 /* the skin's main color right now (animated colors cycle) */
 function skinColor(skin,t){
   { const cx=cxSkinColor(skin,t); if(cx) return cx }
   { const lc=lkSkinColor(skin,t); if(lc) return lc }
+  { const s4=sk4SkinColor(skin,t); if(s4) return s4 }
   if(skin.anim==='hue') return hslHex((t*40)%360,95,62);
   if(skin.anim==='shift'){ const k=.5+.5*Math.sin(t*1.3), a=parseInt(skin.color.slice(1),16), b=parseInt((skin.c2||skin.color).slice(1),16), m=(x,y)=>Math.round(x+(y-x)*k);
     return '#'+[m(a>>16,b>>16),m(a>>8&255,b>>8&255),m(a&255,b&255)].map(v=>v.toString(16).padStart(2,'0')).join('') }
@@ -3433,8 +3463,37 @@ function lkAura(ctx,x,y,r,c,id,t,front){
   }
   return false;
 }
+/* ---------- skin pack 4 (sk4*): auras; true = handled ---------- */
+function sk4Aura(ctx,x,y,r,c,id,t,front){
+  if(id==='staubring'){ // a tilted ring of tiny dust grains, the near half in front of the planet
+    ctx.save(); ctx.translate(x,y); const tl=-.3, ct=Math.cos(tl), st=Math.sin(tl), R=r*1.55, fl=.32;
+    ctx.globalCompositeOperation='lighter'; ctx.strokeStyle=rgba(c,.13); ctx.lineWidth=r*.35; ctx.beginPath(); ctx.ellipse(0,0,R,R*fl,tl,front?0:Math.PI,front?Math.PI:2*Math.PI); ctx.stroke();
+    for(let i=0;i<64;i++){ const a=i*.0982+t*(.25+.15*cxHash(i))+cxHash(i*3)*.4, sa=Math.sin(a); if((sa>0)!==front) continue;
+      const rr=R*(.88+.24*cxHash(i*7)), lx=Math.cos(a)*rr, ly=sa*rr*fl, px=lx*ct-ly*st, py=lx*st+ly*ct, sz=Math.max(.8,r*(.04+.05*cxHash(i*5)));
+      ctx.fillStyle=i%5?rgba(c,.9):'#ffffff'; ctx.fillRect(px-sz/2,py-sz/2,sz,sz) }
+    ctx.restore(); return true }
+  if(id==='kometenkranz'){ // three little comets circle the planet, tails behind them
+    ctx.save(); ctx.translate(x,y); ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+    const R=r*1.75, fl=.55, tl=.25, ct=Math.cos(tl), st=Math.sin(tl), P=a=>{ const lx=Math.cos(a)*R, ly=Math.sin(a)*R*fl; return [lx*ct-ly*st,lx*st+ly*ct] };
+    if(!front) radialHex(ctx,0,0,R*1.3,c,.12);
+    for(let k=0;k<3;k++){ const a=t*1.2+k*2.094; if((Math.sin(a)>0)!==front) continue;
+      for(let j=1;j<=8;j++){ const [ax,ay]=P(a-j*.07), [bx,by]=P(a-(j-1)*.07), f=1-j/9; ctx.strokeStyle=k===1?`rgba(255,210,120,${.55*f})`:rgba(c,.55*f); ctx.lineWidth=Math.max(.6,r*.22*f); ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke() }
+      const [hx,hy]=P(a); radialHex(ctx,hx,hy,r*.45,k===1?'#ffd166':c,.6); ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.arc(hx,hy,Math.max(1,r*.11),0,7); ctx.fill() }
+    ctx.restore(); return true }
+  if(id==='leerenkrone'){ // black shards hover above the planet like a crown, their tips glow
+    if(!front){ ctx.save(); const vg=ctx.createRadialGradient(x,y-r*.6,r*.3,x,y-r*.6,r*2.4); vg.addColorStop(0,'rgba(162,77,255,.35)'); vg.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=vg; ctx.fillRect(x-r*2.4,y-r*3,r*4.8,r*4.8); ctx.restore(); return true }
+    ctx.save(); ctx.translate(x,y); const f=Math.floor(t*8);
+    for(let k=0;k<7;k++){ const u=(k-3)/3, a=-Math.PI/2+u*1.05+Math.sin(t*.8)*.06, d=r*(1.32+.06*Math.abs(u))+Math.sin(t*2.2+k)*r*.08, h=r*(.62-.22*Math.abs(u))*(1+.08*Math.sin(t*3+k)), w=r*.16;
+      const cx=Math.cos(a)*d, cy=Math.sin(a)*d, ux=Math.cos(a), uy=Math.sin(a), px=-uy, py=ux, jit=cxHash(f+k*5)<.06?r*.06:0;
+      ctx.beginPath(); ctx.moveTo(cx-ux*h*.2+px*w,cy-uy*h*.2+py*w); ctx.lineTo(cx+ux*h+jit,cy+uy*h); ctx.lineTo(cx-ux*h*.2-px*w,cy-uy*h*.2-py*w); ctx.closePath();
+      ctx.fillStyle='#06000c'; ctx.fill(); ctx.strokeStyle=k%2?'rgba(255,59,92,.9)':'rgba(162,77,255,.95)'; ctx.lineWidth=Math.max(.7,r*.045); ctx.stroke();
+      ctx.globalCompositeOperation='lighter'; radialHex(ctx,cx+ux*h,cy+uy*h,r*.18,k%2?'#ff3b5c':'#a24dff',.5+.3*Math.sin(t*4+k)); ctx.globalCompositeOperation='source-over' }
+    ctx.restore(); return true }
+  return false;
+}
 /* aura parts behind the planet */
 function auraBack(ctx,x,y,r,c,id,t){
+  if(sk4Aura(ctx,x,y,r,c,id,t,false)) return;
   if(lkAura(ctx,x,y,r,c,id,t,false)) return;
   if(id==='halo'){ radialHex(ctx,x,y,r*3.2,c,.28); radialHex(ctx,x,y,r*1.9,'#ffffff',.12) }
   if(id==='nebula'){
@@ -3490,6 +3549,7 @@ function auraBack(ctx,x,y,r,c,id,t){
 }
 /* aura parts in front of the planet */
 function auraFront(ctx,x,y,r,c,id,t){
+  if(sk4Aura(ctx,x,y,r,c,id,t,true)) return;
   if(lkAura(ctx,x,y,r,c,id,t,true)) return;
   if(id==='pulse'){
     for(let k=0;k<2;k++){ const ph=(t*.8+k*.5)%1; ctx.strokeStyle=rgba(c,(1-ph)*.6);ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,r+4+ph*30,0,7);ctx.stroke() }
@@ -3561,7 +3621,7 @@ function auraFront(ctx,x,y,r,c,id,t){
     }
   }
 }
-function auraGlow(id){ return id==='kollektor'?24:id==='magneto'?20:id==='schlund'?6:id==='glow'?30:id==='inferno'?28:id==='corona'||id==='flare'||id==='halo'||id==='wings'?22:id==='none'?4:14 }
+function auraGlow(id){ return id==='staubring'?8:id==='kometenkranz'?16:id==='leerenkrone'?6:id==='kollektor'?24:id==='magneto'?20:id==='schlund'?6:id==='glow'?30:id==='inferno'?28:id==='corona'||id==='flare'||id==='halo'||id==='wings'?22:id==='none'?4:14 }
 function radialHex(ctx,x,y,r,c,a){ const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,rgba(c,a)); g.addColorStop(1,rgba(c,0)); ctx.fillStyle=g; ctx.fillRect(x-r,y-r,2*r,2*r) }
 function ringHalf(ctx,x,y,r,c,back){
   ctx.save();ctx.translate(x,y);ctx.rotate(-.35);ctx.scale(1,.32);
@@ -3638,6 +3698,28 @@ function pvTrail(ctx,seg,n,line,nrm,c,style,t){
     return;
   }
 }
+/* ---------- skin pack 4 (sk4*): trails ---------- */
+function sk4Trail(ctx,seg,n,line,nrm,c,style,t){
+  if(style==='funkenregen'){ // a thin line, glitter flickers around it
+    line(()=>0,2,rgba(c,.75)); ctx.shadowBlur=0;
+    for(let i=n-1;i>0;i-=3){ const k=i/n, f=Math.floor(t*12+i); if(cxHash(f*1.7+i)<.5) continue; const q=nrm(i), o=(cxHash(i*3.3+f)-.5)*10*k, sz=.8+1.6*k;
+      ctx.fillStyle=cxHash(i+f)<.5?'#ffffff':'#ffd166'; ctx.fillRect(seg[i][0]+q[0]*o-sz/2,seg[i][1]+q[1]*o-sz/2+(1-k)*4,sz,sz) }
+    return }
+  if(style==='lichtband'){ // a twisting band of light
+    const w=i=>(2+6*(i/n))*Math.sin(i*.18-t*5);
+    line(i=>w(i),2.4,rgba(c,.9)); line(i=>-w(i),2.4,'rgba(255,255,255,.75)'); ctx.shadowBlur=0;
+    for(let m=1;m<4;m++) line(i=>w(i)*(1-m/2),1,rgba(c,.35));
+    const h=seg[n-1]; radialHex(ctx,h[0],h[1],12,c,.4); return }
+  if(style==='zerfall'){ // a black thread whose older half falls apart into drifting pixels
+    const s0=Math.floor(n*.45); ctx.shadowColor='#a24dff';
+    ctx.beginPath(); for(let i=s0;i<n;i++) i===s0?ctx.moveTo(seg[i][0],seg[i][1]):ctx.lineTo(seg[i][0],seg[i][1]);
+    ctx.strokeStyle='rgba(162,77,255,.55)'; ctx.lineWidth=5; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.globalCompositeOperation='source-over'; ctx.strokeStyle='#05000a'; ctx.lineWidth=2.4; ctx.stroke(); ctx.globalCompositeOperation='lighter';
+    ctx.strokeStyle='rgba(255,59,92,.8)'; ctx.lineWidth=.8; ctx.stroke();
+    for(let i=0;i<s0;i+=2){ const k=1-i/s0, q=nrm(i), d=k*k*14*(.4+cxHash(i*1.9)), sd=cxHash(i*3.1)<.5?1:-1, sz=Math.max(1,2.6*(1-k*.6));
+      ctx.fillStyle=cxHash(i*2.7)<.6?`rgba(162,77,255,${1-k*.8})`:`rgba(255,59,92,${1-k*.8})`; ctx.fillRect(Math.round(seg[i][0]+q[0]*d*sd)-sz/2,Math.round(seg[i][1]+q[1]*d*sd-k*6)-sz/2,sz,sz) }
+    return }
+}
 /* long trails: the newest TRAIL_DETAIL points stay, the older part is reduced to about TRAIL_OLD points (keeps every style cheap) */
 var TRAIL_DETAIL=110, TRAIL_OLD=70;
 function thinTrail(seg){ const n=seg.length, keep=n-TRAIL_DETAIL, step=Math.ceil(keep/TRAIL_OLD), out=[];
@@ -3707,6 +3789,7 @@ function drawStyledTrail(ctx,tr,c,style,t,alpha){
       case 'goldfaden': case 'spektral': case 'nichts': case 'relice': case 'relnebel': case 'relwind': cxTrail(ctx,seg,n,line,nrm,c,style,t); break;
       case 'rellinse': gxTrail(ctx,seg,n,line,nrm,c,style,t); break;
       case 'ereignis': case 'plasmasturm': case 'abgrund': pvTrail(ctx,seg,n,line,nrm,c,style,t); break;
+      case 'funkenregen': case 'lichtband': case 'zerfall': sk4Trail(ctx,seg,n,line,nrm,c,style,t); break;
       case 'basic': line(()=>0,2,c); break;
       default: line(()=>0,2.6,c);
     }
@@ -3718,6 +3801,8 @@ function trailParticles(style,x,y,c){
   if(style==='sparks'&&Math.random()<.5) return {x,y,vx:(Math.random()-.5)*60,vy:(Math.random()-.5)*60,life:.5,max:.7,color:Math.random()<.5?'#ffffff':c};
   if(style==='fire'&&Math.random()<.45) return {x,y,vx:(Math.random()-.5)*40,vy:-20-Math.random()*40,life:.6,max:.6,color:Math.random()<.5?'#ffb020':'#ff5a1f'};
   if(style==='dragon'&&Math.random()<.6) return {x,y,vx:(Math.random()-.5)*50,vy:(Math.random()-.5)*50-15,life:.8,max:.8,color:Math.random()<.4?'#ffcf6b':'#ff2a1a'};
+  if(style==='funkenregen'&&Math.random()<.3) return {x,y,vx:(Math.random()-.5)*30,vy:30+Math.random()*40,life:.6,max:.6,color:Math.random()<.5?'#ffd166':'#ffffff'};
+  if(style==='zerfall'&&Math.random()<.2) return {x,y,vx:(Math.random()-.5)*40,vy:(Math.random()-.5)*40,life:.7,max:.7,color:Math.random()<.6?'#a24dff':'#ff3b5c'};
   if(style==='plasmasturm'&&Math.random()<.25) return {x,y,vx:(Math.random()-.5)*110,vy:(Math.random()-.5)*110,life:.3,max:.35,color:Math.random()<.5?'#ffffff':'#2ee6ff'};
   if(style==='ereignis'&&Math.random()<.2){ const a=Math.random()*6.28; return {x:x+Math.cos(a)*14,y:y+Math.sin(a)*14,vx:-Math.cos(a)*34,vy:-Math.sin(a)*34,life:.4,max:.4,color:Math.random()<.5?'#ffcf7a':'#ffffff',star:true} }
   if(style==='abgrund'&&Math.random()<.22) return {x:x+(Math.random()-.5)*6,y,vx:(Math.random()-.5)*6,vy:18+Math.random()*26,life:.9,max:.9,color:Math.random()<.65?'#ff3b5c':'#a24dff'};
@@ -3741,6 +3826,7 @@ function cxSkinColor(skin,t){
 /* extra surface effects of the new color items, drawn right after the planet body */
 function cxColorFx(g,x,y,r,c,anim,t){
   if(lkColorFx(g,x,y,r,c,anim,t)) return;
+  if(sk4ColorFx(g,x,y,r,c,anim,t)) return;
   if(anim!=='dawn'&&anim!=='milky'&&anim!=='abyss') return;
   g.save(); g.beginPath(); g.arc(x,y,r,0,7); g.clip();
   if(anim==='dawn'){
@@ -4187,10 +4273,12 @@ SHOP.shot=[
   {id:'ring',   name:'Ring',         price:150,  rarity:'rare'},
   {id:'star',   name:'Stern',        price:200,  rarity:'rare'},
   {id:'heart',  name:'Herz',         price:230,  rarity:'rare'},
+  {id:'saturnchen',name:'Saturnchen',  price:240,  rarity:'rare'},
   {id:'comet',  name:'Kometenkopf',  price:260,  rarity:'rare'},
   {id:'snow',   name:'Schneeflocke', price:340,  rarity:'epic'},
   {id:'ufo',    name:'Mini-Ufo',     price:450,  rarity:'epic',     minLevel:4},
   {id:'atom',   name:'Atom',         price:520,  rarity:'epic',     minLevel:5},
+  {id:'prismasplitter',name:'Prismasplitter',price:480,rarity:'epic', minLevel:4},
   {id:'core',   name:'Plasmakern',   price:2600, rarity:'legendary',minLevel:6},
   {id:'hole',   name:'Mini-Schwarzloch',price:3600,rarity:'legendary',minLevel:8},
   {id:'eye',    name:'Auge des Sturms',price:8750,rarity:'mythic',  minLevel:9},
@@ -4201,6 +4289,7 @@ SHOP.shot=[
   {id:'tesserakt',  name:'Tesserakt',        price:58000, rarity:'cosmic',   minLevel:200},
   {id:'singular',   name:'Leerenkern',       price:0,     rarity:'void',     src:'void'},
   {id:'leerendorn', name:'Leerendorn',       price:0,     rarity:'void',     src:'void'},
+  {id:'nullpunkt',  name:'Nullpunkt',        price:0,     rarity:'void',     src:'void'},
   {id:'relspiral',  name:'Spiral-Relikt',    price:0,     rarity:'legendary',src:'campaign',gal:'spiral',diff:3},
   {id:'relasteroid',name:'Asteroiden-Relikt',price:0,     rarity:'mythic',   src:'campaign',gal:'asteroid',diff:3}
 ];
@@ -4213,9 +4302,11 @@ SHOP.pattern=[
   {id:'continents',name:'Kontinente',price:180,  rarity:'rare'},
   {id:'grid',   name:'Raster',       price:240,  rarity:'rare'},
   {id:'cracks', name:'Risse',        price:260,  rarity:'rare'},
+  {id:'wolkenband',name:'Wolkenbänder',price:200, rarity:'rare'},
   {id:'facets', name:'Facetten',     price:360,  rarity:'epic'},
   {id:'swirl',  name:'Sturmwirbel',  price:420,  rarity:'epic'},
   {id:'icecap', name:'Polkappen',    price:460,  rarity:'epic'},
+  {id:'vulkane', name:'Vulkane',      price:480,  rarity:'epic'},
   {id:'lava',   name:'Lava-Adern',   price:2400, rarity:'legendary',minLevel:5},
   {id:'starry', name:'Sternenhimmel',price:3400, rarity:'legendary',minLevel:7},
   {id:'circuit',name:'Schaltkreis',  price:3800, rarity:'legendary',minLevel:8},
@@ -4225,6 +4316,7 @@ SHOP.pattern=[
   {id:'sternbild',  name:'Sternbilder',      price:40000, rarity:'cosmic',   minLevel:200},
   {id:'auge',       name:'Starrendes Nichts',price:0,     rarity:'void',     src:'void'},
   {id:'spalt',      name:'Klaffender Spalt', price:0,     rarity:'void',     src:'void'},
+  {id:'leerenrunen',name:'Leerenrunen',      price:0,     rarity:'void',     src:'void'},
   {id:'relglut',    name:'Glutkern-Relikt',  price:0,     rarity:'legendary',src:'campaign',gal:'glut',diff:3},
   {id:'relprisma',  name:'Prismen-Relikt',   price:0,     rarity:'legendary',src:'campaign',gal:'prisma',diff:3},
   {id:'relrand',    name:'Rand-Relikt',      price:0,     rarity:'mythic',   src:'campaign',gal:'rand',diff:3}
@@ -4236,11 +4328,13 @@ SHOP.impact=[
   {id:'pixel',    name:'Pixelregen',   price:140,  rarity:'rare'},
   {id:'nova',     name:'Schockwelle',  price:220,  rarity:'rare'},
   {id:'hearts',   name:'Liebesgrüße',  price:260,  rarity:'rare'},
+  {id:'glitzer',  name:'Glitzerwolke', price:240,  rarity:'rare'},
   {id:'starfall', name:'Sternschauer', price:320,  rarity:'epic'},
   {id:'lightning',name:'Blitzschlag',  price:420,  rarity:'epic'},
   {id:'shards',   name:'Glassplitter', price:520,  rarity:'epic'},
   {id:'fireworks',name:'Feuerwerk',    price:2600, rarity:'legendary',minLevel:5},
   {id:'supernova',name:'Supernova',    price:3800, rarity:'legendary',minLevel:8},
+  {id:'lichtfontaene',name:'Lichtfontäne',price:3000,rarity:'legendary',minLevel:6},
   {id:'implode',  name:'Singularität', price:9500, rarity:'mythic',   minLevel:9},
   {id:'redgiant', name:'Roter Riese',  price:13750, rarity:'mythic',   minLevel:12},
   {id:'raumbruch',  name:'Raumbruch',        price:14000, rarity:'mythic',   minLevel:12},
@@ -4248,6 +4342,7 @@ SHOP.impact=[
   {id:'sternentor', name:'Sternentor',       price:35000, rarity:'cosmic',   minLevel:200},
   {id:'kollaps',    name:'Leerenkollaps',    price:0,     rarity:'void',     src:'void'},
   {id:'leerenschlund',name:'Schlund der Leere',price:0,     rarity:'void',     src:'void'},
+  {id:'leerenbluete',name:'Leerenblüte',    price:0,     rarity:'void',     src:'void'},
   {id:'reldunkel',  name:'Dunkel-Relikt',    price:0,     rarity:'legendary',src:'campaign',gal:'dunkel',diff:3}
 ];
 SHOP.title=[
@@ -4255,14 +4350,18 @@ SHOP.title=[
   {id:'rookie',   name:'Raumkadett',              price:40,   rarity:'common'},
   {id:'pilot',    name:'Testpilot',               price:60,   rarity:'common'},
   {id:'hunter',   name:'Kometenjäger',            price:90,   rarity:'common'},
+  {id:'bahnrechner',name:'Bahnrechner',           price:50,   rarity:'common'},
   {id:'breaker',  name:'Mondbrecher',             price:160,  rarity:'rare'},
   {id:'wanderer', name:'Sternenwanderer',         price:220,  rarity:'rare'},
   {id:'ace',      name:'Fliegerass',              price:280,  rarity:'rare'},
+  {id:'orbitpilot',name:'Orbitpilot',             price:180,  rarity:'rare'},
   {id:'whisper',  name:'Schwerkraftflüsterer',    price:380,  rarity:'epic',     minLevel:4},
   {id:'rider',    name:'Wurmlochreiter',          price:450,  rarity:'epic',     minLevel:5},
   {id:'tamer',    name:'Planetenbändiger',        price:650,  rarity:'epic',     minLevel:6},
+  {id:'gravkuenstler',name:'Gravitationskünstler',price:500, rarity:'epic',     minLevel:5},
   {id:'nova',     name:'Supernova',               price:2600, rarity:'legendary',minLevel:7},
   {id:'emperor',  name:'Herrscher der Leere',     price:4400, rarity:'legendary',minLevel:10},
+  {id:'sternkapitaen',name:'Sternenkapitän',      price:3000, rarity:'legendary',minLevel:8},
   {id:'legend',   name:'Legende der Galaxis',     price:10000, rarity:'mythic',   minLevel:10},
   {id:'redcomet', name:'Der Rote Komet',          price:15000, rarity:'mythic',   minLevel:13},
   {id:'sternschmied',name:'Sternenschmied',         price:12000, rarity:'mythic',   minLevel:12},
@@ -4276,6 +4375,8 @@ SHOP.title=[
   {id:'ewig',       name:'Der Ewige Stern',  price:30000, rarity:'cosmic',   minLevel:200},
   {id:'nichtskind', name:'Kind des Nichts',  price:0,     rarity:'void',     src:'void'},
   {id:'abgrundstimme',name:'Stimme des Abgrunds',price:0,   rarity:'void',     src:'void'},
+  {id:'leerenwandler',name:'Leerenwandler',     price:0,     rarity:'void',     src:'void'},
+  {id:'hueterleere',name:'Hüter der Leere',     price:0,     rarity:'void',     src:'void'},
   {id:'sammler',    name:'Sammler',          price:0,     rarity:'epic',     src:'album'},
   {id:'kurator',    name:'Kurator',          price:0,     rarity:'legendary',src:'album'},
   {id:'archivar',   name:'Archivar des Alls',price:0,     rarity:'mythic',   src:'album'},
@@ -4296,9 +4397,11 @@ SHOP.companion=[
   {id:'satellit',  name:'Satellit',           price:220,   rarity:'rare'},
   {id:'komet',     name:'Kometchen',          price:320,   rarity:'rare'},
   {id:'drohne',    name:'Drohne',             price:420,   rarity:'rare'},
+  {id:'miniplanet',name:'Mini-Planet',        price:280,   rarity:'rare'},
   {id:'ufo',       name:'Untertasse',         price:650,   rarity:'epic'},
   {id:'katze',     name:'Raumkatze',          price:850,   rarity:'epic'},
   {id:'kristall',  name:'Kristallsplitter',   price:1000,  rarity:'epic'},
+  {id:'sternfisch',name:'Sternfisch',         price:900,   rarity:'epic'},
   {id:'loch',      name:'Schwarzes Löchlein', price:2400,  rarity:'legendary',minLevel:6},
   {id:'irrlicht',  name:'Irrlicht',           price:3800,  rarity:'legendary',minLevel:8},
   {id:'phoenix',   name:'Phönixküken',        price:11250, rarity:'mythic',   minLevel:11},
@@ -4307,6 +4410,7 @@ SHOP.companion=[
   {id:'qualle',    name:'Sternenqualle',      price:52000, rarity:'cosmic',   minLevel:200},
   {id:'leerling',  name:'Leerling',           price:0,     rarity:'void',     src:'void'},
   {id:'abgrundmotte',name:'Abgrundmotte',     price:0,     rarity:'void',     src:'void'},
+  {id:'leerenauge',name:'Wächterauge',        price:0,     rarity:'void',     src:'void'},
   {id:'rakete',    name:'Neujahrsrakete',     price:0,     rarity:'season',   season:3}
 ];
 SHOP.victory=[
@@ -4317,17 +4421,20 @@ SHOP.victory=[
   {id:'feuerwerk',   name:'Feuerwerk',          price:240,   rarity:'rare'},
   {id:'regenbogen',  name:'Regenbogen',         price:320,   rarity:'rare'},
   {id:'kronen',      name:'Kronenregen',        price:450,   rarity:'rare'},
+  {id:'sternschnuppen',name:'Sternschnuppen',   price:300,   rarity:'rare'},
   {id:'wirbel',      name:'Siegeswirbel',       price:650,   rarity:'epic'},
   {id:'meteore',     name:'Meteorschauer',      price:850,   rarity:'epic'},
   {id:'polar',       name:'Nordlichter',        price:1000,  rarity:'epic'},
   {id:'krone',       name:'Goldene Krone',      price:2800,  rarity:'legendary',minLevel:6},
   {id:'supernova',   name:'Konfetti-Supernova', price:4000,  rarity:'legendary',minLevel:9},
+  {id:'lichtsaeule', name:'Lichtsäule',         price:3200,  rarity:'legendary',minLevel:7},
   {id:'schlund',     name:'Schwarzer Schlund',  price:12500, rarity:'mythic',   minLevel:12},
   {id:'galaxie',     name:'Galaxiengeburt',     price:55000, rarity:'cosmic',   minLevel:200},
   {id:'sternbild',   name:'Siegessternbild',    price:45000, rarity:'cosmic',   minLevel:200},
   {id:'pulsar',      name:'Pulsarfeuer',        price:58000, rarity:'cosmic',   minLevel:200},
   {id:'leerenschrei',name:'Schrei der Leere',   price:0,     rarity:'void',     src:'void'},
-  {id:'abgrundblick',name:'Blick des Abgrunds', price:0,     rarity:'void',     src:'void'}
+  {id:'abgrundblick',name:'Blick des Abgrunds', price:0,     rarity:'void',     src:'void'},
+  {id:'verschlungen',name:'Verschlungen',       price:0,     rarity:'void',     src:'void'}
 ];
 const h01=i=>{ const x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x) };
 /* a point on the companion's tilted orbit (front half: sin(a)>0) */
@@ -4441,6 +4548,28 @@ const COMP_FX={
     g.fillStyle='#05010a'; g.beginPath(); g.ellipse(-s*.1,0,s*.78,s*.26,0,0,7); g.fill();
     g.strokeStyle='#5a2a90'; g.lineWidth=Math.max(.5,s*.07); g.beginPath(); g.moveTo(s*.55,-s*.08); g.quadraticCurveTo(s*1,-s*.15,s*1.2,-s*.6); g.moveTo(s*.55,s*.08); g.quadraticCurveTo(s*1,s*.15,s*1.2,s*.6); g.stroke();
     g.fillStyle='#ff3b5c'; dotAt(g,s*.6,0,s*.09+.2) }},
+  miniplanet:{sp:.9,draw(g,x,y,s,t,o){ g.translate(x,y); g.rotate(-.35); g.strokeStyle='rgba(255,226,170,.9)'; g.lineWidth=Math.max(.6,s*.18);
+    g.beginPath(); g.ellipse(0,0,s*1.7,s*.5,0,Math.PI,2*Math.PI); g.stroke();
+    const gr=g.createRadialGradient(-s*.3,-s*.35,0,0,0,s); gr.addColorStop(0,'#bff0ff'); gr.addColorStop(.6,'#3f8bff'); gr.addColorStop(1,'#1a2a7a'); g.fillStyle=gr; dotAt(g,0,0,s);
+    g.save(); g.beginPath(); g.arc(0,0,s,0,7); g.clip(); g.fillStyle='rgba(255,255,255,.3)'; g.fillRect(-s,-s*.2+Math.sin(t*2)*s*.1,s*2,s*.2); g.restore();
+    g.beginPath(); g.ellipse(0,0,s*1.7,s*.5,0,0,Math.PI); g.stroke() }},
+  sternfisch:{sp:1,draw(g,x,y,s,t,o){
+    for(let k=1;k<=3;k++){ const [px,py]=o.at(k*.09); g.globalAlpha=.6-k*.15; g.strokeStyle='#bff6ff'; g.lineWidth=Math.max(.5,s*.1); g.beginPath(); g.arc(px,py,s*(.18+.06*k),0,7); g.stroke() }
+    g.globalAlpha=1; g.translate(x,y); g.rotate(Math.sin(t*3)*.35+t*.4);
+    g.beginPath(); for(let i=0;i<10;i++){ const a=i*.6283-Math.PI/2, rr=i%2?s*.55:s*(1.25+.08*Math.sin(t*6+i)); g[i?'lineTo':'moveTo'](Math.cos(a)*rr,Math.sin(a)*rr) } g.closePath();
+    const gr=g.createRadialGradient(0,0,0,0,0,s*1.3); gr.addColorStop(0,'#ffe08a'); gr.addColorStop(1,'#ff7a3d'); g.fillStyle=gr; g.fill(); g.strokeStyle='#b33a00'; g.lineWidth=Math.max(.5,s*.08); g.stroke();
+    g.fillStyle='#ffffff'; for(let i=0;i<5;i++){ const a=i*1.2566-Math.PI/2; dotAt(g,Math.cos(a)*s*.85,Math.sin(a)*s*.85,s*.07+.2) }
+    g.fillStyle='#2a0a10'; if((t%3.1)<.12){ g.fillRect(-s*.32,-s*.12,s*.22,s*.05+.3); g.fillRect(s*.1,-s*.12,s*.22,s*.05+.3) } else { dotAt(g,-s*.2,-s*.1,s*.1+.2); dotAt(g,s*.2,-s*.1,s*.1+.2) }
+    g.strokeStyle='#2a0a10'; g.lineWidth=Math.max(.4,s*.06); g.beginPath(); g.arc(0,s*.05,s*.16,.3,2.84); g.stroke() }},
+  leerenauge:{sp:1.05,draw(g,x,y,s,t,o){ g.lineCap='round';
+    for(let j=0;j<3;j++){ g.strokeStyle=j%2?'rgba(255,59,92,.7)':'rgba(162,77,255,.8)'; g.lineWidth=Math.max(.5,s*(.16-j*.03)); g.beginPath(); g.moveTo(x,y);
+      for(let k=1;k<=4;k++){ const [px,py]=o.at(k*.06), w=Math.sin(t*6-k+j*2)*s*.45; g.lineTo(px+w*(j-1),py+w) } g.stroke() }
+    radialHex(g,x,y,s*3,'#a24dff',.5); radialHex(g,x,y,s*1.8,'#ff3b5c',.3);
+    const [nx,ny]=o.at(-.05), bl=(t%2.7)<.13?.12:1; g.translate(x,y); g.scale(1.25,1.25);
+    g.fillStyle='#05000a'; g.beginPath(); g.ellipse(0,0,s*1.15,s*.95,0,0,7); g.fill(); g.strokeStyle='rgba(162,77,255,.95)'; g.lineWidth=Math.max(.5,s*.1); g.stroke();
+    g.save(); g.beginPath(); g.ellipse(0,0,s*.95,s*.7*bl,0,0,7); g.clip(); const la=Math.atan2(ny-y,nx-x), lx=Math.cos(la)*s*.25, ly=Math.sin(la)*s*.15;
+    const ig=g.createRadialGradient(lx,ly,0,lx,ly,s*.6); ig.addColorStop(0,'#ffb0bd'); ig.addColorStop(.4,'#ff3b5c'); ig.addColorStop(1,'#4a0014'); g.fillStyle=ig; dotAt(g,lx,ly,s*.6);
+    g.fillStyle='#000'; g.beginPath(); g.ellipse(lx,ly,s*.1,s*.38,0,0,7); g.fill(); g.restore() }},
   leerling:{sp:1.1,draw(g,x,y,s,t,o){ radialHex(g,x,y,s*2.8,'#a24dff',.4); g.strokeStyle='rgba(162,77,255,.8)'; g.lineWidth=Math.max(.7,s*.18); g.lineCap='round';
     for(let i=0;i<3;i++){ const a=2.2+i*.9+Math.sin(t*3+i)*.3; g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+Math.cos(a)*s*1.4+Math.sin(t*5+i)*s*.4,y+Math.sin(a)*s*1.4,x+Math.cos(a+.4)*s*2.1,y+Math.sin(a+.4)*s*2.1); g.stroke() }
     g.fillStyle='#07020f'; dotAt(g,x,y,s*.95); const ea=Math.atan2(o.y-y,o.x-x), op=(t%4)<.15?.15:1;
@@ -4597,6 +4726,25 @@ const VIC_FX={
       for(let k=1;k<6;k++){ const u=k/6, lx=ex-W+2*W*u, ly=ey-4*H*u*(1-u); g.moveTo(lx,ly); g.lineTo(lx+(u-.5)*r*.7,ly-r*(.35+.2*Math.sin(u*Math.PI))*op) } g.stroke() }
     if(e>1.6&&e<2.2){ const q=(e-1.6)/.6; g.globalAlpha=Math.sin(q*Math.PI)*.9; g.strokeStyle='#ff3b5c'; g.lineWidth=r*.12+1; g.beginPath(); g.arc(x,y,r*(3.6-2.55*q),0,7); g.stroke();
       g.strokeStyle='#a24dff'; g.lineWidth=r*.06+.6; g.beginPath(); g.arc(x,y,r*(4.1-2.9*q),0,7); g.stroke() } },
+  sternschnuppen(g,x,y,r,e,c,d,F){ g.globalCompositeOperation='lighter'; g.lineCap='round';
+    for(let i=0;i<9;i++){ const st=h01(i+3)*1.2, q=(e-st)/.7; if(q<0||q>1) continue;
+      const sx=x+(h01(i+11)-.6)*r*7, sy=y-(r*2.2+h01(i+21)*r*2.5)*d, L=r*2.6, px=sx+q*r*3.5, py=sy+q*r*1.6*d;
+      const gr=g.createLinearGradient(px-L,py-L*.45*d,px,py); gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(1,i%3?'rgba(255,240,200,.95)':rgba(c,.95));
+      g.globalAlpha=F*Math.sin(q*Math.PI); g.strokeStyle=gr; g.lineWidth=r*.12+.6; g.beginPath(); g.moveTo(px-L,py-L*.45*d); g.lineTo(px,py); g.stroke(); g.fillStyle='#ffffff'; sparkle(g,px,py,r*.22+.6) } },
+  lichtsaeule(g,x,y,r,e,c,d,F){ g.globalCompositeOperation='lighter'; const on=Math.min(1,e/.35), H=r*6*on, W=r*(.9+.25*Math.sin(e*6));
+    const gr=g.createLinearGradient(x,y,x,y-H*d); gr.addColorStop(0,rgba(c,.8)); gr.addColorStop(.6,'rgba(255,255,255,.35)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    g.globalAlpha=F; g.fillStyle=gr; g.beginPath(); g.moveTo(x-W*.6,y); g.lineTo(x-W,y-H*d); g.lineTo(x+W,y-H*d); g.lineTo(x+W*.6,y); g.closePath(); g.fill();
+    g.fillStyle='rgba(255,255,255,.45)'; g.fillRect(x-r*.06,d>0?y-H:y,r*.12,H);
+    for(let k=0;k<5;k++){ const q=(e*.9+k/5)%1; g.globalAlpha=F*on*(1-q); g.strokeStyle=k%2?'#ffffff':c; g.lineWidth=r*.1+.6; g.beginPath(); g.ellipse(x,y-q*H*d,W*(.6+.4*q),W*.25,0,0,7); g.stroke() }
+    g.globalAlpha=F*on; radialHex(g,x,y,r*2.4,c,.35);
+    g.fillStyle='#ffffff'; for(let i=0;i<10;i++){ const q=(e*.7+h01(i+5))%1; g.globalAlpha=F*on*(1-q); sparkle(g,x+(h01(i)-.5)*W*1.6,y-q*H*d,r*.14+.5) } },
+  verschlungen(g,x,y,r,e,c,d,F){ const q=Math.min(1,e/1.3);
+    g.globalAlpha=F; const vg=g.createRadialGradient(x,y,r*.8,x,y,r*4.5); vg.addColorStop(0,`rgba(5,0,10,${.85*Math.min(1,e*2)})`); vg.addColorStop(1,'rgba(5,0,10,0)'); g.fillStyle=vg; g.fillRect(x-r*4.5,y-r*4.5,r*9,r*9);
+    for(let k=0;k<4;k++){ const p=Math.min(1,Math.max(0,(e-k*.18)/1.1)), R=r*(4.2-3.1*p*p); if(p>=1) continue; g.globalAlpha=F*(.4+.6*p); g.strokeStyle='#06000c'; g.lineWidth=r*(.35-.06*k); g.beginPath(); g.arc(x,y,R,0,7); g.stroke(); g.strokeStyle=k%2?'#ff3b5c':'#a24dff'; g.lineWidth=r*.06+.5; g.stroke() }
+    g.globalCompositeOperation='lighter';
+    for(let i=0;i<14;i++){ const a=h01(i+2)*6.283+e*.8, D=r*(4-3*((e*.9+h01(i))%1)), sz=r*.1+.5; g.globalAlpha=F*.8; g.fillStyle=i%2?'#a24dff':'#ff3b5c'; g.fillRect(x+Math.cos(a)*D-sz/2,y+Math.sin(a)*D-sz/2,sz,sz) }
+    if(e>1.3){ const b=Math.min(1,e-1.3); g.globalAlpha=F*(1-b); g.strokeStyle='#ff3b5c'; g.lineWidth=r*.2*(1-b)+.8; g.beginPath(); g.arc(x,y,r*(1.1+b*4),0,7); g.stroke(); radialHex(g,x,y,r*(2-b),'#ff3b5c',.6*(1-b)) }
+    g.globalAlpha=F*q; radialHex(g,x,y,r*1.4,'#a24dff',.3) },
   leerenschrei(g,x,y,r,e,c,d,F){ const open=Math.min(1,e/.5), fr=Math.floor(e*12), cl=e>1.9?Math.max(0,1-(e-1.9)/.4):1;
     const gr=g.createRadialGradient(x,y,r,x,y,r*3.4); gr.addColorStop(0,`rgba(20,0,10,${.7*open*cl})`); gr.addColorStop(1,'rgba(20,0,10,0)'); g.fillStyle=gr; g.fillRect(x-r*3.4,y-r*3.4,r*6.8,r*6.8);
     g.lineJoin='round'; g.globalCompositeOperation='lighter';
@@ -4682,6 +4830,26 @@ function pvShot(g,id,c,t){
       g.strokeStyle=k?'rgba(162,77,255,.9)':'rgba(255,59,92,.9)'; g.lineWidth=.7; g.stroke() } }
   g.restore();
 }
+/* projectile heads, skin pack 4 (origin = shot, pointing along +x) */
+function sk4Shot(g,id,c,t){
+  g.save();
+  if(id==='saturnchen'){ // a tiny ringed planet
+    radialHex(g,0,0,12,c,.35); g.rotate(-.4); g.strokeStyle='rgba(255,230,180,.9)'; g.lineWidth=1.3;
+    g.beginPath(); g.ellipse(0,0,8.5,2.6,0,Math.PI,2*Math.PI); g.stroke();
+    const gr=g.createRadialGradient(-1.4,-1.6,0,0,0,5); gr.addColorStop(0,'#ffffff'); gr.addColorStop(.5,c); gr.addColorStop(1,shade(c,.5)); g.fillStyle=gr; g.beginPath(); g.arc(0,0,4.6,0,7); g.fill();
+    g.beginPath(); g.ellipse(0,0,8.5,2.6,0,0,Math.PI); g.stroke() }
+  else if(id==='prismasplitter'){ // a spinning glass prism that throws a rainbow behind it
+    g.globalCompositeOperation='lighter';
+    for(let k=0;k<5;k++){ const a=Math.PI+(k-2)*.16; g.strokeStyle=`hsla(${(k*60+t*120)%360},100%,65%,.7)`; g.lineWidth=1.4; g.beginPath(); g.moveTo(0,0); g.lineTo(Math.cos(a)*16,Math.sin(a)*16); g.stroke() }
+    g.globalCompositeOperation='source-over'; g.rotate(t*3); g.fillStyle='rgba(230,245,255,.9)'; g.strokeStyle='#ffffff'; g.lineWidth=1; g.beginPath();
+    for(let k=0;k<3;k++){ const a=k*2.094-Math.PI/2; g[k?'lineTo':'moveTo'](Math.cos(a)*5.5,Math.sin(a)*5.5) } g.closePath(); g.fill(); g.stroke() }
+  else if(id==='nullpunkt'){ // a black point that drinks the light around it
+    const pu=.5+.5*Math.sin(t*7); radialHex(g,0,0,16,'#a24dff',.35+.15*pu); g.globalCompositeOperation='lighter';
+    g.strokeStyle=`rgba(255,59,92,${.5+.4*pu})`; g.lineWidth=1; g.beginPath(); g.arc(0,0,7+pu*1.5,0,7); g.stroke();
+    g.fillStyle='rgba(220,190,255,.9)'; for(let k=0;k<6;k++){ const a=k*1.047+t*4, d=10-((t*12+k*3)%8); g.fillRect(Math.cos(a)*d-.6,Math.sin(a)*d-.6,1.2,1.2) }
+    g.globalCompositeOperation='source-over'; g.fillStyle='#000'; g.beginPath(); g.arc(0,0,4.2,0,7); g.fill(); g.strokeStyle='rgba(190,130,255,.95)'; g.lineWidth=.8; g.stroke() }
+  g.restore();
+}
 function drawShotHead(g,id,c,t){
   g.fillStyle='#fff'; g.shadowColor=c; g.shadowBlur=16;
   switch(id){
@@ -4717,6 +4885,7 @@ function drawShotHead(g,id,c,t){
     case 'quasar': case 'morgenstern': case 'singular': case 'relspiral': case 'relasteroid': cxShot(g,id,c,t); break;
     case 'relkomet': gxShotHead(g,c,t); break;
     case 'binaer': case 'tesserakt': case 'leerendorn': pvShot(g,id,c,t); break;
+    case 'saturnchen': case 'prismasplitter': case 'nullpunkt': sk4Shot(g,id,c,t); break;
     default: g.beginPath(); g.arc(0,0,3.6,0,7); g.fill();
   }
   g.shadowBlur=0;
@@ -4757,6 +4926,37 @@ function lkPattern(g,x,y,r,c,id,t){
     return;
   }
 }
+/* ---------- skin pack 4 (sk4*): patterns (inside drawPattern's clip) ---------- */
+function sk4Pattern(g,x,y,r,c,id,t){
+  if(id==='wolkenband'){ // soft cloud bands drifting in opposite directions, a little storm crossing them
+    for(let k=0;k<7;k++){ const y0=y-r+k*2*r/7, h=2*r/7*.62; g.fillStyle=k%2?'rgba(255,255,255,.17)':'rgba(0,0,30,.2)'; g.beginPath(); g.moveTo(x-r,y0);
+      for(let i=0;i<=8;i++) g.lineTo(x-r+i*r/4,y0+Math.sin(i*1.3+t*(k%2?1.1:-.8)+k)*r*.05);
+      for(let i=8;i>=0;i--) g.lineTo(x-r+i*r/4,y0+h+Math.sin(i*1.1-t*.9+k*2)*r*.05);
+      g.closePath(); g.fill() }
+    const ex=x+(((t*.08)%1)*2-1)*r*1.3, ey=y+r*.25; g.fillStyle='rgba(255,240,230,.28)'; g.beginPath(); g.ellipse(ex,ey,r*.22,r*.12,0,0,7); g.fill();
+    g.strokeStyle='rgba(255,255,255,.3)'; g.lineWidth=Math.max(.6,r*.03); g.beginPath(); g.ellipse(ex,ey,r*.12,r*.06,t*2,0,5); g.stroke(); return }
+  if(id==='vulkane'){ // a dark crust, vents glow up and spit sparks one after another
+    g.fillStyle='rgba(20,6,2,.45)'; g.fillRect(x-r,y-r,2*r,2*r);
+    g.strokeStyle='rgba(255,90,30,.35)'; g.lineWidth=Math.max(.6,r*.03); g.beginPath();
+    for(let k=0;k<4;k++){ const a=k*1.6; g.moveTo(x+Math.cos(a)*r*.2,y+Math.sin(a)*r*.2); g.quadraticCurveTo(x+Math.cos(a+.5)*r*.6,y+Math.sin(a+.5)*r*.6,x+Math.cos(a+.3)*r,y+Math.sin(a+.3)*r) } g.stroke();
+    for(let k=0;k<5;k++){ const vx=x+(cxHash(k*3.1)-.5)*1.4*r, vy=y+(cxHash(k*7.7)-.5)*1.4*r, ph=(t*.5+cxHash(k))%1, hot=Math.max(0,1-ph*2.2);
+      radialHex(g,vx,vy,r*(.22+.25*hot),'#ff6a1f',.35+.5*hot); g.fillStyle='#2a0a02'; g.beginPath(); g.arc(vx,vy,r*.07,0,7); g.fill();
+      if(hot>0){ g.fillStyle=`rgba(255,220,120,${hot})`; const sz=Math.max(1.2,r*.05); for(let j=0;j<4;j++){ const a=cxHash(k*11+j)*6.283, d=r*(.05+ph*.6)*(.5+cxHash(j+k)); g.fillRect(vx+Math.cos(a)*d-sz/2,vy+Math.sin(a)*d-sz/2,sz,sz) } } }
+    return }
+  if(id==='leerenrunen'){ // two rings of runes turn against each other around a red ember
+    g.fillStyle='rgba(3,0,8,.9)'; g.fillRect(x-r,y-r,2*r,2*r); g.globalCompositeOperation='lighter';
+    const pu=.5+.5*Math.sin(t*2.2); g.lineCap='round'; g.lineJoin='round';
+    for(const [R,dir,n,col] of [[.72,1,8,'162,77,255'],[.42,-1,5,'255,59,92']]){ g.strokeStyle=`rgba(${col},.25)`; g.lineWidth=Math.max(.6,r*.03); g.beginPath(); g.arc(x,y,r*R,0,7); g.stroke();
+      g.strokeStyle=`rgba(${col},${.6+.35*pu})`; g.lineWidth=Math.max(.7,r*.05); g.beginPath();
+      for(let k=0;k<n;k++){ const a=k/n*6.283+t*.35*dir, gx=x+Math.cos(a)*r*R, gy=y+Math.sin(a)*r*R, q=r*.09, v=Math.floor(cxHash(k*13+n)*4);
+        g.moveTo(gx-q,gy-q);
+        if(v===0){ g.lineTo(gx+q,gy-q); g.lineTo(gx-q,gy+q); g.lineTo(gx+q,gy+q) }
+        else if(v===1){ g.lineTo(gx,gy+q); g.lineTo(gx+q,gy-q); g.moveTo(gx,gy-q*.2); g.lineTo(gx,gy+q) }
+        else if(v===2){ g.lineTo(gx-q,gy+q); g.lineTo(gx+q,gy); g.lineTo(gx-q,gy-q*.1) }
+        else { g.lineTo(gx+q,gy+q); g.moveTo(gx+q,gy-q); g.lineTo(gx-q,gy+q) } }
+      g.stroke() }
+    radialHex(g,x,y,r*(.2+.1*pu),'#ff3b5c',.5+.4*pu); g.globalCompositeOperation='source-over'; g.fillStyle='#000'; g.beginPath(); g.arc(x,y,r*.08,0,7); g.fill(); return }
+}
 /* a surface pattern clipped to the planet */
 function drawPattern(g,x,y,r,c,id,t){
   if(!id||id==='none') return;
@@ -4765,6 +4965,7 @@ function drawPattern(g,x,y,r,c,id,t){
   switch(id){
     case 'sternnebel': case 'sternbild': case 'auge': case 'relglut': case 'relprisma': case 'relrand': cxPattern(g,x,y,r,c,id,t); break;
     case 'wurmloch': case 'spalt': lkPattern(g,x,y,r,c,id,t); break;
+    case 'wolkenband': case 'vulkane': case 'leerenrunen': sk4Pattern(g,x,y,r,c,id,t); break;
     case 'craters': g.fillStyle=rgba('#000000',.22); for(const [a,d,s] of [[.6,.45,.22],[2.4,.35,.16],[4.1,.55,.2],[5.3,.2,.12]]){ g.beginPath(); g.arc(x+Math.cos(a)*d*r,y+Math.sin(a)*d*r,s*r,0,7); g.fill() } break;
     case 'bands': for(let k=-3;k<=3;k++){ g.fillStyle=k%2?rgba('#ffffff',.16):rgba('#000000',.18); g.fillRect(x-r,y+k*r*.28+Math.sin(t*.8+k)*1.5,2*r,r*.14) } break;
     case 'spots': g.fillStyle=dark; for(let k=0;k<7;k++){ const a=k*2.4+t*.3, d=(k%3+1)*.25*r; g.beginPath(); g.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,r*(.08+(k%2)*.07),0,7); g.fill() } break;
@@ -4850,6 +5051,29 @@ function pvDrawFx(g,f,k){
   }
   g.restore(); return true;
 }
+/* hit effects, skin pack 4 (sk4*) */
+function sk4ImpactParts(id,x,y,c,add,R){
+  if(id==='glitzer'){ for(let i=0;i<30;i++){ const a=R(0,6.28),v=R(30,140); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:R(.6,1.2),max:1.2,color:['#ffffff','#ffd166','#ff9be0',c][i%4],star:true}) } return true }
+  if(id==='lichtfontaene'){ for(let i=0;i<36;i++){ const a=-Math.PI/2+R(-.5,.5), v=R(160,320); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:R(.7,1.1),max:1.1,color:['#ffffff','#9ff6ff',c,'#ffd166'][i%4],rect:true,spin:R(0,6)}) } return true }
+  if(id==='leerenbluete'){ for(let i=0;i<14;i++){ const a=R(0,6.28),v=R(60,170); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:R(.5,.8),max:.8,color:i%2?'#ff3b5c':'#a24dff',pixel:true,delay:.55}) } return true }
+  return false;
+}
+function sk4ImpactFx(id,x,y,c){
+  if(id==='glitzer') return [{kind:'ring',x,y,c:'#ffd166',t:0,max:.5}];
+  if(id==='lichtfontaene') return [{kind:'cxflash',x,y,c:'#ffffff',t:0,max:.25},{kind:'ring',x,y,c:'#9ff6ff',t:0,max:.6}];
+  if(id==='leerenbluete') return [{kind:'sk4bluete',x,y,t:0,max:1.1}];
+  return null;
+}
+function sk4DrawFx(g,f,k){
+  if(f.kind!=='sk4bluete') return false;
+  if(k>=1) return true;
+  // black petals open around the hit, glow at their edges, then fold shut again
+  const open=k<.35?Math.sin(k/.35*Math.PI/2):k<.75?1:1-(k-.75)/.25;
+  g.save(); g.translate(f.x,f.y); g.rotate(k*1.2); g.globalCompositeOperation='lighter'; radialHex(g,0,0,60*open+6,'#a24dff',.35*open); g.globalCompositeOperation='source-over';
+  for(let p=0;p<8;p++){ g.save(); g.rotate(p*.785); const L=46*open, W=13*open; g.beginPath(); g.moveTo(0,0); g.quadraticCurveTo(W,-L*.5,0,-L); g.quadraticCurveTo(-W,-L*.5,0,0);
+    g.fillStyle='#05000a'; g.fill(); g.strokeStyle=p%2?'rgba(255,59,92,.9)':'rgba(162,77,255,.95)'; g.lineWidth=1.4; g.stroke(); g.restore() }
+  g.globalCompositeOperation='lighter'; radialHex(g,0,0,14,'#ff3b5c',.8*open); g.restore(); return true;
+}
 /* hit effects: particles plus short-lived drawn effects (rings, bolts) */
 function impactParticles(id,x,y,c){
   const P=[], add=(o)=>P.push(Object.assign({life:1,max:1},o)), R=(a,b)=>a+Math.random()*(b-a);
@@ -4865,12 +5089,12 @@ function impactParticles(id,x,y,c){
   else if(id==='supernova'){ for(let i=0;i<50;i++){ const a=R(0,6.28),v=R(60,260); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:R(.8,1.5),max:1.5,color:i%2?'#ffd34f':c,star:i%3===0}) } }
   else if(id==='redgiant'){ for(let i=0;i<80;i++){ const a=R(0,6.28),v=R(40,300); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:R(.6,1.6),max:1.6,color:['#ff2a1a','#ff6a1f','#ffcf6b','#ffffff'][i%4]}) }
     for(let b=0;b<2;b++) for(let i=0;i<28;i++){ const a=i/28*6.28,v=R(130,170); add({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,max:1,color:'#ff3b3b',delay:.25+b*.25}) } }
-  else if(gxImpactParts(id,x,y,c,add,R)||cxImpactParts(id,x,y,c,add,R)||pvImpactParts(id,x,y,c,add,R)){}
+  else if(gxImpactParts(id,x,y,c,add,R)||cxImpactParts(id,x,y,c,add,R)||pvImpactParts(id,x,y,c,add,R)||sk4ImpactParts(id,x,y,c,add,R)){}
   else for(let i=0;i<70;i++){ const a=R(0,6.28),s=R(30,260); add({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:R(.4,1.2),max:1.2,color:Math.random()<.25?'#ffffff':(Math.random()<.2?'#ffd34f':c)}) }
   return P;
 }
 function impactFx(id,x,y,c){
-  { const cx=gxImpactFx(id,x,y,c)||cxImpactFx(id,x,y,c)||pvImpactFx(id,x,y,c); if(cx) return cx }
+  { const cx=gxImpactFx(id,x,y,c)||cxImpactFx(id,x,y,c)||pvImpactFx(id,x,y,c)||sk4ImpactFx(id,x,y,c); if(cx) return cx }
   if(id==='nova') return [{kind:'ring',x,y,c,t:0,max:.7},{kind:'ring',x,y,c:'#ffffff',t:-.12,max:.7}];
   if(id==='lightning') return [{kind:'bolts',x,y,c,t:0,max:.45,seed:Math.random()*1000}];
   if(id==='implode') return [{kind:'hole',x,y,c,t:0,max:.9}];
@@ -4884,6 +5108,7 @@ function drawFx(g,f){
   if(f.kind==='gxnet'){ if(k<1){ g.save(); gxDrawFx(g,f,k); g.restore() } return }
   if(cxDrawFx(g,f,k)) return;
   if(pvDrawFx(g,f,k)) return;
+  if(sk4DrawFx(g,f,k)) return;
   if(f.kind==='ring'){ g.strokeStyle=rgba(f.c,1-k); g.lineWidth=4*(1-k)+1; g.beginPath(); g.arc(f.x,f.y,10+k*90,0,7); g.stroke() }
   if(f.kind==='bolts'){ g.strokeStyle=rgba('#ffffff',1-k); g.shadowColor=f.c; g.shadowBlur=12; g.lineWidth=2;
     let s=f.seed+Math.floor(f.t*30); const r=()=>((s=(s*9301+49297)%233280)/233280);
