@@ -27,5 +27,43 @@
    "type": "image/png",
    "purpose": "maskable"
   }
+ ],
+ "id": "/",
+ "description": "Schieß mit der Schwerkraft: 510 Level in 17 Galaxien, Duelle gegen Freunde und KI, Tageslevel, Turniere und über 300 Skins zum Freispielen. Kostenlos, ohne Werbung und ohne Käufe.",
+ "categories": [
+  "games",
+  "entertainment"
+ ],
+ "dir": "ltr",
+ "prefer_related_applications": false,
+ "screenshots": [
+  {
+   "src": "shots/level.jpg",
+   "sizes": "720x1280",
+   "type": "image/jpeg",
+   "form_factor": "narrow",
+   "label": "Kampagne: um Monde herum ins Ziel"
+  },
+  {
+   "src": "shots/duell.jpg",
+   "sizes": "720x1280",
+   "type": "image/jpeg",
+   "form_factor": "narrow",
+   "label": "Duell in der Arena"
+  },
+  {
+   "src": "shots/shop.jpg",
+   "sizes": "720x1280",
+   "type": "image/jpeg",
+   "form_factor": "narrow",
+   "label": "Skins im Shop"
+  },
+  {
+   "src": "shots/galaxien.jpg",
+   "sizes": "720x1280",
+   "type": "image/jpeg",
+   "form_factor": "narrow",
+   "label": "Galaxien und Ränge"
+  }
  ]
 }
