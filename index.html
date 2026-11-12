@@ -8924,6 +8924,7 @@ function fernExit(keep){
 /* ---------- player profiles (gd_player): look, showcase, crew, stats, challenge ---------- */
 var plData=null, plFrom='home', plPick=false, plSkin=null;
 async function openPlayer(id,hint){
+  plRep=false;
   if(Net.state!=='ready') return toast('Profile gibt es nur mit Verbindung zum Server');
   if(current!=='player') plFrom=current||'home';
   plData=hint&&hint.id===id?{...hint,_part:true}:{id,_part:true}; plPick=false; renderPlayer(); show('player'); $('player').scrollTop=0;
@@ -8965,7 +8966,17 @@ function renderPlayer(){
   }
   if(can) btn(fernActive(p.id)?'Zum Fernduell':'Fernduell starten',p.online?'ghost':'',()=>{ Sfx.select(); fernStartWith(p) });
   else { const n=document.createElement('p'); n.className='fine'; n.style.textAlign='center'; n.textContent='Herausfordern kannst du Freunde und Mitglieder deiner Crew.'; a.appendChild(n) }
+  // report a player (name, crew name, cheating): goes to the moderation list
+  if(Net.state==='ready'&&!p._part){
+    const rb=btn(plRep?'Was möchtest du melden?':'⚑ Spieler melden','ghost mini',()=>{ plRep=!plRep; renderPlayer() }); rb.style.alignSelf='center';
+    if(plRep){ const pk=document.createElement('div'); pk.className='frpick'; pk.setAttribute('role','group'); pk.setAttribute('aria-label','Grund der Meldung');
+      for(const [k,t] of [['name','Anstößiger Name'],['crew','Anstößiger Crew-Name'],['cheat','Schummeln'],['other','Etwas anderes']]){ const b=document.createElement('button'); b.className='ghost'; b.textContent=t;
+        b.onclick=async()=>{ b.disabled=true; try{ await rpc('gd_player_report',{p_id:p.id,p_reason:k}); plRep=false; toast('Danke, die Meldung ist angekommen. Wir schauen uns das an.'); renderPlayer() }
+          catch(e){ plRep=false; const m=String(e&&e.message||e); toast(/already reported/.test(m)?'Du hast diesen Spieler schon gemeldet.':/report limit/.test(m)?'Du hast heute schon mehrere Spieler gemeldet. Versuch es morgen wieder.':niceErr(e)); renderPlayer() } };
+        pk.appendChild(b) }
+      a.appendChild(pk) } }
 }
+let plRep=false;
 function plTick(t){
   if(current!=='player'||!plSkin) return;
   const cv=$('plHero'), g=fitCanvas(cv), w=cv.width/dpr, h=cv.height/dpr; if(!w) return;
