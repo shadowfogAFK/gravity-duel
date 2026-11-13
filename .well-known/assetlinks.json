@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.gravityduel.app",
+      "sha256_cert_fingerprints": [
+        "CF:F8:D4:AA:DC:ED:EC:84:ED:01:BB:B2:F9:B4:21:87:81:27:A4:CC:B0:45:8D:D8:81:4F:AC:93:4C:48:BC:41"
+      ]
+    }
+  }
+]
