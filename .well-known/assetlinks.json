@@ -1,10 +1,13 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.gravityduel.app",
       "sha256_cert_fingerprints": [
+        "8A:76:1D:05:3E:AA:0F:4B:CA:7D:76:D2:34:28:26:E2:2A:FF:D2:52:83:C0:54:9B:8F:9F:86:1B:57:01:3D:28",
         "CF:F8:D4:AA:DC:ED:EC:84:ED:01:BB:B2:F9:B4:21:87:81:27:A4:CC:B0:45:8D:D8:81:4F:AC:93:4C:48:BC:41"
       ]
     }
